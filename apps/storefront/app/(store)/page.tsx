@@ -1,9 +1,21 @@
+import AnnouncementBar from "@/components/store/announcement-bar";
+import Header from "@/components/store/header";
+import Navbar from "@/components/store/navbar";
+import Hero from "@/components/store/hero";
+import Categories from "@/components/store/categories";
+import FeaturedProducts from "@/components/store/featured-products";
+import Footer from "@/components/store/footer";
+
 export default function Home() {
   return (
-    <main className="min-h-screen flex items-center justify-center">
-      <h1 className="text-4xl font-bold">
-        KAPI PEN
-      </h1>
-    </main>
+    <>
+      <AnnouncementBar />
+      <Header />
+      <Navbar />
+      <Hero />
+      <Categories />
+      <FeaturedProducts />
+      <Footer />
+    </>
   );
 }

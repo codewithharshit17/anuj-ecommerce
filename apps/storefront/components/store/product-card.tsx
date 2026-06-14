@@ -1,10 +1,13 @@
+"use client";
 import Link from "next/link";
 import { Heart, Star } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useCartStore } from "@/lib/store/cart-store";
 
 interface ProductCardProps {
+  id: number;
   slug: string;
   name: string;
   price: number;
@@ -12,6 +15,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({
+  id,
   slug,
   name,
   price,
@@ -19,9 +23,9 @@ export default function ProductCard({
 }: ProductCardProps) {
   const originalPrice = Math.round(price * 2.2);
 
-  const discount = Math.round(
-    ((originalPrice - price) / originalPrice) * 100
-  );
+  const discount = Math.round(((originalPrice - price) / originalPrice) * 100);
+
+  const addItem = useCartStore((state) => state.addItem);
 
   return (
     <Card
@@ -36,11 +40,7 @@ export default function ProductCard({
     >
       <Link href={`/products/${slug}`}>
         <div className="relative">
-          <img
-            src={image}
-            alt={name}
-            className="w-full h-56 object-cover"
-          />
+          <img src={image} alt={name} className="w-full h-56 object-cover" />
 
           <button
             className="
@@ -88,9 +88,7 @@ export default function ProductCard({
               justify-center
             "
           >
-            <Button variant="secondary">
-              Quick View
-            </Button>
+            <Button variant="secondary">Quick View</Button>
           </div>
         </div>
       </Link>
@@ -117,20 +115,14 @@ export default function ProductCard({
           <Star size={14} fill="currentColor" />
           <Star size={14} fill="currentColor" />
 
-          <span className="text-sm text-gray-500 ml-1">
-            (124)
-          </span>
+          <span className="text-sm text-gray-500 ml-1">(124)</span>
         </div>
 
         <div className="mt-3">
-          <p className="text-red-500 font-bold text-lg">
-            ₹{price}
-          </p>
+          <p className="text-red-500 font-bold text-lg">₹{price}</p>
 
           <div className="flex items-center gap-2">
-            <span className="line-through text-gray-400">
-              ₹{originalPrice}
-            </span>
+            <span className="line-through text-gray-400">₹{originalPrice}</span>
 
             <span className="text-green-600 text-sm font-semibold">
               {discount}% OFF
@@ -138,16 +130,22 @@ export default function ProductCard({
           </div>
         </div>
 
-        <Button
-          className="
-            w-full
-            mt-4
-            bg-red-500
-            hover:bg-red-600
-          "
-        >
-          Add To Cart
-        </Button>
+        <div className="mt-4">
+          <Button
+            className="w-full bg-red-500 hover:bg-red-600"
+            onClick={() =>
+              addItem({
+                id,
+                name,
+                price,
+                image,
+                quantity: 1,
+              })
+            }
+          >
+            Add To Cart
+          </Button>
+        </div>
       </div>
     </Card>
   );

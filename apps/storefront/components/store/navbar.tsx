@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Navbar() {
   return (
     <nav className="border-b">
@@ -6,10 +8,16 @@ export default function Navbar() {
 
         <ul className="flex gap-8 py-3 font-medium">
 
-          <li>Pens</li>
-          <li>Notebooks</li>
-          <li>Art Supplies</li>
-          <li>Office Supplies</li>
+          <li>
+            <Link href="/products">
+                Products
+            </Link>
+          </li>
+          <li>
+            <Link href="/">
+                Home
+            </Link>
+          </li>
 
         </ul>
 

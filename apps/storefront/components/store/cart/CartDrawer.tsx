@@ -71,7 +71,7 @@ export default function CartDrawer() {
 
   const handleCheckout = () => {
     setCartOpen(false);
-    router.push("/cart");
+    router.push("/checkout");
   };
 
   const handleAddRecommend = (prod: MedusaProduct) => {

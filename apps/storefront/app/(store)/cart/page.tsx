@@ -383,7 +383,8 @@ export default function CartPage() {
                     </div>
                   </div>
 
-                  <button
+                  <Link
+                    href="/checkout"
                     className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm text-white transition-all hover:-translate-y-0.5 hover:shadow-xl active:translate-y-0"
                     style={{
                       background: "linear-gradient(135deg, #E8442A, #C7321A)",
@@ -392,7 +393,7 @@ export default function CartPage() {
                   >
                     Proceed to Checkout
                     <ArrowRight size={16} />
-                  </button>
+                  </Link>
 
                   {/* Trust signals */}
                   <div className="flex items-center justify-center gap-4 mt-4">

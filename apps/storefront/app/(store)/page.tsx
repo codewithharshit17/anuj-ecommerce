@@ -4,6 +4,8 @@ import Navbar from "@/components/store/navbar";
 import Hero from "@/components/store/hero";
 import Categories from "@/components/store/categories";
 import FeaturedProducts from "@/components/store/featured-products";
+import WhyUs from "@/components/store/why-us";
+import Testimonials from "@/components/store/testimonials";
 import Footer from "@/components/store/footer";
 
 export default function Home() {
@@ -15,6 +17,8 @@ export default function Home() {
       <Hero />
       <Categories />
       <FeaturedProducts />
+      <WhyUs />
+      <Testimonials />
       <Footer />
     </>
   );

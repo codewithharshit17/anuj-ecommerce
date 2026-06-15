@@ -13,13 +13,12 @@
  * fixed MobileBottomNav bar (h-14 = 3.5rem = 56px).
  */
 
-import AnnouncementBar from "@/components/store/announcement-bar";
-import Header from "@/components/store/header";
-import Navbar from "@/components/store/navbar";
-import Footer from "@/components/store/footer";
-import ReviewsTab from "@/components/store/reviews-tab";
-import FloatingBubbles from "@/components/store/floating-bubbles";
-import MobileBottomNav from "@/components/store/mobile-bottom-nav";
+import Header from "@/components/store/layout/Header";
+import Footer from "@/components/store/layout/Footer";
+import CartDrawer from "@/components/store/cart/CartDrawer";
+import MobileMenu from "@/components/store/layout/MobileMenu";
+import WhatsAppFAB from "@/components/store/ui/WhatsAppFAB";
+import FloatingCartButton from "@/components/store/ui/FloatingCartButton";
 
 export default function StoreLayout({
   children,
@@ -27,32 +26,23 @@ export default function StoreLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* ── Zone A: Announcement bar (collapses on scroll via Header logic) ── */}
-      <AnnouncementBar />
-
-      {/* ── Zone B + C: Sticky header + navigation ── */}
+    <div className="flex flex-col min-h-screen bg-[var(--ag-gray-100)]">
+      {/* ── Sticky Header (Zones A, B, and C) ── */}
       <Header />
-      <Navbar />
 
       {/* ── Main content ── */}
-      {/* pb-14 md:pb-0 prevents MobileBottomNav overlap on small screens */}
-      <main className="flex-1 pb-14 md:pb-0">
+      <main className="flex-1 pb-16 md:pb-0">
         {children}
       </main>
 
       {/* ── Footer ── */}
       <Footer />
 
-      {/* ── Viewport-fixed persistent elements ── */}
-      {/* Reviews tab — right edge vertical pill */}
-      <ReviewsTab />
-
-      {/* Cart + WhatsApp floating bubbles — bottom right */}
-      <FloatingBubbles />
-
-      {/* Mobile bottom navigation bar */}
-      <MobileBottomNav />
+      {/* ── Viewport-fixed overlays ── */}
+      <CartDrawer />
+      <MobileMenu />
+      <WhatsAppFAB />
+      <FloatingCartButton />
     </div>
   );
 }

@@ -1,29 +1,5 @@
 import type { Metadata } from "next";
-import { DM_Sans, Inter } from "next/font/google";
 import "./globals.css";
-import { cn } from "@/lib/utils/utils";
-
-/**
- * DM Sans — display / heading font (scooboo.in spec, weights 400-700)
- * Exposed as CSS var --font-dm-sans → consumed by --font-display in globals.css
- */
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-dm-sans",
-  display: "swap",
-});
-
-/**
- * Inter — body copy fallback (scooboo.in spec)
- * Exposed as CSS var --font-inter → consumed by --font-body in globals.css
- */
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-inter",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "KAPI PEN — Pens, Stationery & Art Supplies",
@@ -38,15 +14,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={cn(
-        "h-full antialiased",
-        dmSans.variable,
-        inter.variable
-      )}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en" className="h-full antialiased" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = localStorage.getItem('theme');
+                  if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
+      <body className="min-h-full flex flex-col bg-white dark:bg-[var(--background)] text-[var(--ag-dark)] dark:text-[var(--foreground)] transition-colors duration-200">
+        {children}
+      </body>
     </html>
   );
 }

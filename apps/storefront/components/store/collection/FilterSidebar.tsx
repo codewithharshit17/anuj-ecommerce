@@ -54,7 +54,7 @@ export default function FilterSidebar({
   };
 
   return (
-    <div className="w-full md:w-60 shrink-0 flex flex-col gap-6 select-none bg-white p-4 border border-[var(--ag-gray-200)] rounded-[var(--radius-lg)]">
+    <div className="w-full md:w-60 shrink-0 flex flex-col gap-6 select-none bg-white dark:bg-[#1E1E1E] p-4 border border-[var(--ag-gray-200)] rounded-[var(--radius-lg)]">
       
       {/* SECTION: Price Range */}
       <div className="border-b border-[var(--ag-gray-200)] pb-4">

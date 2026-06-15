@@ -71,7 +71,7 @@ export default function VariantSelector({
                       className={`px-4 py-2 text-xs font-bold border rounded-[var(--radius-sm)] transition-all ${
                         isSelected
                           ? "bg-[var(--ag-red)] text-white border-[var(--ag-red)]"
-                          : "bg-white text-[var(--ag-gray-800)] border-[var(--ag-gray-200)] hover:bg-[var(--ag-gray-100)]"
+                          : "bg-white dark:bg-[#1E1E1E] text-[var(--ag-gray-800)] border-[var(--ag-gray-200)] hover:bg-[var(--ag-gray-100)]"
                       }`}
                     >
                       {val}

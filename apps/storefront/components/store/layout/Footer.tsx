@@ -17,25 +17,17 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-white border-t border-[var(--ag-gray-200)] text-[var(--ag-dark)] pt-16 pb-8 select-none">
+    <footer className="bg-white dark:bg-neutral-900 border-t border-[var(--ag-gray-200)] text-[var(--ag-dark)] pt-16 pb-8 select-none">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 border-b border-[var(--ag-gray-200)] pb-12">
         
         {/* Column 1: Brand details & Newsletter */}
         <div className="lg:col-span-5 flex flex-col gap-6">
-          <Link href="/" className="flex items-center gap-2 group w-fit">
-            <div
-              className="w-9 h-9 rounded-xl flex items-center justify-center font-display text-white font-extrabold text-sm shadow-md"
-              style={{ background: "linear-gradient(135deg, var(--ag-red), var(--ag-yellow))" }}
-            >
-              K
-            </div>
-            <div>
+          <Link href="/" className="flex items-center gap-2.5 group w-fit">
+            <img src="/logo.jpg" alt="KAPI PEN Store Logo" className="h-14 w-auto object-contain" />
+            <div className="flex flex-col">
               <span className="text-xl font-display font-black tracking-tight leading-none text-[var(--ag-dark)]">
-                KAPI PEN
+                KAPI PEN Store
               </span>
-              <p className="text-[10px] font-bold tracking-widest uppercase text-[var(--ag-gray-500)] mt-0.5">
-                Pens & Premium Stationery
-              </p>
             </div>
           </Link>
           <p className="text-sm text-[var(--ag-gray-500)] leading-relaxed max-w-sm">

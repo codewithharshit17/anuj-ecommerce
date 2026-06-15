@@ -38,7 +38,7 @@ const promoCards: PromoCard[] = [
 
 export default function PromoCards() {
   return (
-    <section className="py-12 bg-white select-none">
+    <section className="py-12 bg-white dark:bg-neutral-900 select-none">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {promoCards.map((card, i) => (

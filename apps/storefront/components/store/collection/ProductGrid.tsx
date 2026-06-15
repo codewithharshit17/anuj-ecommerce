@@ -51,7 +51,7 @@ export default function ProductGrid({ products, loading, hasMore, onLoadMore }: 
 
   if (products.length === 0 && !loading) {
     return (
-      <div className="w-full flex flex-col items-center justify-center py-20 text-center select-none bg-white border border-[var(--ag-gray-200)] rounded-[var(--radius-lg)]">
+      <div className="w-full flex flex-col items-center justify-center py-20 text-center select-none bg-white dark:bg-[#1E1E1E] border border-[var(--ag-gray-200)] rounded-[var(--radius-lg)]">
         <div className="w-16 h-16 rounded-full bg-[var(--ag-gray-100)] flex items-center justify-center mb-4 text-[var(--ag-gray-500)] text-2xl">
           📦
         </div>

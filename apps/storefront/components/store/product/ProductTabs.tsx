@@ -21,7 +21,7 @@ export default function ProductTabs({
   const [activeTab, setActiveTab] = useState("Description");
 
   return (
-    <div className="w-full select-none bg-white border border-[var(--ag-gray-200)] rounded-[var(--radius-lg)] overflow-hidden mt-10">
+    <div className="w-full select-none bg-white dark:bg-[#1E1E1E] border border-[var(--ag-gray-200)] rounded-[var(--radius-lg)] overflow-hidden mt-10">
       {/* Tabs list Header */}
       <div className="flex border-b border-[var(--ag-gray-200)] bg-[var(--ag-gray-100)] overflow-x-auto no-scrollbar relative">
         {tabs.map((tab) => {

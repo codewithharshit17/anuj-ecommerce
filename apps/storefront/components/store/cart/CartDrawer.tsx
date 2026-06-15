@@ -74,7 +74,7 @@ export default function CartDrawer() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 30, stiffness: 250 }}
-              className="w-screen max-w-[420px] bg-white flex flex-col shadow-2xl relative"
+              className="w-screen max-w-[420px] bg-white dark:bg-[#1E1E1E] flex flex-col shadow-2xl relative"
             >
               {/* Header */}
               <div className="px-6 py-5 border-b border-[var(--ag-gray-200)] flex items-center justify-between">
@@ -152,7 +152,7 @@ export default function CartDrawer() {
 
               {/* Footer */}
               {items.length > 0 && (
-                <div className="border-t border-[var(--ag-gray-200)] p-6 bg-white shrink-0 shadow-inner">
+                <div className="border-t border-[var(--ag-gray-200)] p-6 bg-white dark:bg-[#1E1E1E] shrink-0 shadow-inner">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-sm font-semibold text-[var(--ag-gray-500)]">
                       Subtotal

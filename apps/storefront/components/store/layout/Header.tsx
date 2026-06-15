@@ -121,19 +121,11 @@ export default function Header() {
         >
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
-            <div
-              className="w-9 h-9 rounded-xl flex items-center justify-center font-display text-white font-extrabold text-sm shadow-md"
-              style={{ background: "linear-gradient(135deg, var(--ag-red), var(--ag-yellow))" }}
-            >
-              K
-            </div>
+            <img src="/logo.jpg" alt="KAPI PEN Store Logo" className="h-12 w-auto object-contain" />
             <div className="hidden sm:block">
               <span className="text-xl font-display font-black tracking-tight leading-none text-[var(--ag-dark)]">
-                KAPI PEN
+                KAPI PEN Store
               </span>
-              <p className="text-[10px] font-bold tracking-widest uppercase text-[var(--ag-gray-500)] mt-0.5">
-                Pens & Stationery
-              </p>
             </div>
           </Link>
 

@@ -49,7 +49,7 @@ export default function CartItemComponent({ item }: CartItemProps) {
             <button
               onClick={() => decreaseQuantity(item.id)}
               disabled={item.quantity <= 1}
-              className="px-2 h-full flex items-center justify-center hover:bg-white text-[var(--ag-gray-800)] disabled:opacity-40 transition-colors"
+              className="px-2 h-full flex items-center justify-center hover:bg-white dark:hover:bg-[#2D2D2D] text-[var(--ag-gray-800)] disabled:opacity-40 transition-colors"
               aria-label="Decrease quantity"
             >
               <Minus size={11} />
@@ -64,7 +64,7 @@ export default function CartItemComponent({ item }: CartItemProps) {
             </motion.span>
             <button
               onClick={() => increaseQuantity(item.id)}
-              className="px-2 h-full flex items-center justify-center hover:bg-white text-[var(--ag-gray-800)] transition-colors"
+              className="px-2 h-full flex items-center justify-center hover:bg-white dark:hover:bg-[#2D2D2D] text-[var(--ag-gray-800)] transition-colors"
               aria-label="Increase quantity"
             >
               <Plus size={11} />

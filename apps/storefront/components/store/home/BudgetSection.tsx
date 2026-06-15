@@ -96,7 +96,7 @@ export default function BudgetSection() {
                   className={`px-4.5 py-2.5 rounded-full text-xs font-bold border transition-all ${
                     isActive
                       ? "bg-[var(--ag-red)] text-white border-[var(--ag-red)] shadow-md hover:shadow-lg"
-                      : "bg-white text-[var(--ag-gray-800)] border-[var(--ag-gray-200)] hover:bg-[var(--ag-gray-100)]"
+                      : "bg-white dark:bg-[#1E1E1E] text-[var(--ag-gray-800)] border-[var(--ag-gray-200)] hover:bg-[var(--ag-gray-100)]"
                   }`}
                 >
                   {chip.label}
@@ -120,7 +120,7 @@ export default function BudgetSection() {
                 {[1, 2, 3, 4].map((n) => (
                   <div
                     key={n}
-                    className="w-full aspect-[4/5] rounded-[var(--radius-lg)] border border-[var(--ag-gray-200)] bg-white skeleton"
+                    className="w-full aspect-[4/5] rounded-[var(--radius-lg)] border border-[var(--ag-gray-200)] bg-white dark:bg-[#1E1E1E] skeleton"
                   />
                 ))}
               </motion.div>
@@ -130,7 +130,7 @@ export default function BudgetSection() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="w-full py-16 text-center text-sm font-semibold text-[var(--ag-gray-500)] bg-white rounded-[var(--radius-lg)] border border-[var(--ag-gray-200)]"
+                className="w-full py-16 text-center text-sm font-semibold text-[var(--ag-gray-500)] bg-white dark:bg-[#1E1E1E] rounded-[var(--radius-lg)] border border-[var(--ag-gray-200)]"
               >
                 No products found in this budget category.
               </motion.div>

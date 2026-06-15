@@ -31,7 +31,7 @@ export default function QuantitySelector({ quantity, max = 99, onChange }: Quant
         <button
           onClick={handleDecrease}
           disabled={quantity <= 1}
-          className="w-9 h-full flex items-center justify-center hover:bg-white text-[var(--ag-gray-800)] disabled:opacity-40 transition-colors"
+          className="w-9 h-full flex items-center justify-center hover:bg-white dark:hover:bg-[#2D2D2D] text-[var(--ag-gray-800)] disabled:opacity-40 transition-colors"
           aria-label="Decrease quantity"
         >
           <Minus size={13} />
@@ -42,7 +42,7 @@ export default function QuantitySelector({ quantity, max = 99, onChange }: Quant
         <button
           onClick={handleIncrease}
           disabled={quantity >= max}
-          className="w-9 h-full flex items-center justify-center hover:bg-white text-[var(--ag-gray-800)] disabled:opacity-40 transition-colors"
+          className="w-9 h-full flex items-center justify-center hover:bg-white dark:hover:bg-[#2D2D2D] text-[var(--ag-gray-800)] disabled:opacity-40 transition-colors"
           aria-label="Increase quantity"
         >
           <Plus size={13} />

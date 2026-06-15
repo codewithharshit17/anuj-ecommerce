@@ -86,7 +86,7 @@ export default function ReviewsCarousel() {
   };
 
   return (
-    <section className="py-12 bg-white select-none">
+    <section className="py-12 bg-white dark:bg-neutral-900 select-none">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         
         {/* Header */}
@@ -129,7 +129,7 @@ export default function ReviewsCarousel() {
                 key={rev.id}
                 className="flex-[0_0_100%] sm:flex-[0_0_50%] lg:flex-[0_0_33.333%] min-w-0"
               >
-                <div className="bg-white border border-[var(--ag-gray-200)] rounded-[var(--radius-lg)] p-6 flex flex-col justify-between h-full min-h-[200px] shadow-xs">
+                <div className="bg-white dark:bg-[#1E1E1E] border border-[var(--ag-gray-200)] rounded-[var(--radius-lg)] p-6 flex flex-col justify-between h-full min-h-[200px] shadow-xs">
                   <div>
                     {/* Stars */}
                     <div className="flex items-center gap-0.5 mb-3 text-[var(--ag-yellow)]">

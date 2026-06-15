@@ -69,7 +69,7 @@ export default function BlogSection() {
             <Link
               key={post.id}
               href={post.href}
-              className="group bg-white border border-[var(--ag-gray-200)] rounded-[var(--radius-lg)] overflow-hidden shadow-xs hover:shadow-md transition-shadow flex flex-col sm:flex-row h-full"
+              className="group bg-white dark:bg-[#1E1E1E] border border-[var(--ag-gray-200)] rounded-[var(--radius-lg)] overflow-hidden shadow-xs hover:shadow-md transition-shadow flex flex-col sm:flex-row h-full"
             >
               {/* Image side */}
               <div className="w-full sm:w-2/5 aspect-[16/9] sm:aspect-auto sm:min-h-[160px] overflow-hidden bg-[var(--ag-gray-100)] relative shrink-0">

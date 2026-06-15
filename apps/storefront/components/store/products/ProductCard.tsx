@@ -48,7 +48,7 @@ export default function ProductCard({ product, showVendor = true, showBadge = tr
     <motion.div
       whileHover={{ y: -4 }}
       transition={{ type: "spring", damping: 30, stiffness: 250 }}
-      className="group relative bg-white border border-[var(--ag-gray-200)] rounded-[var(--radius-lg)] overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col h-full select-none"
+      className="group relative bg-white dark:bg-[#1E1E1E] border border-[var(--ag-gray-200)] rounded-[var(--radius-lg)] overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col h-full select-none"
     >
       <Link href={`/products/${product.handle}`} className="flex flex-col h-full">
         {/* Image wrapper */}
@@ -70,7 +70,7 @@ export default function ProductCard({ product, showVendor = true, showBadge = tr
           {/* Wishlist toggle */}
           <button
             onClick={handleWishlistToggle}
-            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white border border-[var(--ag-gray-200)] shadow-sm hover:shadow-md flex items-center justify-center text-[var(--ag-gray-800)] hover:text-[var(--ag-red)] transition-all z-10"
+            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white dark:bg-[#1E1E1E] border border-[var(--ag-gray-200)] shadow-sm hover:shadow-md flex items-center justify-center text-[var(--ag-gray-800)] hover:text-[var(--ag-red)] transition-all z-10"
             aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
           >
             <motion.div

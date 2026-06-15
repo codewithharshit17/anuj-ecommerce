@@ -125,9 +125,12 @@ export default function MobileMenu() {
           >
             {/* Header */}
             <div className="p-4 border-b border-[var(--ag-gray-200)] dark:border-neutral-800 flex items-center justify-between bg-white dark:bg-neutral-900">
-              <span className="font-display font-extrabold text-lg text-[var(--ag-dark)] dark:text-[var(--foreground)]">
-                Kapi Pen Store
-              </span>
+              <div className="flex items-center gap-2">
+                <img src="/logo.jpg" alt="KAPI PEN Store Logo" className="h-8 w-auto object-contain" />
+                <span className="font-display font-black text-sm leading-tight tracking-tight text-[var(--ag-dark)] dark:text-[var(--foreground)]">
+                  KAPI PEN<br/>Store
+                </span>
+              </div>
               <div className="flex items-center gap-1.5">
                 <ThemeToggle />
                 <button

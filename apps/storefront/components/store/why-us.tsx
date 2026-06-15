@@ -14,6 +14,7 @@ const features = [
     desc: "Every item is sourced directly from authorized distributors. No counterfeits, ever.",
     color: "#E8442A",
     bg: "rgba(232,68,42,0.08)",
+    hoverClass: "hover:border-[#E8442A]/40",
   },
   {
     icon: Zap,
@@ -21,6 +22,7 @@ const features = [
     desc: "Order before 2 PM and get same-day dispatch. Delivered within 2 business days.",
     color: "#F5A623",
     bg: "rgba(245,166,35,0.08)",
+    hoverClass: "hover:border-[#F5A623]/40",
   },
   {
     icon: RefreshCcw,
@@ -28,6 +30,7 @@ const features = [
     desc: "Not satisfied? Return it within 7 days for a full refund — no questions asked.",
     color: "#4A9B8E",
     bg: "rgba(74,155,142,0.08)",
+    hoverClass: "hover:border-[#4A9B8E]/40",
   },
   {
     icon: Headphones,
@@ -35,6 +38,7 @@ const features = [
     desc: "Our stationery experts are here to help you find exactly what you need.",
     color: "#9B59B6",
     bg: "rgba(155,89,182,0.08)",
+    hoverClass: "hover:border-[#9B59B6]/40",
   },
 ];
 
@@ -111,17 +115,7 @@ export default function WhyUs() {
             return (
               <div
                 key={feat.title}
-                className="group rounded-2xl border p-6 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl cursor-default"
-                style={{
-                  borderColor: "#EAE4DD",
-                  background: "white",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.borderColor = feat.color + "40";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.borderColor = "#EAE4DD";
-                }}
+                className={`group rounded-2xl border p-6 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl cursor-default bg-white border-[#EAE4DD] ${feat.hoverClass}`}
               >
                 <div
                   className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110"

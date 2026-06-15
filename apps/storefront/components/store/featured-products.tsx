@@ -36,22 +36,7 @@ export default function FeaturedProducts() {
 
           <Link
             href="/products"
-            className="inline-flex items-center gap-1.5 text-sm font-bold px-5 py-2.5 rounded-xl border-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md flex-shrink-0"
-            style={{
-              color: "var(--brand-coral)",
-              borderColor: "var(--brand-coral)",
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.background =
-                "var(--brand-coral)";
-              (e.currentTarget as HTMLAnchorElement).style.color = "white";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.background =
-                "transparent";
-              (e.currentTarget as HTMLAnchorElement).style.color =
-                "var(--brand-coral)";
-            }}
+            className="inline-flex items-center gap-1.5 text-sm font-bold px-5 py-2.5 rounded-xl border-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md flex-shrink-0 border-[#E8442A] text-[#E8442A] hover:bg-[#E8442A] hover:text-white"
           >
             View All Products
             <ArrowRight size={15} />

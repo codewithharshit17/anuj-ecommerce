@@ -3,7 +3,8 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { getMedusaClient, MedusaProduct } from "@/lib/medusa/client";
+import { getProducts } from "@/lib/actions/product-actions";
+import { StorefrontProduct } from "../products/ProductCard";
 import ProductCard from "../products/ProductCard";
 
 interface Chip {
@@ -39,23 +40,22 @@ const cardItemVariants = {
 };
 
 export default function BudgetSection() {
-  const medusa = getMedusaClient();
   const [activeChip, setActiveChip] = useState<Chip>(budgetChips[0]);
-  const [filteredProducts, setFilteredProducts] = useState<MedusaProduct[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<StorefrontProduct[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchBudgetProducts = async () => {
       setLoading(true);
       try {
-        const { products } = await medusa.store.product.list({ limit: 40 });
+        const products = (await getProducts()) as StorefrontProduct[];
         
         // Filter by budget locally
         const min = activeChip.min ?? 0;
         const max = activeChip.max ?? Infinity;
         
         const filtered = products.filter((p) => {
-          const price = p.variants[0]?.prices[0]?.amount || 0;
+          const price = p.price || 0;
           return price >= min && price < max;
         });
         

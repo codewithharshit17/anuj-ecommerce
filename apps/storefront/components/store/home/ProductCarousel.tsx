@@ -4,7 +4,8 @@
 import useEmblaCarousel from "embla-carousel-react";
 import { useEffect, useState, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { getMedusaClient, MedusaProduct } from "@/lib/medusa/client";
+import { getProducts, getProductsByCategory } from "@/lib/actions/product-actions";
+import { StorefrontProduct } from "../products/ProductCard";
 import ProductCard from "../products/ProductCard";
 import { motion } from "framer-motion";
 
@@ -13,7 +14,7 @@ interface ProductCarouselProps {
   subtitle?: string;
   collectionId?: string;
   limit?: number;
-  filterFn?: (p: MedusaProduct) => boolean;
+  filterFn?: (p: StorefrontProduct) => boolean;
 }
 
 export default function ProductCarousel({
@@ -23,8 +24,7 @@ export default function ProductCarousel({
   limit = 8,
   filterFn,
 }: ProductCarouselProps) {
-  const medusa = getMedusaClient();
-  const [products, setProducts] = useState<MedusaProduct[]>([]);
+  const [products, setProducts] = useState<StorefrontProduct[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -56,11 +56,18 @@ export default function ProductCarousel({
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const query: any = { limit: 40 };
+        let fetched: StorefrontProduct[] = [];
         if (collectionId) {
-          query.collection_id = [collectionId];
+          // Map mock collectionIds to categories or use generic
+          if (collectionId === "col-bestsellers") {
+            fetched = (await getProducts()) as StorefrontProduct[];
+          } else {
+            fetched = (await getProductsByCategory(collectionId)) as StorefrontProduct[];
+          }
+        } else {
+          fetched = (await getProducts()) as StorefrontProduct[];
         }
-        const { products: fetched } = await medusa.store.product.list(query);
+
         let list = fetched || [];
         if (filterFn) {
           list = list.filter(filterFn);
@@ -74,7 +81,7 @@ export default function ProductCarousel({
     };
 
     fetchProducts();
-  }, [collectionId, limit]);
+  }, [collectionId, limit, filterFn]);
 
   return (
     <section className="py-12 bg-white dark:bg-neutral-900 border-b border-[var(--ag-gray-200)] dark:border-neutral-800 select-none">

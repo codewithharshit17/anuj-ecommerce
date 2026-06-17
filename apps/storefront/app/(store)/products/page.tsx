@@ -6,15 +6,16 @@ import Link from "next/link";
 import { ChevronRight, SlidersHorizontal, Grid3x3, List, Search } from "lucide-react";
 import ProductCard from "@/components/store/products/ProductCard";
 import SkeletonCard from "@/components/store/ui/SkeletonCard";
-import { getMedusaClient, MedusaProduct } from "@/lib/medusa/client";
+import { StorefrontProduct } from "@/components/store/products/ProductCard";
+import { getProducts, getProductsByCategory, searchProducts } from "@/lib/actions/product-actions";
 
 const badges = ["sale", "new", "hot", "sale"] as const;
 
 const categoriesList = [
   { label: "All", value: "" },
-  { label: "Pens", value: "col-stationery" },
-  { label: "Notebooks", value: "col-office" },
-  { label: "Art Supplies", value: "col-art" },
+  { label: "Pens", value: "pens" },
+  { label: "Notebooks", value: "notebooks" },
+  { label: "Art Supplies", value: "art-supplies" },
 ];
 
 const sortOptions = [
@@ -25,9 +26,7 @@ const sortOptions = [
 ];
 
 export default function ProductsPage() {
-  const medusa = getMedusaClient();
-
-  const [products, setProducts] = useState<MedusaProduct[]>([]);
+  const [products, setProducts] = useState<StorefrontProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("");
   const [sortBy, setSortBy] = useState("Most Popular");
@@ -38,12 +37,27 @@ export default function ProductsPage() {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const { products: fetchedProds } = await medusa.store.product.list({
-          collection_id: activeCategory ? [activeCategory] : undefined,
-          order: sortBy,
-          q: searchQuery || undefined,
-          limit: 40,
-        });
+        let fetchedProds: StorefrontProduct[] = [];
+        if (searchQuery) {
+          fetchedProds = await searchProducts(searchQuery, 40) as StorefrontProduct[];
+          if (activeCategory) {
+             fetchedProds = fetchedProds.filter(p => p.category?.slug === activeCategory);
+          }
+        } else if (activeCategory) {
+          fetchedProds = await getProductsByCategory(activeCategory) as StorefrontProduct[];
+        } else {
+          fetchedProds = await getProducts() as StorefrontProduct[];
+        }
+        
+        // Sorting
+        if (sortBy === "Price: Low to High") {
+          fetchedProds.sort((a, b) => (a.price) - (b.price));
+        } else if (sortBy === "Price: High to Low") {
+          fetchedProds.sort((a, b) => (b.price) - (a.price));
+        } else if (sortBy === "Newest First") {
+          fetchedProds.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        }
+
         setProducts(fetchedProds || []);
       } catch (err) {
         console.error(err);
@@ -199,16 +213,16 @@ export default function ProductsPage() {
                   <ProductCard product={product} />
                 ) : (
                   <div className="bg-white border border-[var(--ag-gray-200)] p-4 rounded-[var(--radius-lg)] flex gap-4 items-center">
-                    <img src={product.thumbnail} alt="" className="w-20 h-20 object-cover rounded-[var(--radius-sm)] border shrink-0 bg-[var(--ag-gray-100)]" />
+                    <img src={product.images.find(i => i.isPrimary)?.url || product.images[0]?.url || ""} alt="" className="w-20 h-20 object-cover rounded-[var(--radius-sm)] border shrink-0 bg-[var(--ag-gray-100)]" />
                     <div className="flex-1 min-w-0">
-                      <span className="text-[10px] font-bold text-[var(--ag-gray-500)] uppercase tracking-wider">{product.brand}</span>
-                      <h4 className="font-bold text-sm text-[var(--ag-dark)] truncate">{product.title}</h4>
+                      <span className="text-[10px] font-bold text-[var(--ag-gray-500)] uppercase tracking-wider">{product.category?.name}</span>
+                      <h4 className="font-bold text-sm text-[var(--ag-dark)] truncate">{product.name}</h4>
                       <p className="text-xs text-[var(--ag-gray-500)] line-clamp-1 mt-0.5">{product.description}</p>
                     </div>
                     <div className="text-right shrink-0">
-                      <span className="text-base font-extrabold text-[var(--ag-red)]">₹{product.variants[0].prices[0].amount}</span>
+                      <span className="text-base font-extrabold text-[var(--ag-red)]">₹{product.price}</span>
                       <div className="mt-2">
-                        <Link href={`/products/${product.handle}`} className="px-3.5 py-1.5 bg-[var(--ag-dark)] text-white text-[10px] font-black rounded-[var(--radius-sm)] hover:bg-[var(--ag-red)] transition-colors">
+                        <Link href={`/products/${product.slug}`} className="px-3.5 py-1.5 bg-[var(--ag-dark)] text-white text-[10px] font-black rounded-[var(--radius-sm)] hover:bg-[var(--ag-red)] transition-colors">
                           VIEW
                         </Link>
                       </div>

@@ -110,7 +110,7 @@ export default function Home() {
         title="Trending This Week"
         subtitle="Popular stationery items flying off the shelves."
         limit={6}
-        filterFn={(p) => p.brand === "Pilot" || p.brand === "Muji"}
+        filterFn={(p) => p.name.includes("Pilot") || p.name.includes("Muji")}
       />
 
       {/* 7. New Arrivals */}
@@ -118,7 +118,7 @@ export default function Home() {
         title="New Arrivals"
         subtitle="Fresh additions to our writing, office, and celebration catalogs."
         limit={6}
-        filterFn={(p) => p.id.includes("lamy") || p.id.includes("birthday") || p.id.includes("tombow")}
+        filterFn={(p) => p.slug.includes("lamy") || p.slug.includes("birthday") || p.slug.includes("tombow") || p.slug.includes("balloons")}
       />
 
       {/* 8. Offers & Deals */}

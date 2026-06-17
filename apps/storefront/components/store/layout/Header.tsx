@@ -7,7 +7,8 @@ import { useRouter } from "next/navigation";
 import { Search, Heart, User, ShoppingBag, Menu, X, ArrowRight, Plus, Trash2, History, TrendingUp } from "lucide-react";
 import { useCartStore } from "@/lib/store/cart-store";
 import { useUIStore } from "@/components/store/ui-store";
-import { getMedusaClient, MedusaProduct } from "@/lib/medusa/client";
+import { searchProducts } from "@/lib/actions/product-actions";
+import { StorefrontProduct } from "../products/ProductCard";
 import AnnouncementBar from "./AnnouncementBar";
 import MegaMenu from "./MegaMenu";
 import ThemeToggle from "@/components/store/ui/ThemeToggle";
@@ -44,7 +45,6 @@ const trendingSearches = [
 
 export default function Header() {
   const router = useRouter();
-  const medusa = getMedusaClient();
   const { items, addItem } = useCartStore();
   const { setCartOpen, setMobileMenuOpen, wishlist } = useUIStore();
 
@@ -52,7 +52,7 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const [searchResults, setSearchResults] = useState<MedusaProduct[]>([]);
+  const [searchResults, setSearchResults] = useState<StorefrontProduct[]>([]);
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -96,11 +96,7 @@ export default function Header() {
         : undefined;
 
       try {
-        const { products } = await medusa.store.product.list({
-          q: searchQuery,
-          collection_id: categoryId ? [categoryId] : undefined,
-          limit: 5,
-        });
+        const products = await searchProducts(searchQuery, 5);
         setSearchResults(products || []);
         setActiveSelectionIndex(-1); // Reset selection on new results
       } catch (err) {
@@ -137,14 +133,14 @@ export default function Header() {
     }
   };
 
-  const handleQuickAdd = (e: React.MouseEvent, prod: MedusaProduct) => {
+  const handleQuickAdd = (e: React.MouseEvent, prod: StorefrontProduct) => {
     e.preventDefault();
     e.stopPropagation();
     addItem({
-      id: prod.id as any,
-      name: prod.title,
-      price: prod.variants[0]?.prices[0]?.amount || 0,
-      image: prod.thumbnail,
+      id: prod.id,
+      name: prod.name,
+      price: prod.price,
+      image: prod.images.find(i => i.isPrimary)?.url || prod.images[0]?.url || "",
       quantity: 1,
     });
     setCartOpen(true);
@@ -177,7 +173,7 @@ export default function Header() {
           const highlighted = searchResults[activeSelectionIndex];
           saveSearchQuery(searchQuery);
           setIsSearchFocused(false);
-          router.push(`/products/${highlighted.handle}`);
+          router.push(`/products/${highlighted.slug}`);
         }
       } else {
         saveSearchQuery(searchQuery);
@@ -380,7 +376,7 @@ export default function Header() {
                             return (
                               <Link
                                 key={prod.id}
-                                href={`/products/${prod.handle}`}
+                                href={`/products/${prod.slug}`}
                                 onMouseDown={() => saveSearchQuery(searchQuery)}
                                 onMouseEnter={() => setActiveSelectionIndex(idx)}
                                 className={`flex items-center gap-3 p-3 transition-colors ${
@@ -388,15 +384,15 @@ export default function Header() {
                                 }`}
                               >
                                 <div className="w-10 h-10 rounded-[var(--radius-md)] overflow-hidden bg-[var(--ag-gray-100)] dark:bg-neutral-800 border border-[var(--ag-gray-200)] dark:border-neutral-750 shrink-0">
-                                  <img src={prod.thumbnail} alt="" className="w-full h-full object-cover" />
+                                  <img src={prod.images.find(i => i.isPrimary)?.url || prod.images[0]?.url || ""} alt="" className="w-full h-full object-cover" />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <h4 className="text-xs sm:text-sm font-bold text-[var(--ag-dark)] dark:text-white truncate">{prod.title}</h4>
-                                  <p className="text-[10px] font-bold text-[var(--ag-gray-500)] dark:text-neutral-400">{prod.brand}</p>
+                                  <h4 className="text-xs sm:text-sm font-bold text-[var(--ag-dark)] dark:text-white truncate">{prod.name}</h4>
+                                  <p className="text-[10px] font-bold text-[var(--ag-gray-500)] dark:text-neutral-400">{prod.category?.name}</p>
                                 </div>
                                 <div className="flex items-center gap-3 shrink-0">
                                   <div className="text-right">
-                                    <span className="text-sm font-extrabold text-[var(--ag-red)]">₹{prod.variants[0]?.prices[0]?.amount}</span>
+                                    <span className="text-sm font-extrabold text-[var(--ag-red)]">₹{prod.price}</span>
                                   </div>
                                   <button
                                     onMouseDown={(e) => handleQuickAdd(e, prod)}

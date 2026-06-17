@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 interface CartItem {
-  id: number;
+  id: string;
   name: string;
   price: number;
   image: string;
@@ -14,11 +14,11 @@ interface CartStore {
 
   addItem: (item: CartItem) => void;
 
-  removeItem: (id: number) => void;
+  removeItem: (id: string) => void;
 
-  increaseQuantity: (id: number) => void;
+  increaseQuantity: (id: string) => void;
 
-  decreaseQuantity: (id: number) => void;
+  decreaseQuantity: (id: string) => void;
 }
 
 export const useCartStore = create<CartStore>()(

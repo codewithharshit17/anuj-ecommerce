@@ -5,10 +5,10 @@ import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import ProductCard from "../products/ProductCard";
 import SkeletonCard from "../ui/SkeletonCard";
-import { MedusaProduct } from "@/lib/medusa/client";
+import { StorefrontProduct } from "../products/ProductCard";
 
 interface ProductGridProps {
-  products: MedusaProduct[];
+  products: StorefrontProduct[];
   loading: boolean;
   hasMore: boolean;
   onLoadMore: () => void;

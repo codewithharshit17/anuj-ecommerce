@@ -5,7 +5,8 @@ import { useEffect, useState, use } from "react";
 import Link from "next/link";
 import { notFound, useRouter } from "next/navigation";
 import { ChevronRight, Truck, RotateCcw, Shield, Check, ShoppingBag, CreditCard } from "lucide-react";
-import { getMedusaClient, MedusaProduct } from "@/lib/medusa/client";
+import { getProductBySlug, getProductsByCategory } from "@/lib/actions/product-actions";
+import { StorefrontProduct } from "@/components/store/products/ProductCard";
 import ImageGallery from "@/components/store/product/ImageGallery";
 import VariantSelector from "@/components/store/product/VariantSelector";
 import QuantitySelector from "@/components/store/product/QuantitySelector";
@@ -22,39 +23,32 @@ interface PageProps {
 export default function ProductDetailPage({ params }: PageProps) {
   const { handle } = use(params);
   const router = useRouter();
-  const medusa = getMedusaClient();
   const { addItem } = useCartStore();
   const { setCartOpen } = useUIStore();
-
-  const [product, setProduct] = useState<MedusaProduct | null>(null);
+  const [product, setProduct] = useState<StorefrontProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [quantity, setQuantity] = useState(1);
   const [addingToCart, setAddingToCart] = useState(false);
   const [cartSuccess, setCartSuccess] = useState(false);
-  const [relatedProducts, setRelatedProducts] = useState<MedusaProduct[]>([]);
+  const [relatedProducts, setRelatedProducts] = useState<StorefrontProduct[]>([]);
 
   // Fetch product & related items
   useEffect(() => {
     const fetchProduct = async () => {
       setLoading(true);
       try {
-        const { product: fetchedProd } = await medusa.store.product.retrieve(handle);
+        const fetchedProd = await getProductBySlug(handle) as StorefrontProduct;
         setProduct(fetchedProd);
         
-        // Setup default options
-        const defaults: Record<string, string> = {};
-        fetchedProd.options.forEach((o) => {
-          if (o.values.length > 0) defaults[o.id] = o.values[0];
-        });
-        setSelectedOptions(defaults);
+        // Setup default options - for now Prisma schema doesn't have options mapping yet, we skip
+        setSelectedOptions({});
 
         // Fetch related products
-        const { products: fetchedRelated } = await medusa.store.product.list({
-          collection_id: [fetchedProd.collection_id],
-          limit: 4,
-        });
-        setRelatedProducts(fetchedRelated.filter((p) => p.id !== fetchedProd.id).slice(0, 3));
+        if (fetchedProd && fetchedProd.categoryId) {
+          const fetchedRelated = await getProductsByCategory(fetchedProd.category?.slug || "");
+          setRelatedProducts((fetchedRelated as StorefrontProduct[]).filter((p) => p.id !== fetchedProd.id).slice(0, 3));
+        }
       } catch (err) {
         console.error(err);
       } finally {
@@ -81,9 +75,9 @@ export default function ProductDetailPage({ params }: PageProps) {
   };
 
   // Find price of active variant (or default first variant)
-  const activePrice = product.variants[0]?.prices[0]?.amount || 0;
-  const originalPrice = product.variants[0]?.prices[0]?.original_amount || Math.round(activePrice * 1.3);
-  const discount = Math.round(((originalPrice - activePrice) / originalPrice) * 100);
+  const activePrice = product.price;
+  const originalPrice = product.mrp;
+  const discount = originalPrice > activePrice ? Math.round(((originalPrice - activePrice) / originalPrice) * 100) : 0;
 
   const handleAddToCart = async () => {
     setAddingToCart(true);
@@ -91,10 +85,10 @@ export default function ProductDetailPage({ params }: PageProps) {
     const selectedVariantName = Object.values(selectedOptions).join(" / ");
     
     addItem({
-      id: product.id as any,
-      name: product.title,
+      id: product.id,
+      name: product.name,
       price: activePrice,
-      image: product.thumbnail,
+      image: product.images.find(i => i.isPrimary)?.url || product.images[0]?.url || "",
       quantity: quantity,
     });
 
@@ -127,7 +121,7 @@ export default function ProductDetailPage({ params }: PageProps) {
           <ChevronRight size={12} />
           <Link href="/products" className="hover:text-[var(--ag-dark)] transition-colors">Products</Link>
           <ChevronRight size={12} />
-          <span className="text-[var(--ag-red)] font-bold">{product.title}</span>
+          <span className="text-[var(--ag-red)] font-bold">{product.name}</span>
         </nav>
 
         {/* Dynamic Detail grid */}
@@ -135,7 +129,7 @@ export default function ProductDetailPage({ params }: PageProps) {
           
           {/* Left Column: ImageGallery */}
           <div className="lg:col-span-7">
-            <ImageGallery images={product.images} />
+            <ImageGallery images={product.images.map(img => img.url)} />
           </div>
 
           {/* Right Column: Info details */}
@@ -143,12 +137,12 @@ export default function ProductDetailPage({ params }: PageProps) {
             <div>
               {/* Brand Chip */}
               <span className="inline-block bg-[var(--ag-gray-200)] text-[var(--ag-gray-800)] text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full mb-3">
-                {product.brand}
+                {product.category?.name || "KAPI PEN"}
               </span>
 
               {/* Title */}
               <h1 className="text-xl sm:text-2xl font-display font-black leading-tight tracking-tight text-[var(--ag-dark)]">
-                {product.title}
+                {product.name}
               </h1>
             </div>
 
@@ -159,7 +153,7 @@ export default function ProductDetailPage({ params }: PageProps) {
               </div>
               <span className="text-[var(--ag-dark)]">4.5</span>
               <span className="text-[var(--ag-gray-500)]">|</span>
-              <span className="text-[var(--ag-gray-500)]">{product.reviewCount} ratings</span>
+              <span className="text-[var(--ag-gray-500)]">12 ratings</span>
               <span className="text-[var(--ag-gray-500)]">|</span>
               <span className="text-emerald-600 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-ping" />
@@ -182,26 +176,19 @@ export default function ProductDetailPage({ params }: PageProps) {
 
             {/* Description intro */}
             <p className="text-sm text-[var(--ag-gray-500)] leading-relaxed font-semibold">
-              {product.description.split(".")[0]}. Perfect for everyday task efficiency.
+              {(product.description || "").split(".")[0]}. Perfect for everyday task efficiency.
             </p>
 
             {/* Separator */}
             <hr className="border-[var(--ag-gray-200)]" />
 
-            {/* Variant Selector */}
-            {product.options && product.options.length > 0 && (
-              <VariantSelector
-                options={product.options}
-                selectedOptions={selectedOptions}
-                onSelectOption={handleSelectOption}
-              />
-            )}
+            {/* Variant Selector (Removed until variants schema gets mapped to frontend options component) */}
 
             {/* Quantity Selector */}
             <QuantitySelector
               quantity={quantity}
               onChange={setQuantity}
-              max={product.variants[0]?.inventory_quantity || 10}
+              max={product.variants[0]?.stock || 10}
             />
 
             {/* Call to Actions */}
@@ -253,10 +240,10 @@ export default function ProductDetailPage({ params }: PageProps) {
 
         {/* Product Details Tabs */}
         <ProductTabs
-          description={product.description}
-          brand={product.brand}
-          reviewCount={product.reviewCount}
-          specifications={product.specifications}
+          description={product.description || ""}
+          brand={product.category?.name || "KAPI PEN"}
+          reviewCount={12}
+          specifications={{}}
         />
 
         {/* You Might Also Like */}

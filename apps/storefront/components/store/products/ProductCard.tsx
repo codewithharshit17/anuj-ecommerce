@@ -6,11 +6,15 @@ import { Heart, Star, ShoppingCart, Info } from "lucide-react";
 import Link from "next/link";
 import { useUIStore } from "@/components/store/ui-store";
 import { useCartStore } from "@/lib/store/cart-store";
-import { MedusaProduct } from "@/lib/medusa/client";
+import { Prisma } from "@prisma/client";
 import { useState } from "react";
 
+export type StorefrontProduct = Prisma.ProductGetPayload<{
+  include: { images: true; variants: true; category: true };
+}>;
+
 interface ProductCardProps {
-  product: MedusaProduct;
+  product: StorefrontProduct;
   showVendor?: boolean;
   showBadge?: boolean;
 }
@@ -22,15 +26,24 @@ export default function ProductCard({ product, showVendor = true, showBadge = tr
 
   const isWishlisted = wishlist.includes(product.id);
 
+  // Images
+  const primaryImage = product.images.find(img => img.isPrimary)?.url || product.images[0]?.url || "";
+  const secondaryImage = product.images.filter(img => !img.isPrimary)[0]?.url || primaryImage;
+  const hasSecondaryImage = product.images.length > 1;
+
   // Price variables
-  const price = product.variants[0]?.prices[0]?.amount || 0;
-  const originalPrice = product.variants[0]?.prices[0]?.original_amount || Math.round(price * 1.3);
+  const price = product.price;
+  const originalPrice = product.mrp;
   const discount = originalPrice > price ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0;
 
   // Inventory logic
-  const inventory = product.variants[0]?.inventory_quantity;
-  const isOutOfStock = inventory !== undefined && inventory <= 0;
-  const isLowStock = inventory !== undefined && inventory > 0 && inventory < 10;
+  const inventory = product.variants[0]?.stock || 0;
+  const isOutOfStock = inventory <= 0;
+  const isLowStock = inventory > 0 && inventory < 10;
+
+  // Mock rating
+  const rating = 4.5;
+  const reviewCount = 12;
 
   const handleWishlistToggle = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -44,17 +57,14 @@ export default function ProductCard({ product, showVendor = true, showBadge = tr
     if (isOutOfStock) return;
     
     addItem({
-      id: product.id as any,
-      name: product.title,
+      id: product.id,
+      name: product.name,
       price: price,
-      image: product.thumbnail,
+      image: primaryImage,
       quantity: 1,
     });
     setCartOpen(true);
   };
-
-  const hasSecondaryImage = product.images && product.images.length > 1;
-  const hoverImage = hasSecondaryImage ? product.images[1] : product.thumbnail;
 
   return (
     <motion.div
@@ -64,14 +74,14 @@ export default function ProductCard({ product, showVendor = true, showBadge = tr
       onMouseLeave={() => setIsHovered(false)}
       className="group relative bg-white dark:bg-[#1E1E1E] border border-[var(--ag-gray-200)] dark:border-neutral-800 rounded-[var(--radius-xl)] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_30px_rgba(0,0,0,0.1)] transition-all duration-300 flex flex-col h-full select-none"
     >
-      <Link href={`/products/${product.handle}`} className="flex flex-col h-full flex-1">
+      <Link href={`/products/${product.slug}`} className="flex flex-col h-full flex-1">
         {/* Image wrapper */}
         <div className="relative aspect-square w-full bg-[var(--ag-gray-100)] dark:bg-neutral-850 overflow-hidden border-b border-[var(--ag-gray-200)] dark:border-neutral-800 shrink-0">
           
           {/* Primary image */}
           <img
-            src={product.thumbnail}
-            alt={product.title}
+            src={primaryImage}
+            alt={product.name}
             className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 ease-out-expo ${
               hasSecondaryImage && isHovered ? "opacity-0 scale-95" : "opacity-100 scale-100 group-hover:scale-105"
             }`}
@@ -81,8 +91,8 @@ export default function ProductCard({ product, showVendor = true, showBadge = tr
           {/* Secondary image on hover */}
           {hasSecondaryImage && (
             <img
-              src={hoverImage}
-              alt={product.title}
+              src={secondaryImage}
+              alt={product.name}
               className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 ease-out-expo ${
                 isHovered ? "opacity-100 scale-105" : "opacity-0 scale-100"
               }`}
@@ -138,7 +148,7 @@ export default function ProductCard({ product, showVendor = true, showBadge = tr
             <div className="flex items-center justify-between gap-2">
               {showVendor && (
                 <span className="text-[9px] font-black uppercase tracking-widest text-[var(--ag-gray-500)]">
-                  {product.brand}
+                  {product.category?.name || "KAPI PEN"}
                 </span>
               )}
               
@@ -157,7 +167,7 @@ export default function ProductCard({ product, showVendor = true, showBadge = tr
 
             {/* Product Title */}
             <h3 className="text-xs sm:text-sm font-bold text-[var(--ag-dark)] dark:text-[var(--foreground)] group-hover:text-[var(--ag-red)] transition-colors line-clamp-2 leading-tight min-h-[36px]">
-              {product.title}
+              {product.name}
             </h3>
 
             {/* Stars Rating */}
@@ -167,12 +177,12 @@ export default function ProductCard({ product, showVendor = true, showBadge = tr
                   <Star
                     key={s}
                     size={11}
-                    className={s <= Math.floor(product.rating) ? "fill-current" : "text-gray-200 dark:text-neutral-700"}
+                    className={s <= Math.floor(rating) ? "fill-current" : "text-gray-200 dark:text-neutral-700"}
                   />
                 ))}
               </div>
               <span className="text-[9px] font-black text-[var(--ag-gray-500)] dark:text-neutral-400">
-                ({product.reviewCount})
+                ({reviewCount})
               </span>
             </div>
           </div>

@@ -8,16 +8,16 @@ import { useCartStore } from "@/lib/store/cart-store";
 import { useUIStore } from "@/components/store/ui-store";
 import CartItemComponent from "./CartItem";
 import { useRouter } from "next/navigation";
-import { getMedusaClient, MedusaProduct } from "@/lib/medusa/client";
+import { getProducts } from "@/lib/actions/product-actions";
+import { StorefrontProduct } from "../products/ProductCard";
 
 export default function CartDrawer() {
   const router = useRouter();
-  const medusa = getMedusaClient();
   const { isCartOpen, setCartOpen } = useUIStore();
   const { items, addItem } = useCartStore();
   const drawerRef = useRef<HTMLDivElement>(null);
 
-  const [recommended, setRecommended] = useState<MedusaProduct[]>([]);
+  const [recommended, setRecommended] = useState<StorefrontProduct[]>([]);
 
   const cartCount = items.reduce((total, item) => total + item.quantity, 0);
   const subtotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -31,10 +31,10 @@ export default function CartDrawer() {
   useEffect(() => {
     const fetchRecs = async () => {
       try {
-        const { products } = await medusa.store.product.list({ limit: 8 });
+        const products = (await getProducts()) as StorefrontProduct[];
         const cartItemNames = items.map((i) => i.name.toLowerCase());
         const filtered = (products || []).filter(
-          (p) => !cartItemNames.some((name) => p.title.toLowerCase().includes(name) || name.includes(p.title.toLowerCase()))
+          (p) => !cartItemNames.some((name) => p.name.toLowerCase().includes(name) || name.includes(p.name.toLowerCase()))
         );
         setRecommended(filtered.slice(0, 3));
       } catch (err) {
@@ -74,12 +74,12 @@ export default function CartDrawer() {
     router.push("/checkout");
   };
 
-  const handleAddRecommend = (prod: MedusaProduct) => {
+  const handleAddRecommend = (prod: StorefrontProduct) => {
     addItem({
-      id: prod.id as any,
-      name: prod.title,
-      price: prod.variants[0]?.prices[0]?.amount || 0,
-      image: prod.thumbnail,
+      id: prod.id,
+      name: prod.name,
+      price: prod.price,
+      image: prod.images.find(i => i.isPrimary)?.url || prod.images[0]?.url || "",
       quantity: 1,
     });
   };
@@ -222,16 +222,16 @@ export default function CartDrawer() {
                             >
                               <div className="flex items-center gap-3 min-w-0">
                                 <img
-                                  src={prod.thumbnail}
+                                  src={prod.images.find(i => i.isPrimary)?.url || prod.images[0]?.url || ""}
                                   alt=""
                                   className="w-10 h-10 object-cover rounded-[var(--radius-md)] border border-[var(--ag-gray-200)] dark:border-neutral-850 shrink-0 bg-[var(--ag-gray-100)] dark:bg-neutral-800"
                                 />
                                 <div className="min-w-0">
                                   <h5 className="text-xs font-bold text-[var(--ag-dark)] dark:text-white truncate">
-                                    {prod.title}
+                                    {prod.name}
                                   </h5>
                                   <p className="text-[10px] font-black text-[var(--ag-red)]">
-                                    ₹{prod.variants[0]?.prices[0]?.amount}
+                                    ₹{prod.price}
                                   </p>
                                 </div>
                               </div>

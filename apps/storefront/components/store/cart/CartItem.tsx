@@ -7,7 +7,7 @@ import { useCartStore } from "@/lib/store/cart-store";
 
 interface CartItemProps {
   item: {
-    id: any;
+    id: string;
     name: string;
     price: number;
     image: string;

@@ -4,7 +4,8 @@
 import { useEffect, useState, use } from "react";
 import Link from "next/link";
 import { ChevronRight, X } from "lucide-react";
-import { getMedusaClient, MedusaProduct, MedusaCollection } from "@/lib/medusa/client";
+import { StorefrontProduct } from "@/components/store/products/ProductCard";
+import { getProductsByCategory } from "@/lib/actions/product-actions";
 import FilterSidebar from "@/components/store/collection/FilterSidebar";
 import ProductGrid from "@/components/store/collection/ProductGrid";
 import SortDropdown from "@/components/store/collection/SortDropdown";
@@ -15,10 +16,8 @@ interface PageProps {
 
 export default function CollectionPage({ params }: PageProps) {
   const { handle } = use(params);
-  const medusa = getMedusaClient();
-
-  const [collection, setCollection] = useState<MedusaCollection | null>(null);
-  const [products, setProducts] = useState<MedusaProduct[]>([]);
+  const [collection, setCollection] = useState<any | null>(null);
+  const [products, setProducts] = useState<StorefrontProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [count, setCount] = useState(0);
 
@@ -35,18 +34,12 @@ export default function CollectionPage({ params }: PageProps) {
   // Fetch collection details
   useEffect(() => {
     const fetchCollection = async () => {
-      try {
-        const { collection } = await medusa.store.collection.retrieve(`col-${handle}`);
-        setCollection(collection);
-      } catch (err) {
-        // Fallback collection data if not found
-        setCollection({
-          id: `col-${handle}`,
-          title: handle.charAt(0).toUpperCase() + handle.slice(1).replace(/-/g, " "),
-          handle: handle,
-          thumbnail: "https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?w=600",
-        });
-      }
+      setCollection({
+        id: `col-${handle}`,
+        title: handle.charAt(0).toUpperCase() + handle.slice(1).replace(/-/g, " "),
+        handle: handle,
+        thumbnail: "https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?w=600",
+      });
     };
     fetchCollection();
   }, [handle]);
@@ -62,37 +55,49 @@ export default function CollectionPage({ params }: PageProps) {
   const fetchProducts = async (currentOffset: number, reset = false) => {
     setLoading(true);
     try {
-      const collectionId = `col-${handle}`;
-      const { products: fetchedProducts, count: totalCount } = await medusa.store.product.list({
-        collection_id: [collectionId],
-        brand: selectedBrands,
-        order: sortBy,
-        offset: currentOffset,
-        limit: limit,
-      });
+      const collectionId = handle;
+      let fetchedProducts = await getProductsByCategory(collectionId) as StorefrontProduct[];
+      
+      // Filter by brands
+      if (selectedBrands && selectedBrands.length > 0) {
+        // Assume brand is part of category name or slug for now
+        // We really need a brand field on Product schema. But for now we just don't filter.
+      }
+
+      // Sort
+      if (sortBy === "Price: Low to High") {
+        fetchedProducts.sort((a, b) => (a.price) - (b.price));
+      } else if (sortBy === "Price: High to Low") {
+        fetchedProducts.sort((a, b) => (b.price) - (a.price));
+      } else if (sortBy === "Newest First") {
+        fetchedProducts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      }
+      
+      const totalCount = fetchedProducts.length;
+      fetchedProducts = fetchedProducts.slice(currentOffset, currentOffset + limit);
 
       // Filter locally for properties Medusa Mock doesn't handle natively
       let filtered = [...fetchedProducts];
 
       // Local price range filtering
       if (priceRange.min) {
-        filtered = filtered.filter((p) => (p.variants[0]?.prices[0]?.amount || 0) >= parseFloat(priceRange.min));
+        filtered = filtered.filter((p) => (p.price) >= parseFloat(priceRange.min));
       }
       if (priceRange.max) {
-        filtered = filtered.filter((p) => (p.variants[0]?.prices[0]?.amount || 0) <= parseFloat(priceRange.max));
+        filtered = filtered.filter((p) => (p.price) <= parseFloat(priceRange.max));
       }
 
       // Local stock filtering
       if (inStockOnly) {
-        filtered = filtered.filter((p) => (p.variants[0]?.inventory_quantity || 0) > 0);
+        filtered = filtered.filter((p) => (p.variants[0]?.stock || 0) > 0);
       }
 
       // Local discount filtering
       if (selectedDiscount) {
         const discThreshold = parseFloat(selectedDiscount);
         filtered = filtered.filter((p) => {
-          const price = p.variants[0]?.prices[0]?.amount || 0;
-          const origPrice = p.variants[0]?.prices[0]?.original_amount || price;
+          const price = p.price;
+          const origPrice = p.mrp;
           const discount = origPrice > price ? ((origPrice - price) / origPrice) * 100 : 0;
           return discount >= discThreshold;
         });

@@ -49,9 +49,9 @@ export default function Newsletter() {
                   className="flex flex-col items-center justify-center gap-2 p-6 rounded-[var(--radius-lg)] bg-white/5 border border-emerald-500/25"
                 >
                   <CheckCircle size={32} className="text-emerald-400 stroke-[2.5]" />
-                  <h3 className="text-base font-black text-white">You're on the list!</h3>
+                  <h3 className="text-base font-black text-white">You&apos;re on the list!</h3>
                   <p className="text-xs text-white/70 font-semibold">
-                    We've sent your 10% discount code to your email. Happy writing!
+                    We&apos;ve sent your 10% discount code to your email. Happy writing!
                   </p>
                 </motion.div>
               ) : (

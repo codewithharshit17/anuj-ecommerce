@@ -98,7 +98,7 @@ export default function CartPage() {
               className="text-base mb-8 max-w-sm"
               style={{ color: "var(--muted-foreground)" }}
             >
-              Looks like you haven't added anything yet. Explore our premium
+              Looks like you haven&apos;t added anything yet. Explore our premium
               stationery collection!
             </p>
             <Link
@@ -168,7 +168,7 @@ export default function CartPage() {
                     className="text-sm font-semibold"
                     style={{ color: "#15803D" }}
                   >
-                    🎉 Congrats! You've unlocked FREE delivery!
+                    🎉 Congrats! You&apos;ve unlocked FREE delivery!
                   </span>
                 </div>
               )}

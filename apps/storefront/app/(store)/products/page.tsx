@@ -3,13 +3,13 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ChevronRight, SlidersHorizontal, Grid3x3, List, Search } from "lucide-react";
+import { ChevronRight, Grid3x3, List, Search } from "lucide-react";
 import ProductCard from "@/components/store/products/ProductCard";
 import SkeletonCard from "@/components/store/ui/SkeletonCard";
 import { StorefrontProduct } from "@/components/store/products/ProductCard";
 import { getProducts, getProductsByCategory, searchProducts } from "@/lib/actions/product-actions";
 
-const badges = ["sale", "new", "hot", "sale"] as const;
+
 
 const categoriesList = [
   { label: "All", value: "" },
@@ -207,7 +207,7 @@ export default function ProductsPage() {
                 : "flex flex-col gap-4"
             }
           >
-            {products.map((product, i) => (
+            {products.map((product) => (
               <div key={product.id}>
                 {viewMode === "grid" ? (
                   <ProductCard product={product} />

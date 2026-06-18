@@ -1,7 +1,7 @@
 // apps/storefront/app/(store)/collections/[handle]/page.tsx
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState, use, useCallback } from "react";
 import Link from "next/link";
 import { ChevronRight, X } from "lucide-react";
 import { StorefrontProduct } from "@/components/store/products/ProductCard";
@@ -14,9 +14,16 @@ interface PageProps {
   params: Promise<{ handle: string }>;
 }
 
+interface Collection {
+  id: string;
+  title: string;
+  handle: string;
+  thumbnail: string;
+}
+
 export default function CollectionPage({ params }: PageProps) {
   const { handle } = use(params);
-  const [collection, setCollection] = useState<any | null>(null);
+  const [collection, setCollection] = useState<Collection | null>(null);
   const [products, setProducts] = useState<StorefrontProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [count, setCount] = useState(0);
@@ -44,15 +51,7 @@ export default function CollectionPage({ params }: PageProps) {
     fetchCollection();
   }, [handle]);
 
-  // Fetch products (reset offset on filters change)
-  useEffect(() => {
-    setOffset(0);
-    setProducts([]);
-    setHasMore(true);
-    fetchProducts(0, true);
-  }, [handle, selectedBrands, priceRange.min, priceRange.max, inStockOnly, selectedDiscount, sortBy]);
-
-  const fetchProducts = async (currentOffset: number, reset = false) => {
+  const fetchProducts = useCallback(async (currentOffset: number, reset = false) => {
     setLoading(true);
     try {
       const collectionId = handle;
@@ -116,7 +115,24 @@ export default function CollectionPage({ params }: PageProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [handle, selectedBrands, priceRange.min, priceRange.max, inStockOnly, selectedDiscount, sortBy, limit]);
+
+  // Fetch products (reset offset on filters change)
+  useEffect(() => {
+    let active = true;
+    const resetAndFetch = async () => {
+      if (!active) return;
+      setOffset(0);
+      setProducts([]);
+      setHasMore(true);
+      await fetchProducts(0, true);
+    };
+    const frame = requestAnimationFrame(resetAndFetch);
+    return () => {
+      active = false;
+      cancelAnimationFrame(frame);
+    };
+  }, [fetchProducts]);
 
   const handleLoadMore = () => {
     const nextOffset = offset + limit;

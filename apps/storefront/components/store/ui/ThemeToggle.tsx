@@ -9,10 +9,14 @@ export default function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
     const root = document.documentElement;
     const isDark = root.classList.contains("dark");
-    setTheme(isDark ? "dark" : "light");
+    const initialTheme = isDark ? "dark" : "light";
+    const frame = requestAnimationFrame(() => {
+      setTheme(initialTheme);
+      setMounted(true);
+    });
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   const toggleTheme = () => {

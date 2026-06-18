@@ -1,0 +1,93 @@
+/**
+ * signup.ts — Server Action
+ *
+ * Handles email/password registration via Supabase Auth, then syncs
+ * the new user into the Prisma `User` table.
+ */
+"use server";
+
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { syncUserToPrisma } from "@/lib/auth/sync-user";
+
+// ── Types ────────────────────────────────────────────────────────────
+
+export interface SignUpState {
+  error?: string;
+  success?: boolean;
+}
+
+// ── Validation ───────────────────────────────────────────────────────
+
+function validateSignUpInput(formData: FormData): string | null {
+  const firstName = formData.get("firstName") as string | null;
+  const lastName = formData.get("lastName") as string | null;
+  const email = formData.get("email") as string | null;
+  const password = formData.get("password") as string | null;
+  const confirmPassword = formData.get("confirmPassword") as string | null;
+
+  if (!firstName?.trim() || !lastName?.trim() || !email?.trim() || !password || !confirmPassword) {
+    return "All fields are required.";
+  }
+
+  // Basic email format check
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return "Please enter a valid email address.";
+  }
+
+  if (password.length < 6) {
+    return "Password must be at least 6 characters.";
+  }
+
+  if (password !== confirmPassword) {
+    return "Passwords do not match.";
+  }
+
+  return null;
+}
+
+// ── Server Action ────────────────────────────────────────────────────
+
+export async function signUp(
+  _prevState: SignUpState,
+  formData: FormData
+): Promise<SignUpState> {
+  // 1. Validate
+  const validationError = validateSignUpInput(formData);
+  if (validationError) {
+    return { error: validationError };
+  }
+
+  const firstName = (formData.get("firstName") as string).trim();
+  const lastName = (formData.get("lastName") as string).trim();
+  const email = (formData.get("email") as string).trim().toLowerCase();
+  const password = formData.get("password") as string;
+
+  // 2. Create Supabase Auth user
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        first_name: firstName,
+        last_name: lastName,
+        full_name: `${firstName} ${lastName}`,
+      },
+    },
+  });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  // 3. Sync to Prisma
+  if (data.user) {
+    await syncUserToPrisma(data.user);
+  }
+
+  // 4. Redirect on success
+  redirect("/");
+}

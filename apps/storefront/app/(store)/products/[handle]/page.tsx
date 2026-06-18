@@ -8,13 +8,12 @@ import { ChevronRight, Truck, RotateCcw, Shield, Check, ShoppingBag, CreditCard 
 import { getProductBySlug, getProductsByCategory } from "@/lib/actions/product-actions";
 import { StorefrontProduct } from "@/components/store/products/ProductCard";
 import ImageGallery from "@/components/store/product/ImageGallery";
-import VariantSelector from "@/components/store/product/VariantSelector";
 import QuantitySelector from "@/components/store/product/QuantitySelector";
 import ProductTabs from "@/components/store/product/ProductTabs";
 import ProductCard from "@/components/store/products/ProductCard";
 import { useCartStore } from "@/lib/store/cart-store";
 import { useUIStore } from "@/components/store/ui-store";
-import { checkAuth } from "@/components/store/auth/AuthGate";
+import { useAuthStore } from "@/lib/store/auth-store";
 
 interface PageProps {
   params: Promise<{ handle: string }>;
@@ -27,11 +26,11 @@ export default function ProductDetailPage({ params }: PageProps) {
   const { setCartOpen } = useUIStore();
   const [product, setProduct] = useState<StorefrontProduct | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [quantity, setQuantity] = useState(1);
   const [addingToCart, setAddingToCart] = useState(false);
   const [cartSuccess, setCartSuccess] = useState(false);
   const [relatedProducts, setRelatedProducts] = useState<StorefrontProduct[]>([]);
+  const { isAuthenticated } = useAuthStore();
 
   // Fetch product & related items
   useEffect(() => {
@@ -41,8 +40,7 @@ export default function ProductDetailPage({ params }: PageProps) {
         const fetchedProd = await getProductBySlug(handle) as StorefrontProduct;
         setProduct(fetchedProd);
         
-        // Setup default options - for now Prisma schema doesn't have options mapping yet, we skip
-        setSelectedOptions({});
+
 
         // Fetch related products
         if (fetchedProd && fetchedProd.categoryId) {
@@ -70,10 +68,6 @@ export default function ProductDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  const handleSelectOption = (optionId: string, value: string) => {
-    setSelectedOptions((prev) => ({ ...prev, [optionId]: value }));
-  };
-
   // Find price of active variant (or default first variant)
   const activePrice = product.price;
   const originalPrice = product.mrp;
@@ -81,8 +75,6 @@ export default function ProductDetailPage({ params }: PageProps) {
 
   const handleAddToCart = async () => {
     setAddingToCart(true);
-    // Find matching variant title based on options
-    const selectedVariantName = Object.values(selectedOptions).join(" / ");
     
     addItem({
       id: product.id,
@@ -100,9 +92,10 @@ export default function ProductDetailPage({ params }: PageProps) {
     }, 600);
   };
 
+
+
   const handleBuyNow = () => {
-    const isAuthed = checkAuth();
-    if (!isAuthed) {
+    if (!isAuthenticated) {
       router.push(`/account/login?redirect=${encodeURIComponent(`/products/${handle}`)}`);
     } else {
       // Proceed to checkout

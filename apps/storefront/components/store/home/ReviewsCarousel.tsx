@@ -72,9 +72,16 @@ export default function ReviewsCarousel() {
 
   useEffect(() => {
     if (!emblaApi) return;
-    onSelect();
+    const initCarousel = () => {
+      setCanScrollPrev(emblaApi.canScrollPrev());
+      setCanScrollNext(emblaApi.canScrollNext());
+    };
+    const frame = requestAnimationFrame(initCarousel);
     emblaApi.on("select", onSelect);
     emblaApi.on("reInit", onSelect);
+    return () => {
+      cancelAnimationFrame(frame);
+    };
   }, [emblaApi, onSelect]);
 
   const getInitials = (name: string) => {
@@ -144,7 +151,7 @@ export default function ReviewsCarousel() {
 
                     {/* Text content */}
                     <p className="text-[var(--text-sm)] text-[var(--ag-gray-800)] font-medium leading-relaxed line-clamp-3 italic mb-4">
-                      "{rev.text}"
+                      &ldquo;{rev.text}&rdquo;
                     </p>
                   </div>
 

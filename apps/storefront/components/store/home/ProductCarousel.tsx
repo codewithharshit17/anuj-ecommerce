@@ -7,7 +7,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getProducts, getProductsByCategory } from "@/lib/actions/product-actions";
 import { StorefrontProduct } from "../products/ProductCard";
 import ProductCard from "../products/ProductCard";
-import { motion } from "framer-motion";
+
 
 interface ProductCarouselProps {
   title: string;
@@ -47,9 +47,16 @@ export default function ProductCarousel({
 
   useEffect(() => {
     if (!emblaApi) return;
-    onSelect();
+    const initCarousel = () => {
+      setCanScrollPrev(emblaApi.canScrollPrev());
+      setCanScrollNext(emblaApi.canScrollNext());
+    };
+    const frame = requestAnimationFrame(initCarousel);
     emblaApi.on("select", onSelect);
     emblaApi.on("reInit", onSelect);
+    return () => {
+      cancelAnimationFrame(frame);
+    };
   }, [emblaApi, onSelect]);
 
   useEffect(() => {

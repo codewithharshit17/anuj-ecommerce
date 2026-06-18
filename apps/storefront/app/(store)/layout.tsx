@@ -19,6 +19,7 @@ import CartDrawer from "@/components/store/cart/CartDrawer";
 import MobileMenu from "@/components/store/layout/MobileMenu";
 import WhatsAppFAB from "@/components/store/ui/WhatsAppFAB";
 import FloatingCartButton from "@/components/store/ui/FloatingCartButton";
+import AuthProvider from "@/components/store/auth/AuthProvider";
 
 export default function StoreLayout({
   children,
@@ -26,6 +27,7 @@ export default function StoreLayout({
   children: React.ReactNode;
 }) {
   return (
+    <AuthProvider>
     <div className="flex flex-col min-h-screen bg-[var(--ag-gray-100)]">
       {/* ── Sticky Header (Zones A, B, and C) ── */}
       <Header />
@@ -44,5 +46,6 @@ export default function StoreLayout({
       <WhatsAppFAB />
       <FloatingCartButton />
     </div>
+    </AuthProvider>
   );
 }

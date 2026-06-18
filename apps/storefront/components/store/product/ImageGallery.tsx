@@ -24,8 +24,14 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
 
   useEffect(() => {
     if (!emblaApi) return;
-    onSelect();
+    const initCarousel = () => {
+      setActiveIndex(emblaApi.selectedScrollSnap());
+    };
+    const frame = requestAnimationFrame(initCarousel);
     emblaApi.on("select", onSelect);
+    return () => {
+      cancelAnimationFrame(frame);
+    };
   }, [emblaApi, onSelect]);
 
   const selectImage = (index: number) => {

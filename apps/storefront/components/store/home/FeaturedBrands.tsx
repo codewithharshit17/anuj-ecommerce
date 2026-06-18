@@ -33,7 +33,7 @@ export default function FeaturedBrands() {
             Featured Brands
           </h2>
           <p className="text-sm text-[var(--ag-gray-500)] mt-2 font-medium">
-            Curated writing tools from the world's most trusted manufacturers.
+            Curated writing tools from the world&apos;s most trusted manufacturers.
           </p>
         </div>
 

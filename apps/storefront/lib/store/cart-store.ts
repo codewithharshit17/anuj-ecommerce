@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-interface CartItem {
+export interface CartItem {
   id: string;
   name: string;
   price: number;
@@ -37,9 +37,9 @@ export const useCartStore = create<CartStore>()(
               items: state.items.map((i) =>
                 i.id === item.id
                   ? {
-                      ...i,
-                      quantity: i.quantity + item.quantity,
-                    }
+                    ...i,
+                    quantity: i.quantity + item.quantity,
+                  }
                   : i
               ),
             };
@@ -62,9 +62,9 @@ export const useCartStore = create<CartStore>()(
           items: state.items.map((item) =>
             item.id === id
               ? {
-                  ...item,
-                  quantity: item.quantity + 1,
-                }
+                ...item,
+                quantity: item.quantity + 1,
+              }
               : item
           ),
         })),
@@ -74,12 +74,12 @@ export const useCartStore = create<CartStore>()(
           items: state.items.map((item) =>
             item.id === id
               ? {
-                  ...item,
-                  quantity: Math.max(
-                    1,
-                    item.quantity - 1
-                  ),
-                }
+                ...item,
+                quantity: Math.max(
+                  1,
+                  item.quantity - 1
+                ),
+              }
               : item
           ),
         })),

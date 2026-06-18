@@ -8,16 +8,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   ShieldCheck, 
   Truck, 
-  CreditCard, 
   RotateCcw, 
   ChevronRight, 
   ArrowLeft, 
   Check, 
-  ShoppingBag, 
   Tag, 
-  AlertCircle,
-  Clock,
-  Sparkles
+  AlertCircle
 } from "lucide-react";
 import { useCartStore } from "@/lib/store/cart-store";
 import { useCheckoutStore, CheckoutStep } from "@/lib/store/checkout-store";
@@ -25,10 +21,7 @@ import { useCheckoutStore, CheckoutStep } from "@/lib/store/checkout-store";
 export default function CheckoutPage() {
   const router = useRouter();
   const cartItems = useCartStore((state) => state.items);
-  const clearCart = useCartStore((state) => {
-    // We will clear the cart only when order completes
-    return state.items; 
-  });
+
 
   const {
     step,
@@ -42,8 +35,7 @@ export default function CheckoutPage() {
     setShipping,
     setDeliveryMethod,
     setPaymentMethod,
-    setAppliedCoupon,
-    resetCheckout
+    setAppliedCoupon
   } = useCheckoutStore();
 
   // Local validation error states
@@ -696,7 +688,7 @@ export default function CheckoutPage() {
                     <div className="p-4 rounded-[var(--radius-lg)] bg-amber-500/10 border border-amber-500/25 flex gap-3 mt-4 text-xs font-semibold text-amber-600">
                       <ShieldCheck size={16} className="shrink-0 mt-0.5" />
                       <div>
-                        Secure Gateway Integration: Razorpay Sandbox triggers upon clicking "PLACE ORDER". 100% encrypted environment.
+                        Secure Gateway Integration: Razorpay Sandbox triggers upon clicking &quot;PLACE ORDER&quot;. 100% encrypted environment.
                       </div>
                     </div>
 

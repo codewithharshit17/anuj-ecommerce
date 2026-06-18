@@ -4,43 +4,34 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { CheckCircle, ShoppingBag, Clock, MapPin, Truck, ChevronRight } from "lucide-react";
-import { useCartStore } from "@/lib/store/cart-store";
+import { CheckCircle, ShoppingBag, MapPin, Truck, ChevronRight } from "lucide-react";
+import { useCartStore, CartItem } from "@/lib/store/cart-store";
 import { useCheckoutStore } from "@/lib/store/checkout-store";
 
-export default function CheckoutSuccessPage() {
-  const [orderId, setOrderId] = useState("");
-  const [placedItems, setPlacedItems] = useState<any[]>([]);
-  const [placedTotal, setPlacedTotal] = useState(0);
-  const [placedAddress, setPlacedAddress] = useState<any>(null);
+interface PlacedAddress {
+  name: string;
+  mobile: string;
+  address: string;
+}
 
+export default function CheckoutSuccessPage() {
   const cartItems = useCartStore((state) => state.items);
-  const clearCart = useCartStore((state) => state.items.length > 0 ? () => {
-    // We will clear items via Zustand creation
-    useCartStore.setState({ items: [] });
-  } : () => {});
-  
   const checkoutState = useCheckoutStore();
 
+  const [orderId] = useState(() => "KP-" + Math.floor(100000 + Math.random() * 900000));
+  const [placedItems] = useState<CartItem[]>(() => cartItems);
+  const [placedAddress] = useState<PlacedAddress | null>(() => {
+    if (cartItems.length === 0) return null;
+    return {
+      name: checkoutState.contact.fullName,
+      mobile: checkoutState.contact.mobile,
+      address: `${checkoutState.shipping.addressLine1}, ${checkoutState.shipping.addressLine2 ? checkoutState.shipping.addressLine2 + ", " : ""}${checkoutState.shipping.city}, ${checkoutState.shipping.state} - ${checkoutState.shipping.pinCode}`
+    };
+  });
+
   useEffect(() => {
-    // Generate random order ID
-    const randomId = "KP-" + Math.floor(100000 + Math.random() * 900000);
-    setOrderId(randomId);
-
-    // Save cart state for summary presentation before clearing it
+    // Clear the Cart Store
     if (cartItems.length > 0) {
-      setPlacedItems(cartItems);
-      const sub = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-      setPlacedTotal(sub);
-      
-      // Save address info
-      setPlacedAddress({
-        name: checkoutState.contact.fullName,
-        mobile: checkoutState.contact.mobile,
-        address: `${checkoutState.shipping.addressLine1}, ${checkoutState.shipping.addressLine2 ? checkoutState.shipping.addressLine2 + ", " : ""}${checkoutState.shipping.city}, ${checkoutState.shipping.state} - ${checkoutState.shipping.pinCode}`
-      });
-
-      // Clear the Cart Store
       useCartStore.setState({ items: [] });
     }
 
@@ -48,7 +39,7 @@ export default function CheckoutSuccessPage() {
     return () => {
       checkoutState.resetCheckout();
     };
-  }, []);
+  }, [cartItems.length, checkoutState]);
 
   // Calculate estimated delivery date: 3 days for Express, 6 days for Standard
   const getDeliveryDate = () => {

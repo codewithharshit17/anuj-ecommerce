@@ -2,10 +2,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ShieldCheck, Truck, ShieldAlert, CreditCard, RotateCcw } from "lucide-react";
+import { ShieldCheck, Truck, CreditCard, RotateCcw } from "lucide-react";
 
 interface TrustItem {
-  icon: React.ComponentType<any>;
+  icon: React.ComponentType<{ size?: string | number; className?: string }>;
   title: string;
   description: string;
 }

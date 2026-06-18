@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Mail, Send } from "lucide-react";
+import { Send } from "lucide-react";
 
 export default function Footer() {
   const [email, setEmail] = useState("");

@@ -4,7 +4,7 @@
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, Heart, User, ShoppingBag, Menu, X, ArrowRight, Plus, Trash2, History, TrendingUp } from "lucide-react";
+import { Search, Heart, User, ShoppingBag, Menu, X, Plus, Trash2, History, TrendingUp } from "lucide-react";
 import { useCartStore } from "@/lib/store/cart-store";
 import { useUIStore } from "@/components/store/ui-store";
 import { searchProducts } from "@/lib/actions/product-actions";
@@ -68,7 +68,11 @@ export default function Header() {
     const stored = localStorage.getItem("kapi_recent_searches");
     if (stored) {
       try {
-        setRecentSearches(JSON.parse(stored));
+        const parsed = JSON.parse(stored);
+        const frame = requestAnimationFrame(() => {
+          setRecentSearches(parsed);
+        });
+        return () => cancelAnimationFrame(frame);
       } catch (e) {
         console.error(e);
       }
@@ -91,10 +95,6 @@ export default function Header() {
         setSearchResults([]);
         return;
       }
-      const categoryId = selectedCategory !== "All Categories" 
-        ? `col-${selectedCategory.toLowerCase().replace(/\s+/g, "-")}` 
-        : undefined;
-
       try {
         const products = await searchProducts(searchQuery, 5);
         setSearchResults(products || []);

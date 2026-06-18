@@ -66,10 +66,16 @@ export default function HeroCarousel() {
 
   useEffect(() => {
     if (!emblaApi) return;
-    onSelect();
-    setScrollSnaps(emblaApi.scrollSnapList());
+    const initCarousel = () => {
+      setSelectedIndex(emblaApi.selectedScrollSnap());
+      setScrollSnaps(emblaApi.scrollSnapList());
+    };
+    const frame = requestAnimationFrame(initCarousel);
     emblaApi.on("select", onSelect);
     emblaApi.on("reInit", onSelect);
+    return () => {
+      cancelAnimationFrame(frame);
+    };
   }, [emblaApi, onSelect]);
 
   return (

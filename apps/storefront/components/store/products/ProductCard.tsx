@@ -2,7 +2,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Heart, Star, ShoppingCart, Info } from "lucide-react";
+import { Heart, Star, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import { useUIStore } from "@/components/store/ui-store";
 import { useCartStore } from "@/lib/store/cart-store";

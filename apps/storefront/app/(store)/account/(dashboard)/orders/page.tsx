@@ -1,13 +1,12 @@
 /**
  * Orders Page — `/account/orders`
  *
- * Displays the user's order history. Currently shows an empty state
- * since the order system is not yet implemented.
+ * Displays the user's order history.
  */
 
 import { requireAuth } from "@/lib/auth/require-auth";
 import prisma from "@/lib/prisma";
-import { Package, ShoppingBag, ArrowRight } from "lucide-react";
+import { Package, ShoppingBag, ArrowRight, CreditCard } from "lucide-react";
 import Link from "next/link";
 
 export const metadata = {
@@ -39,7 +38,7 @@ export default async function OrdersPage() {
           My Orders
         </h2>
         <p className="text-sm text-[var(--ag-gray-500)] mt-1">
-          Track and manage your orders
+          Track and manage your order history
         </p>
       </div>
 
@@ -69,48 +68,104 @@ export default async function OrdersPage() {
         </div>
       ) : (
         /* ── Orders list ── */
-        <div className="space-y-4">
+        <div className="space-y-6">
           {orders.map((order) => {
             const statusColors: Record<string, string> = {
-              PENDING: "bg-amber-100 text-amber-700",
-              PROCESSING: "bg-blue-100 text-blue-700",
-              SHIPPED: "bg-purple-100 text-purple-700",
-              DELIVERED: "bg-green-100 text-green-700",
-              CANCELLED: "bg-red-100 text-red-700",
+              PENDING: "bg-amber-100 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400 border-amber-200/50 dark:border-amber-900/30",
+              PROCESSING: "bg-blue-100 text-blue-700 dark:bg-blue-950/20 dark:text-blue-400 border-blue-200/50 dark:border-blue-900/30",
+              SHIPPED: "bg-purple-100 text-purple-700 dark:bg-purple-950/20 dark:text-purple-400 border-purple-200/50 dark:border-purple-900/30",
+              DELIVERED: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400 border-emerald-200/50 dark:border-emerald-900/30",
+              CANCELLED: "bg-red-100 text-red-700 dark:bg-red-950/20 dark:text-red-400 border-red-200/50 dark:border-red-900/30",
             };
 
             return (
               <div
                 key={order.id}
-                className="bg-white dark:bg-[var(--card)] border border-[var(--ag-gray-200)] dark:border-[var(--border)] rounded-2xl p-5 shadow-sm"
+                className="bg-white dark:bg-[var(--card)] border border-[var(--ag-gray-200)] dark:border-neutral-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
               >
-                <div className="flex items-center justify-between mb-3">
-                  <div>
-                    <p className="text-xs text-[var(--ag-gray-500)] font-medium">
-                      Order #{order.id.slice(-8).toUpperCase()}
-                    </p>
-                    <p className="text-[11px] text-[var(--ag-gray-500)]">
-                      {new Intl.DateTimeFormat("en-IN", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      }).format(new Date(order.createdAt))}
-                    </p>
+                {/* Order Header strip */}
+                <div className="bg-[var(--ag-gray-100)] dark:bg-neutral-900/50 px-5 py-4 border-b border-[var(--ag-gray-200)] dark:border-neutral-800 flex flex-wrap gap-4 items-center justify-between">
+                  <div className="flex items-center gap-6">
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-wider text-[var(--ag-gray-500)]">
+                        Order Placed
+                      </p>
+                      <p className="text-xs font-bold text-[var(--ag-dark)] dark:text-gray-300">
+                        {new Intl.DateTimeFormat("en-IN", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        }).format(new Date(order.createdAt))}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-wider text-[var(--ag-gray-500)]">
+                        Order ID
+                      </p>
+                      <p className="text-xs font-bold text-[var(--ag-dark)] dark:text-gray-300 font-mono">
+                        #{order.id.slice(-10).toUpperCase()}
+                      </p>
+                    </div>
                   </div>
+
                   <span
-                    className={`text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg ${statusColors[order.status] ?? "bg-gray-100 text-gray-700"}`}
+                    className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg border ${statusColors[order.status] ?? "bg-gray-100 text-gray-700"}`}
                   >
                     {order.status}
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between pt-3 border-t border-[var(--ag-gray-200)]/50 dark:border-[var(--border)]/50">
-                  <p className="text-sm font-bold text-[var(--ag-dark)]">
-                    ₹{order.totalAmount.toLocaleString("en-IN")}
-                  </p>
-                  <p className="text-xs text-[var(--ag-gray-500)]">
-                    {order.items.length} item{order.items.length > 1 ? "s" : ""}
-                  </p>
+                {/* Order Items list */}
+                <div className="p-5 divide-y divide-[var(--ag-gray-100)] dark:divide-neutral-800/50">
+                  {order.items.map((item) => {
+                    const primaryImage =
+                      item.product.images.find((img) => img.isPrimary)?.url ||
+                      item.product.images[0]?.url ||
+                      "";
+
+                    return (
+                      <div key={item.id} className="flex gap-4 py-4.5 first:pt-0 last:pb-0">
+                        <img
+                          src={primaryImage}
+                          alt={item.product.name}
+                          className="w-14 h-14 object-cover rounded-xl border border-[var(--ag-gray-200)] dark:border-neutral-800 bg-[var(--ag-gray-100)] dark:bg-neutral-800 shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-xs sm:text-sm font-bold text-[var(--ag-dark)] dark:text-gray-200 line-clamp-1">
+                            {item.product.name}
+                          </h4>
+                          <div className="flex gap-4 mt-1 text-[11px] font-bold text-[var(--ag-gray-500)]">
+                            <span>Qty: {item.quantity}</span>
+                            <span>Price: ₹{item.price}</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Razorpay structure & Total billing footer */}
+                <div className="bg-[var(--ag-gray-100)]/30 dark:bg-neutral-900/10 px-5 py-4 border-t border-[var(--ag-gray-200)] dark:border-neutral-800/80 flex flex-wrap gap-4 items-center justify-between">
+                  {/* Future-ready Razorpay Metadata */}
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-[var(--ag-gray-500)]">
+                    <CreditCard size={14} />
+                    <span>Razorpay ID: </span>
+                    <span className="font-mono text-[11px] text-[var(--ag-dark)] dark:text-gray-300">
+                      {order.razorpayOrderId || "pending_integration"}
+                    </span>
+                    <span className="text-[10px] text-[var(--ag-gray-500)] font-bold">
+                      ({order.paymentStatus})
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <span className="text-xs text-[var(--ag-gray-500)] font-bold">
+                      Total ({order.items.length} item{order.items.length > 1 ? "s" : ""}):
+                    </span>
+                    <span className="text-base font-black text-[var(--ag-red)]">
+                      ₹{order.totalAmount.toLocaleString("en-IN")}
+                    </span>
+                  </div>
                 </div>
               </div>
             );

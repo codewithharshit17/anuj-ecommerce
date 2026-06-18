@@ -4,7 +4,7 @@
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, Heart, User, ShoppingBag, Menu, X, Plus, Trash2, History, TrendingUp } from "lucide-react";
+import { Search, Heart, User, ShoppingBag, Menu, X, Plus, Trash2, History, TrendingUp, Package, MapPin, LogOut } from "lucide-react";
 import { useCartStore } from "@/lib/store/cart-store";
 import { useUIStore } from "@/components/store/ui-store";
 import { searchProducts } from "@/lib/actions/product-actions";
@@ -13,6 +13,16 @@ import AnnouncementBar from "./AnnouncementBar";
 import MegaMenu from "./MegaMenu";
 import ThemeToggle from "@/components/store/ui/ThemeToggle";
 import { AnimatePresence, motion } from "framer-motion";
+import { useAuthStore } from "@/lib/store/auth-store";
+import { logout } from "@/lib/actions/auth/logout";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const navCategories = [
   "Stationery",
@@ -47,6 +57,7 @@ export default function Header() {
   const router = useRouter();
   const { items, addItem } = useCartStore();
   const { setCartOpen, setMobileMenuOpen, wishlist } = useUIStore();
+  const { user, isAuthenticated } = useAuthStore();
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -450,14 +461,101 @@ export default function Header() {
               )}
             </Link>
 
-            {/* Account Icon */}
-            <Link
-              href="/account/login"
-              className="p-2.5 rounded-full hover:bg-[var(--ag-gray-100)] dark:hover:bg-neutral-800 text-[var(--ag-dark)] dark:text-[var(--foreground)] transition-colors"
-              aria-label="Account"
-            >
-              <User size={20} />
-            </Link>
+            {/* Account Icon / Dropdown */}
+            {isAuthenticated && user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className="flex items-center gap-1 p-1 rounded-full hover:bg-[var(--ag-gray-100)] dark:hover:bg-neutral-800 transition-colors cursor-pointer outline-none shrink-0"
+                    aria-label="Account Menu"
+                  >
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-sm"
+                      style={{
+                        background:
+                          "linear-gradient(135deg, var(--ag-red), var(--ag-yellow))",
+                      }}
+                    >
+                      {user.user_metadata?.first_name
+                        ? ((user.user_metadata.first_name[0] || "") + (user.user_metadata.last_name?.[0] || "")).toUpperCase()
+                        : user.user_metadata?.full_name
+                        ? user.user_metadata.full_name.split(/\s+/).map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
+                        : user.email?.[0]?.toUpperCase() || "U"}
+                    </div>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel className="flex flex-col gap-0.5">
+                    <span className="font-bold text-xs truncate">
+                      {user.user_metadata?.first_name 
+                        ? `${user.user_metadata.first_name} ${user.user_metadata.last_name || ""}`.trim()
+                        : user.user_metadata?.full_name || "User"}
+                    </span>
+                    <span className="text-[10px] text-[var(--ag-gray-500)] lowercase font-medium truncate">
+                      {user.email}
+                    </span>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/account/profile" className="flex items-center gap-2 w-full">
+                      <User size={14} className="text-[var(--ag-gray-500)]" />
+                      <span>Profile</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/account/orders" className="flex items-center gap-2 w-full">
+                      <Package size={14} className="text-[var(--ag-gray-500)]" />
+                      <span>Orders</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/account/addresses" className="flex items-center gap-2 w-full">
+                      <MapPin size={14} className="text-[var(--ag-gray-500)]" />
+                      <span>Addresses</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/account/wishlist" className="flex items-center gap-2 w-full">
+                      <Heart size={14} className="text-[var(--ag-gray-500)]" />
+                      <span>Wishlist</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    onSelect={async () => {
+                      await logout();
+                    }}
+                    className="text-[var(--ag-red)] hover:bg-[var(--ag-red)]/5 focus:bg-[var(--ag-red)]/5"
+                  >
+                    <LogOut size={14} />
+                    <span>Sign Out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className="p-2.5 rounded-full hover:bg-[var(--ag-gray-100)] dark:hover:bg-neutral-800 text-[var(--ag-dark)] dark:text-[var(--foreground)] transition-colors cursor-pointer outline-none"
+                    aria-label="Account Sign In Menu"
+                  >
+                    <User size={20} />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-40">
+                  <DropdownMenuItem asChild>
+                    <Link href="/account/login" className="flex items-center justify-between w-full">
+                      <span>Login</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/account/register" className="flex items-center justify-between w-full">
+                      <span>Register</span>
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
 
             {/* Cart Icon trigger */}
             <button

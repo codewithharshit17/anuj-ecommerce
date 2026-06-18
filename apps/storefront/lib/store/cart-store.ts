@@ -1,5 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { useAuthStore } from "./auth-store";
+import { syncCartAction } from "@/lib/actions/cart";
 
 export interface CartItem {
   id: string;
@@ -11,78 +13,74 @@ export interface CartItem {
 
 interface CartStore {
   items: CartItem[];
+  addItem: (item: CartItem) => Promise<void>;
+  removeItem: (id: string) => Promise<void>;
+  increaseQuantity: (id: string) => Promise<void>;
+  decreaseQuantity: (id: string) => Promise<void>;
+  setCartItems: (items: CartItem[]) => void;
+}
 
-  addItem: (item: CartItem) => void;
-
-  removeItem: (id: string) => void;
-
-  increaseQuantity: (id: string) => void;
-
-  decreaseQuantity: (id: string) => void;
+async function syncDb(items: CartItem[], set: (state: Partial<CartStore>) => void) {
+  const { isAuthenticated } = useAuthStore.getState();
+  if (isAuthenticated) {
+    try {
+      const dbItems = await syncCartAction(items);
+      set({ items: dbItems });
+    } catch (err) {
+      console.error("[cart-store] Failed to sync cart with DB:", err);
+    }
+  }
 }
 
 export const useCartStore = create<CartStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       items: [],
 
-      addItem: (item) =>
-        set((state) => {
-          const existingItem = state.items.find(
-            (i) => i.id === item.id
+      setCartItems: (items) => set({ items }),
+
+      addItem: async (item) => {
+        const currentItems = get().items;
+        const existingItem = currentItems.find((i) => i.id === item.id);
+        let newItems;
+
+        if (existingItem) {
+          newItems = currentItems.map((i) =>
+            i.id === item.id
+              ? { ...i, quantity: i.quantity + item.quantity }
+              : i
           );
+        } else {
+          newItems = [...currentItems, item];
+        }
 
-          if (existingItem) {
-            return {
-              items: state.items.map((i) =>
-                i.id === item.id
-                  ? {
-                    ...i,
-                    quantity: i.quantity + item.quantity,
-                  }
-                  : i
-              ),
-            };
-          }
+        set({ items: newItems });
+        await syncDb(newItems, set);
+      },
 
-          return {
-            items: [...state.items, item],
-          };
-        }),
+      removeItem: async (id) => {
+        const newItems = get().items.filter((item) => item.id !== id);
+        set({ items: newItems });
+        await syncDb(newItems, set);
+      },
 
-      removeItem: (id) =>
-        set((state) => ({
-          items: state.items.filter(
-            (item) => item.id !== id
-          ),
-        })),
+      increaseQuantity: async (id) => {
+        const newItems = get().items.map((item) =>
+          item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+        );
+        set({ items: newItems });
+        await syncDb(newItems, set);
+      },
 
-      increaseQuantity: (id) =>
-        set((state) => ({
-          items: state.items.map((item) =>
-            item.id === id
-              ? {
-                ...item,
-                quantity: item.quantity + 1,
-              }
-              : item
-          ),
-        })),
-
-      decreaseQuantity: (id) =>
-        set((state) => ({
-          items: state.items.map((item) =>
-            item.id === id
-              ? {
-                ...item,
-                quantity: Math.max(
-                  1,
-                  item.quantity - 1
-                ),
-              }
-              : item
-          ),
-        })),
+      decreaseQuantity: async (id) => {
+        const newItems = get().items.map((item) =>
+          item.id === id
+            ? { ...item, quantity: Math.max(1, item.quantity - 1) }
+            : item
+        );
+        set({ items: newItems });
+        await syncDb(newItems, set);
+      },
     }),
     {
       name: "kapi-cart",

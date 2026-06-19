@@ -1,0 +1,416 @@
+# KAPI PEN — Phase 4 Customer Account System Documentation
+
+## Phase Overview
+
+Phase 4 focused on implementing a production-ready Customer Account System on top of the completed Authentication infrastructure from Phase 3.
+
+This phase provides authenticated users with a personalized account experience including profile management, address management, order history, and persistent cart ownership.
+
+---
+
+# Phase Status
+
+**Status:** Completed ✅
+
+**Git Tag:**
+
+```text
+v0.4-customer-account-complete
+```
+
+---
+
+# Features Implemented
+
+## 1. Account Dropdown Menu
+
+### Guest User
+
+Displays:
+
+```text
+Login
+Register
+```
+
+### Authenticated User
+
+Displays:
+
+```text
+Profile
+Orders
+Addresses
+Sign Out
+```
+
+### Features
+
+* Session-aware navigation
+* Desktop support
+* Mobile support
+* Shadcn UI dropdown integration
+* Supabase session detection
+
+---
+
+## 2. Profile Management
+
+### Route
+
+```text
+/account/profile
+```
+
+### Features
+
+* Fetch authenticated user from Prisma
+
+* Display:
+
+  * First Name
+  * Last Name
+  * Email
+  * Account Creation Date
+
+* Inline profile editing
+
+* Supabase metadata synchronization
+
+* Prisma user synchronization
+
+### Files
+
+```text
+app/(store)/account/(dashboard)/profile/
+
+lib/actions/auth/update-profile.ts
+```
+
+---
+
+## 3. Address Management
+
+### Route
+
+```text
+/account/addresses
+```
+
+### Features
+
+* Add Address
+* Edit Address
+* Delete Address
+* Set Default Address
+* User-owned addresses
+
+### Database Model
+
+```prisma
+Address
+```
+
+### Files
+
+```text
+app/(store)/account/(dashboard)/addresses/
+
+lib/actions/address.ts
+```
+
+---
+
+## 4. Cart Ownership & Persistence
+
+### Objective
+
+Convert guest cart into authenticated user cart.
+
+### Features
+
+* User-owned cart records
+* Persistent cart across sessions
+* Persistent cart across devices
+* Guest cart merging on login
+* Database synchronization
+
+### Database Models
+
+```prisma
+Cart
+CartItem
+```
+
+### Files
+
+```text
+lib/actions/cart.ts
+
+lib/store/cart-store.ts
+
+components/store/auth/AuthProvider.tsx
+```
+
+### Flow
+
+```text
+Guest Cart
+      ↓
+User Login
+      ↓
+Merge Guest Cart
+      ↓
+Database Cart
+      ↓
+Persist Across Sessions
+```
+
+---
+
+## 5. Order History
+
+### Route
+
+```text
+/ account / orders
+```
+
+### Features
+
+Display:
+
+* Order ID
+* Date
+* Status
+* Total Amount
+* Item Count
+
+### Database Models
+
+```prisma
+Order
+OrderItem
+```
+
+### Files
+
+```text
+app/(store)/account/(dashboard)/orders/
+```
+
+---
+
+# Removed Functionality
+
+## Wishlist System
+
+Wishlist functionality was intentionally removed before Phase 4 completion.
+
+Reason:
+
+```text
+Not required for MVP
+Introduced unnecessary complexity
+Not critical to purchasing workflow
+```
+
+Removed:
+
+```text
+Wishlist Route
+Wishlist UI
+Wishlist Actions
+Wishlist Zustand State
+Wishlist Synchronization Logic
+Wishlist Navigation
+```
+
+---
+
+# Route Structure
+
+## Account Routes
+
+```text
+/account/profile
+/account/orders
+/account/addresses
+```
+
+## Removed
+
+```text
+/account/wishlist
+/account/test
+```
+
+---
+
+# Authentication Integration
+
+Protected Routes:
+
+```text
+/account/profile
+/account/orders
+/account/addresses
+/checkout
+```
+
+Authentication Provider:
+
+```text
+components/store/auth/AuthProvider.tsx
+```
+
+Authentication Stack:
+
+```text
+Supabase Auth
+        ↓
+Session Management
+        ↓
+Prisma User Sync
+        ↓
+Protected Routes
+```
+
+---
+
+# Database Models Used
+
+```prisma
+User
+Address
+Cart
+CartItem
+Order
+OrderItem
+```
+
+No schema modifications were required during Phase 4.
+
+---
+
+# Validation Checklist
+
+## Build
+
+```bash
+npm run lint
+```
+
+Result:
+
+```text
+PASS
+```
+
+```bash
+npm run build
+```
+
+Result:
+
+```text
+PASS
+```
+
+---
+
+## Functional Testing
+
+### Authentication
+
+* Login ✅
+* Register ✅
+* Google OAuth ✅
+* Logout ✅
+* Session Persistence ✅
+
+### Profile
+
+* View Profile ✅
+* Edit Profile ✅
+
+### Addresses
+
+* Add Address ✅
+* Edit Address ✅
+* Delete Address ✅
+* Set Default Address ✅
+
+### Orders
+
+* Order History Page ✅
+
+### Cart
+
+* Guest Cart Merge ✅
+* Persistent Cart ✅
+* Cross-Session Persistence ✅
+
+---
+
+# Folder Reference
+
+```text
+app/(store)/account/(dashboard)/
+│
+├── profile/
+├── orders/
+└── addresses/
+
+lib/actions/
+│
+├── auth/
+│   └── update-profile.ts
+│
+├── address.ts
+└── cart.ts
+
+components/store/auth/
+└── AuthProvider.tsx
+
+lib/store/
+└── cart-store.ts
+```
+
+---
+
+# Completion Summary
+
+Phase 4 successfully transformed KAPI PEN from an authenticated storefront into a customer-centric ecommerce platform.
+
+Implemented:
+
+* Customer Profiles
+* Address Book Management
+* Persistent User Cart
+* Order History
+* Account Dashboard
+
+This phase establishes the foundation required for checkout processing and payment integration.
+
+---
+
+# Next Phase
+
+## Phase 5 — Orders & Razorpay Integration
+
+Planned Features:
+
+* Checkout Processing
+* Razorpay Payment Gateway
+* Payment Verification
+* Order Creation Workflow
+* Order Success Page
+* Transaction Storage
+* Order Status Management
+
+Phase 4 Completion Status:
+
+```text
+COMPLETE ✅
+```

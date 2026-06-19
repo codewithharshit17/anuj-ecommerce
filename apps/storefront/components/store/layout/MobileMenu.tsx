@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ChevronDown, ShoppingBag, Heart, User, Home, Package, MapPin, LogOut } from "lucide-react";
+import { X, ChevronDown, ShoppingBag, User, Home, Package, MapPin, LogOut } from "lucide-react";
 import { useUIStore } from "@/components/store/ui-store";
 import { useCartStore } from "@/lib/store/cart-store";
 import Link from "next/link";
@@ -259,14 +259,6 @@ export default function MobileMenu() {
                             <MapPin size={14} className="text-[var(--ag-gray-500)]" />
                             <span>Addresses</span>
                           </Link>
-                          <Link
-                            href="/account/wishlist"
-                            onClick={handleLinkClick}
-                            className="py-1.5 px-2 text-xs font-semibold text-[var(--ag-gray-800)] dark:text-[var(--ag-gray-300)] hover:text-[var(--ag-red)] transition-colors flex items-center gap-2"
-                          >
-                            <Heart size={14} className="text-[var(--ag-gray-500)]" />
-                            <span>Wishlist</span>
-                          </Link>
                           <button
                             onClick={async () => {
                               handleLinkClick();
@@ -283,13 +275,20 @@ export default function MobileMenu() {
                   </AnimatePresence>
                 </div>
               ) : (
-                <div className="pt-2">
+                <div className="pt-2 grid grid-cols-2 gap-2">
                   <Link
                     href="/account/login"
                     onClick={handleLinkClick}
                     className="w-full block text-center py-2.5 px-4 bg-[var(--ag-red)] hover:bg-[var(--ag-red-hover)] text-white font-bold text-xs rounded-xl shadow-sm transition-all"
                   >
-                    Login / Register
+                    Login
+                  </Link>
+                  <Link
+                    href="/account/register"
+                    onClick={handleLinkClick}
+                    className="w-full block text-center py-2.5 px-4 border border-[var(--ag-gray-200)] dark:border-neutral-700 text-[var(--ag-dark)] dark:text-[var(--foreground)] font-bold text-xs rounded-xl transition-all"
+                  >
+                    Register
                   </Link>
                 </div>
               )}
@@ -319,15 +318,6 @@ export default function MobileMenu() {
                 )}
                 <span className="text-[10px] font-bold">Cart</span>
               </button>
-              <Link
-                href={isAuthenticated ? "/account/wishlist" : "/products"}
-                onClick={handleLinkClick}
-                className="flex flex-col items-center gap-1 text-[var(--ag-gray-800)] dark:text-[var(--foreground)] hover:text-[var(--ag-red)] transition-colors"
-                aria-label="Wishlist"
-              >
-                <Heart size={20} />
-                <span className="text-[10px] font-bold">Wishlist</span>
-              </Link>
               {isAuthenticated && user ? (
                 <Link
                   href="/account/profile"

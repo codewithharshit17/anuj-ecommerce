@@ -2,7 +2,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Heart, Star, ShoppingCart } from "lucide-react";
+import { Star, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import { useUIStore } from "@/components/store/ui-store";
 import { useCartStore } from "@/lib/store/cart-store";
@@ -20,11 +20,9 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, showVendor = true, showBadge = true }: ProductCardProps) {
-  const { wishlist, toggleWishlist, setCartOpen } = useUIStore();
+  const { setCartOpen } = useUIStore();
   const { addItem } = useCartStore();
   const [isHovered, setIsHovered] = useState(false);
-
-  const isWishlisted = wishlist.includes(product.id);
 
   // Images
   const primaryImage = product.images.find(img => img.isPrimary)?.url || product.images[0]?.url || "";
@@ -44,12 +42,6 @@ export default function ProductCard({ product, showVendor = true, showBadge = tr
   // Mock rating
   const rating = 4.5;
   const reviewCount = 12;
-
-  const handleWishlistToggle = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    toggleWishlist(product.id);
-  };
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -106,23 +98,6 @@ export default function ProductCard({ product, showVendor = true, showBadge = tr
               SAVE {discount}%
             </div>
           )}
-
-          {/* Wishlist toggle */}
-          <button
-            onClick={handleWishlistToggle}
-            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 dark:bg-neutral-900/90 hover:bg-white dark:hover:bg-neutral-900 border border-[var(--ag-gray-200)] dark:border-neutral-850 shadow-sm hover:shadow-md flex items-center justify-center text-[var(--ag-gray-800)] dark:text-gray-300 hover:text-[var(--ag-red)] dark:hover:text-[var(--ag-red)] transition-all z-10"
-            aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
-          >
-            <motion.div
-              animate={isWishlisted ? { scale: [1, 1.4, 1] } : { scale: 1 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Heart
-                size={14}
-                className={isWishlisted ? "fill-[var(--ag-red)] text-[var(--ag-red)]" : "text-gray-400 dark:text-gray-500"}
-              />
-            </motion.div>
-          </button>
 
           {/* Slide-up Add to Cart button (hover state for desktop) */}
           <div className="absolute inset-x-0 bottom-0 p-3 translate-y-3 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 ease-out-expo hidden sm:block z-10">

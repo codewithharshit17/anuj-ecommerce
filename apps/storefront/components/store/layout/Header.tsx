@@ -4,7 +4,7 @@
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, Heart, User, ShoppingBag, Menu, X, Plus, Trash2, History, TrendingUp, Package, MapPin, LogOut } from "lucide-react";
+import { Search, User, ShoppingBag, Menu, X, Plus, Trash2, History, TrendingUp, Package, MapPin, LogOut } from "lucide-react";
 import { useCartStore } from "@/lib/store/cart-store";
 import { useUIStore } from "@/components/store/ui-store";
 import { searchProducts } from "@/lib/actions/product-actions";
@@ -56,7 +56,7 @@ const trendingSearches = [
 export default function Header() {
   const router = useRouter();
   const { items, addItem } = useCartStore();
-  const { setCartOpen, setMobileMenuOpen, wishlist } = useUIStore();
+  const { setCartOpen, setMobileMenuOpen} = useUIStore();
   const { user, isAuthenticated } = useAuthStore();
 
   const [isScrolled, setIsScrolled] = useState(false);
@@ -447,20 +447,6 @@ export default function Header() {
               <Menu size={20} />
             </button>
 
-            {/* Wishlist Link */}
-            <Link
-              href="/products"
-              className="p-2.5 rounded-full hover:bg-[var(--ag-gray-100)] dark:hover:bg-neutral-800 text-[var(--ag-dark)] dark:text-[var(--foreground)] transition-colors relative"
-              aria-label="Wishlist"
-            >
-              <Heart size={20} className={wishlist.length > 0 ? "fill-[var(--ag-red)] text-[var(--ag-red)]" : ""} />
-              {wishlist.length > 0 && (
-                <span className="absolute top-1.5 right-1.5 bg-[var(--ag-red)] text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                  {wishlist.length}
-                </span>
-              )}
-            </Link>
-
             {/* Account Icon / Dropdown */}
             {isAuthenticated && user ? (
               <DropdownMenu>
@@ -512,12 +498,6 @@ export default function Header() {
                     <Link href="/account/addresses" className="flex items-center gap-2 w-full">
                       <MapPin size={14} className="text-[var(--ag-gray-500)]" />
                       <span>Addresses</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/account/wishlist" className="flex items-center gap-2 w-full">
-                      <Heart size={14} className="text-[var(--ag-gray-500)]" />
-                      <span>Wishlist</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />

@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,64 +8,62 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// Users
 model User {
-  id        String   @id // Supabase Auth UUID
-  email     String   @unique
+  id        String    @id
+  email     String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   firstName String?
   lastName  String?
   addresses Address[]
   cart      Cart?
-  wishlist  Wishlist?
   orders    Order[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  wishlist  Wishlist?
 }
 
 model Address {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   line1     String
   line2     String?
   city      String
   state     String
   pincode   String
-  isDefault Boolean  @default(false)
+  isDefault Boolean @default(false)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
 
-// Products
 model Category {
   id        String    @id @default(cuid())
   name      String
   slug      String    @unique
-  products  Product[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  products  Product[]
 
   @@index([slug])
 }
 
 model Product {
-  id          String   @id @default(cuid())
-  name        String
-  slug        String   @unique
-  description String?
-  price       Float
-  mrp         Float
-  isActive    Boolean  @default(true)
-  isFeatured  Boolean  @default(false)
-  categoryId  String
-  category    Category @relation(fields: [categoryId], references: [id])
-  images      ProductImage[]
-  variants    ProductVariant[]
-  cartItems   CartItem[]
+  id            String           @id @default(cuid())
+  name          String
+  slug          String           @unique
+  description   String?
+  price         Float
+  mrp           Float
+  isActive      Boolean          @default(true)
+  isFeatured    Boolean          @default(false)
+  categoryId    String
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  cartItems     CartItem[]
+  orderItems    OrderItem[]
+  category      Category         @relation(fields: [categoryId], references: [id])
+  images        ProductImage[]
+  variants      ProductVariant[]
   wishlistItems WishlistItem[]
-  orderItems  OrderItem[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
 
   @@index([slug])
 }
@@ -76,99 +71,96 @@ model Product {
 model ProductImage {
   id        String  @id @default(cuid())
   productId String
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   url       String
   alt       String?
   isPrimary Boolean @default(false)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model ProductVariant {
-  id          String  @id @default(cuid())
-  productId   String
-  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  optionName  String  // e.g., "Color", "Size"
-  optionValue String  // e.g., "Blue", "A4"
-  sku         String? @unique
-  stock       Int     @default(0)
-  price       Float?  // Override base price if needed
-  
-  cartItems   CartItem[]
+  id            String         @id @default(cuid())
+  productId     String
+  optionName    String
+  optionValue   String
+  sku           String?        @unique
+  stock         Int            @default(0)
+  price         Float?
+  cartItems     CartItem[]
+  orderItems    OrderItem[]
+  product       Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
   wishlistItems WishlistItem[]
-  orderItems  OrderItem[]
 }
 
-// Shopping
 model Cart {
   id        String     @id @default(cuid())
   userId    String     @unique
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  items     CartItem[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
 
   @@index([userId])
 }
 
 model CartItem {
-  id        String   @id @default(cuid())
+  id        String          @id @default(cuid())
   cartId    String
-  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
   productId String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   variantId String?
-  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
-  quantity  Int      @default(1)
-  
+  quantity  Int             @default(1)
+  cart      Cart            @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product   Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variant   ProductVariant? @relation(fields: [variantId], references: [id])
+
   @@unique([cartId, productId, variantId])
 }
 
 model Wishlist {
-  id        String         @id @default(cuid())
-  userId    String         @unique
-  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  items     WishlistItem[]
+  id     String         @id @default(cuid())
+  userId String         @unique
+  user   User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items  WishlistItem[]
 
   @@index([userId])
 }
 
 model WishlistItem {
-  id         String   @id @default(cuid())
+  id         String          @id @default(cuid())
   wishlistId String
-  wishlist   Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
   productId  String
-  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   variantId  String?
-  variant    ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  product    Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variant    ProductVariant? @relation(fields: [variantId], references: [id])
+  wishlist   Wishlist        @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
 
   @@unique([wishlistId, productId, variantId])
 }
 
-// Orders
 model Order {
-  id            String      @id @default(cuid())
-  userId        String
-  user          User        @relation(fields: [userId], references: [id], onDelete: Restrict)
-  status        OrderStatus @default(PENDING)
-  paymentStatus PaymentStatus @default(PENDING)
-  totalAmount   Float
-  razorpayOrderId String?   @unique
-  items         OrderItem[]
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  id              String        @id @default(cuid())
+  userId          String
+  status          OrderStatus   @default(PENDING)
+  paymentStatus   PaymentStatus @default(PENDING)
+  totalAmount     Float
+  razorpayOrderId String?       @unique
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  user            User          @relation(fields: [userId], references: [id])
+  items           OrderItem[]
 
   @@index([userId])
 }
 
 model OrderItem {
-  id        String  @id @default(cuid())
+  id        String          @id @default(cuid())
   orderId   String
-  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   productId String
-  product   Product @relation(fields: [productId], references: [id], onDelete: Restrict)
   variantId String?
-  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
   quantity  Int
-  price     Float   // Price at the time of purchase
+  price     Float
+  order     Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product         @relation(fields: [productId], references: [id])
+  variant   ProductVariant? @relation(fields: [variantId], references: [id])
 }
 
 enum OrderStatus {

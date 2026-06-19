@@ -18,7 +18,6 @@ import {
   MapPin,
   LogOut,
   ChevronRight,
-  Heart,
 } from "lucide-react";
 
 // ── Navigation items ─────────────────────────────────────────────────
@@ -42,12 +41,7 @@ const NAV_ITEMS = [
     icon: MapPin,
     description: "Saved delivery addresses",
   },
-  {
-    href: "/account/wishlist",
-    label: "Wishlist",
-    icon: Heart,
-    description: "Saved items",
-  },
+
 ] as const;
 
 // ── Layout ───────────────────────────────────────────────────────────

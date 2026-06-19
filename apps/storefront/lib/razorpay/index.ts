@@ -37,9 +37,16 @@ const globalForRazorpay = globalThis as typeof globalThis & {
   razorpayInstance?: Razorpay;
 };
 
-export const razorpay =
-  globalForRazorpay.razorpayInstance ?? createRazorpayInstance();
+function getRazorpayInstance(): Razorpay {
+  if (!globalForRazorpay.razorpayInstance) {
+    globalForRazorpay.razorpayInstance = createRazorpayInstance();
+  }
 
-if (process.env.NODE_ENV !== "production") {
-  globalForRazorpay.razorpayInstance = razorpay;
+  return globalForRazorpay.razorpayInstance;
 }
+
+export const razorpay = new Proxy({} as Razorpay, {
+  get(_target, property, receiver) {
+    return Reflect.get(getRazorpayInstance(), property, receiver);
+  },
+});

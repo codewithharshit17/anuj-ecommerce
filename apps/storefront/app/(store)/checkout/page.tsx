@@ -1,3 +1,5 @@
+// TODO: Phase 5.6
+// Send payload to /api/payment/verify
 // apps/storefront/app/(store)/checkout/page.tsx
 "use client";
 
@@ -17,6 +19,64 @@ import {
 } from "lucide-react";
 import { useCartStore } from "@/lib/store/cart-store";
 import { useCheckoutStore, CheckoutStep } from "@/lib/store/checkout-store";
+
+interface RazorpayPaymentResponse {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
+}
+
+interface RazorpayOptions {
+  key: string;
+  amount: number;
+  currency: string;
+  name: string;
+  description: string;
+  order_id: string;
+  handler: (response: RazorpayPaymentResponse) => void;
+  prefill?: {
+    name?: string;
+    email?: string;
+    contact?: string;
+  };
+  theme?: {
+    color?: string;
+  };
+  modal?: {
+    ondismiss?: () => void;
+  };
+}
+
+interface RazorpayInstance {
+  open: () => void;
+}
+
+interface RazorpayConstructor {
+  new (options: RazorpayOptions): RazorpayInstance;
+}
+
+interface CreateRazorpayOrderSuccess {
+  success: true;
+  orderId: string;
+  amount: number;
+  currency: string;
+}
+
+interface CreateRazorpayOrderFailure {
+  success: false;
+  error?: string;
+  errors?: string[];
+}
+
+type CreateRazorpayOrderResponse =
+  | CreateRazorpayOrderSuccess
+  | CreateRazorpayOrderFailure;
+
+declare global {
+  interface Window {
+    Razorpay?: RazorpayConstructor;
+  }
+}
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -45,6 +105,12 @@ export default function CheckoutPage() {
   const [couponError, setCouponError] = useState("");
   const [couponSuccess, setCouponSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const [razorpayLoaded, setRazorpayLoaded] = useState(
+    () => typeof window !== "undefined" && Boolean(window.Razorpay)
+  );
+  const [paymentError, setPaymentError] = useState("");
+  const [paymentPayload, setPaymentPayload] =
+    useState<RazorpayPaymentResponse | null>(null);
 
   // Focus Refs
   const fullNameRef = useRef<HTMLInputElement>(null);
@@ -56,6 +122,46 @@ export default function CheckoutPage() {
       router.push("/cart");
     }
   }, [cartItems, router]);
+
+  // Load Razorpay Checkout SDK once on the client.
+  useEffect(() => {
+    if (window.Razorpay) {
+      return;
+    }
+
+    const handleScriptLoad = () => setRazorpayLoaded(true);
+    const handleScriptError = () => {
+      setRazorpayLoaded(false);
+      setPaymentError("Unable to load payment gateway. Please try again.");
+    };
+
+    const existingScript = document.querySelector<HTMLScriptElement>(
+      'script[src="https://checkout.razorpay.com/v1/checkout.js"]'
+    );
+
+    if (existingScript) {
+      existingScript.addEventListener("load", handleScriptLoad);
+      existingScript.addEventListener("error", handleScriptError);
+
+      return () => {
+        existingScript.removeEventListener("load", handleScriptLoad);
+        existingScript.removeEventListener("error", handleScriptError);
+      };
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.addEventListener("load", handleScriptLoad);
+    script.addEventListener("error", handleScriptError);
+
+    document.body.appendChild(script);
+
+    return () => {
+      script.removeEventListener("load", handleScriptLoad);
+      script.removeEventListener("error", handleScriptError);
+    };
+  }, []);
 
   // Autofocus field on step changes
   useEffect(() => {
@@ -187,15 +293,81 @@ export default function CheckoutPage() {
     setCouponError("");
   };
 
-  // Complete Order placement
-  const handlePlaceOrder = () => {
+  // Create Razorpay order and open Checkout modal.
+  if (loading) return;
+  const handlePlaceOrder = async () => {
+    setPaymentError("");
+    setPaymentPayload(null);
+
+    if (!razorpayLoaded || !window.Razorpay) {
+      setPaymentError("Payment gateway is still loading. Please try again.");
+      return;
+    }
+
+    const razorpayKeyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+    if (!razorpayKeyId) {
+      setPaymentError("Payment gateway is not configured. Please contact support.");
+      return;
+    }
+
     setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
+
+    try {
+      const response = await fetch("/api/payment/create-order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = (await response.json()) as CreateRazorpayOrderResponse;
+
+      if (!response.ok || !data.success) {
+        const message =
+          !data.success && data.errors?.length
+            ? data.errors.join(" ")
+            : !data.success && data.error
+            ? data.error
+            : "Unable to start payment. Please try again.";
+        setPaymentError(message);
+        return;
+      }
+
+      const razorpay = new window.Razorpay({
+        key: razorpayKeyId,
+        amount: data.amount,
+        currency: data.currency,
+        name: "KAPI PEN",
+        description: "Stationery Purchase",
+        order_id: data.orderId,
+        prefill: {
+          name: contact.fullName,
+          email: contact.email,
+          contact: contact.mobile,
+        },
+        theme: {
+          color: "#e53c3c",
+        },
+        modal: {
+          ondismiss: () => {
+            setPaymentError("Payment was cancelled. You can try again when ready.");
+            setLoading(false);
+          },
+        },
+        handler: (payload) => {
+          console.log("[Razorpay Payment Success]", payload);
+          setPaymentPayload(payload);
+          setPaymentError("");
+          setLoading(false);
+        },
+      });
+
+      razorpay.open();
+    } catch (error) {
+      console.error("[Checkout] Failed to create Razorpay order:", error);
+      setPaymentError("Unable to start payment. Please try again.");
+    } finally {
       setLoading(false);
-      // Route to success page
-      router.push("/checkout/success");
-    }, 2000);
+    }
   };
 
   const stepsList: { id: CheckoutStep; label: string }[] = [
@@ -684,13 +856,29 @@ export default function CheckoutPage() {
                       </button>
                     </div>
 
-                    {/* Razorpay Integration mock indicator */}
+                    {/* Razorpay Integration indicator */}
                     <div className="p-4 rounded-[var(--radius-lg)] bg-amber-500/10 border border-amber-500/25 flex gap-3 mt-4 text-xs font-semibold text-amber-600">
                       <ShieldCheck size={16} className="shrink-0 mt-0.5" />
                       <div>
-                        Secure Gateway Integration: Razorpay Sandbox triggers upon clicking &quot;PLACE ORDER&quot;. 100% encrypted environment.
+                        Secure Gateway: Razorpay opens when you click &quot;PLACE ORDER &amp; PAY&quot;. 100% encrypted environment.
                       </div>
                     </div>
+
+                    {paymentError && (
+                      <div className="p-3 rounded-[var(--radius-lg)] bg-red-500/10 border border-red-500/25 flex gap-2 text-xs font-bold text-red-500">
+                        <AlertCircle size={14} className="shrink-0 mt-0.5" />
+                        <span>{paymentError}</span>
+                      </div>
+                    )}
+
+                    {paymentPayload && (
+                      <div className="p-3 rounded-[var(--radius-lg)] bg-emerald-500/10 border border-emerald-500/25 flex gap-2 text-xs font-bold text-emerald-600">
+                        <Check size={14} className="shrink-0 mt-0.5" />
+                        <span>
+                          Payment captured in checkout state: {paymentPayload.razorpay_payment_id}
+                        </span>
+                      </div>
+                    )}
 
                     <div className="pt-6 flex justify-between gap-4">
                       <button

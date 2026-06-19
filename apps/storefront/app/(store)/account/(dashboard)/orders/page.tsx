@@ -103,7 +103,7 @@ export default async function OrdersPage() {
                         Order ID
                       </p>
                       <p className="text-xs font-bold text-[var(--ag-dark)] dark:text-gray-300 font-mono">
-                        #{order.id.slice(-10).toUpperCase()}
+                        {order.orderNumber}
                       </p>
                     </div>
                   </div>
@@ -149,9 +149,9 @@ export default async function OrdersPage() {
                   {/* Future-ready Razorpay Metadata */}
                   <div className="flex items-center gap-1.5 text-xs font-semibold text-[var(--ag-gray-500)]">
                     <CreditCard size={14} />
-                    <span>Razorpay ID: </span>
+                    <span>Razorpay: </span>
                     <span className="font-mono text-[11px] text-[var(--ag-dark)] dark:text-gray-300">
-                      {order.razorpayOrderId || "pending_integration"}
+                      {order.razorpayOrderId || "N/A"}
                     </span>
                     <span className="text-[10px] text-[var(--ag-gray-500)] font-bold">
                       ({order.paymentStatus})

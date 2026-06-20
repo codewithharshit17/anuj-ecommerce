@@ -5,7 +5,7 @@ import { useEffect, useState, use, useCallback } from "react";
 import Link from "next/link";
 import { ChevronRight, X } from "lucide-react";
 import { StorefrontProduct } from "@/components/store/products/ProductCard";
-import { getProductsByCategory } from "@/lib/actions/product-actions";
+import { getProductsByCategory, getCategoryBySlug } from "@/lib/actions/product-actions";
 import FilterSidebar from "@/components/store/collection/FilterSidebar";
 import ProductGrid from "@/components/store/collection/ProductGrid";
 import SortDropdown from "@/components/store/collection/SortDropdown";
@@ -41,12 +41,36 @@ export default function CollectionPage({ params }: PageProps) {
   // Fetch collection details
   useEffect(() => {
     const fetchCollection = async () => {
-      setCollection({
-        id: `col-${handle}`,
-        title: handle.charAt(0).toUpperCase() + handle.slice(1).replace(/-/g, " "),
-        handle: handle,
-        thumbnail: "https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?w=600",
-      });
+      if (handle === "best-sellers" || handle === "featured") {
+        setCollection({
+          id: `col-${handle}`,
+          title: handle === "best-sellers" ? "Best Sellers" : "Featured Products",
+          handle: handle,
+          thumbnail: "https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?w=600",
+        });
+        return;
+      }
+
+      try {
+        const cat = await getCategoryBySlug(handle);
+        if (cat) {
+          setCollection({
+            id: cat.id,
+            title: cat.name,
+            handle: cat.slug,
+            thumbnail: cat.imageUrl || "https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?w=600",
+          });
+        } else {
+          setCollection({
+            id: `col-${handle}`,
+            title: handle.charAt(0).toUpperCase() + handle.slice(1).replace(/-/g, " "),
+            handle: handle,
+            thumbnail: "https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?w=600",
+          });
+        }
+      } catch (err) {
+        console.error(err);
+      }
     };
     fetchCollection();
   }, [handle]);

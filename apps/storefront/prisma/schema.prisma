@@ -9,16 +9,18 @@ datasource db {
 }
 
 model User {
-  id        String    @id
-  email     String    @unique
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  firstName String?
-  lastName  String?
-  addresses Address[]
-  cart      Cart?
-  orders    Order[]
-  wishlist  Wishlist?
+  id           String             @id
+  email        String             @unique
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  firstName    String?
+  lastName     String?
+  role         UserRole           @default(CUSTOMER)
+  addresses    Address[]
+  cart         Cart?
+  orders       Order[]
+  wishlist     Wishlist?
+  activityLogs AdminActivityLog[]
 }
 
 model Address {
@@ -36,34 +38,37 @@ model Address {
 }
 
 model Category {
-  id        String    @id @default(cuid())
-  name      String
-  slug      String    @unique
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  products  Product[]
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  imageUrl    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  products    Product[]
 
   @@index([slug])
 }
 
 model Product {
-  id            String           @id @default(cuid())
-  name          String
-  slug          String           @unique
-  description   String?
-  price         Float
-  mrp           Float
-  isActive      Boolean          @default(true)
-  isFeatured    Boolean          @default(false)
-  categoryId    String
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-  cartItems     CartItem[]
-  orderItems    OrderItem[]
-  category      Category         @relation(fields: [categoryId], references: [id])
-  images        ProductImage[]
-  variants      ProductVariant[]
-  wishlistItems WishlistItem[]
+  id                String           @id @default(cuid())
+  name              String
+  slug              String           @unique
+  description       String?
+  price             Float
+  mrp               Float
+  isActive          Boolean          @default(true)
+  isFeatured        Boolean          @default(false)
+  categoryId        String
+  lowStockThreshold Int              @default(10)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  cartItems         CartItem[]
+  orderItems        OrderItem[]
+  category          Category         @relation(fields: [categoryId], references: [id])
+  images            ProductImage[]
+  variants          ProductVariant[]
+  wishlistItems     WishlistItem[]
 
   @@index([slug])
 }
@@ -178,4 +183,20 @@ enum PaymentStatus {
   COMPLETED
   FAILED
   REFUNDED
+}
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
+}
+
+model AdminActivityLog {
+  id          String   @id @default(cuid())
+  adminId     String
+  admin       User     @relation(fields: [adminId], references: [id])
+  action      String
+  entityType  String
+  entityId    String
+  metadata    Json?
+  createdAt   DateTime @default(now())
 }

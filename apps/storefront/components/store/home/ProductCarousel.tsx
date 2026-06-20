@@ -4,7 +4,7 @@
 import useEmblaCarousel from "embla-carousel-react";
 import { useEffect, useState, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { getProducts, getProductsByCategory } from "@/lib/actions/product-actions";
+import { getProducts, getProductsByCategory, getFeaturedProducts, getNewArrivals, getTrendingProducts } from "@/lib/actions/product-actions";
 import { StorefrontProduct } from "../products/ProductCard";
 import ProductCard from "../products/ProductCard";
 
@@ -64,13 +64,14 @@ export default function ProductCarousel({
       setLoading(true);
       try {
         let fetched: StorefrontProduct[] = [];
-        if (collectionId) {
-          // Map mock collectionIds to categories or use generic
-          if (collectionId === "col-bestsellers") {
-            fetched = (await getProducts()) as StorefrontProduct[];
-          } else {
-            fetched = (await getProductsByCategory(collectionId)) as StorefrontProduct[];
-          }
+        if (collectionId === "featured" || collectionId === "col-featured") {
+          fetched = (await getFeaturedProducts()) as StorefrontProduct[];
+        } else if (collectionId === "trending") {
+          fetched = (await getTrendingProducts(limit)) as StorefrontProduct[];
+        } else if (collectionId === "new-arrivals") {
+          fetched = (await getNewArrivals(limit)) as StorefrontProduct[];
+        } else if (collectionId) {
+          fetched = (await getProductsByCategory(collectionId)) as StorefrontProduct[];
         } else {
           fetched = (await getProducts()) as StorefrontProduct[];
         }
@@ -89,6 +90,7 @@ export default function ProductCarousel({
 
     fetchProducts();
   }, [collectionId, limit, filterFn]);
+
 
   return (
     <section className="py-12 bg-white dark:bg-neutral-900 border-b border-[var(--ag-gray-200)] dark:border-neutral-800 select-none">

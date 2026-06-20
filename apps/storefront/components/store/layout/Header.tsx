@@ -24,24 +24,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const navCategories = [
-  "Stationery",
-  "Office Supplies",
-  "Art Supplies",
-  "Craft Material",
-  "Best Sellers",
-  "Birthday/Party Items",
-];
-
-const searchCategories = [
-  "All Categories",
-  "Stationery",
-  "Office Supplies",
-  "Art Supplies",
-  "Craft Material",
-  "Best Sellers",
-  "Birthday/Party Items",
-];
+interface HeaderProps {
+  categories: any[];
+}
 
 // Popular stationery searches
 const trendingSearches = [
@@ -53,7 +38,9 @@ const trendingSearches = [
   "Washi Tape",
 ];
 
-export default function Header() {
+export default function Header({ categories = [] }: HeaderProps) {
+  const navCategories = categories.map((c) => c.name);
+  const searchCategories = ["All Categories", ...categories.map((c) => c.name)];
   const router = useRouter();
   const { items, addItem } = useCartStore();
   const { setCartOpen, setMobileMenuOpen} = useUIStore();
@@ -563,18 +550,18 @@ export default function Header() {
         <div className="w-full border-t border-[var(--ag-gray-200)] dark:border-neutral-800 hidden md:block">
           <div className="max-w-7xl mx-auto px-8 flex justify-center relative">
             <nav className="flex items-center gap-8 h-12" onMouseLeave={handleNavLeave}>
-              {navCategories.map((category) => (
+              {categories.map((category) => (
                 <div
-                  key={category}
+                  key={category.id}
                   className="h-full flex items-center"
-                  onMouseEnter={() => handleNavHover(category)}
+                  onMouseEnter={() => handleNavHover(category.slug)}
                 >
                   <Link
-                    href={`/collections/${category.toLowerCase().replace(/\s+/g, "-")}`}
+                    href={`/collections/${category.slug}`}
                     className="text-sm font-bold text-[var(--ag-gray-800)] hover:text-[var(--ag-red)] transition-colors relative py-3"
                   >
-                    {category}
-                    {hoveredCategory === category && (
+                    {category.name}
+                    {hoveredCategory === category.slug && (
                       <motion.div
                         layoutId="nav-underline"
                         className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--ag-red)]"
@@ -583,6 +570,23 @@ export default function Header() {
                   </Link>
                 </div>
               ))}
+              <div
+                className="h-full flex items-center"
+                onMouseEnter={() => handleNavHover("best-sellers")}
+              >
+                <Link
+                  href="/collections/best-sellers"
+                  className="text-sm font-bold text-[var(--ag-gray-800)] hover:text-[var(--ag-red)] transition-colors relative py-3"
+                >
+                  Best Sellers
+                  {hoveredCategory === "best-sellers" && (
+                    <motion.div
+                      layoutId="nav-underline"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--ag-red)]"
+                    />
+                  )}
+                </Link>
+              </div>
             </nav>
 
             {/* Render full-width MegaMenu */}
@@ -591,6 +595,15 @@ export default function Header() {
                 <div onMouseEnter={() => handleNavHover(hoveredCategory)}>
                   <MegaMenu
                     category={hoveredCategory}
+                    categoryData={
+                      hoveredCategory === "best-sellers"
+                        ? {
+                            name: "Best Sellers",
+                            slug: "best-sellers",
+                            products: categories.flatMap((c) => c.products).filter((p) => p.isFeatured),
+                          }
+                        : categories.find((c) => c.slug === hoveredCategory)
+                    }
                     onClose={() => setHoveredCategory(null)}
                   />
                 </div>

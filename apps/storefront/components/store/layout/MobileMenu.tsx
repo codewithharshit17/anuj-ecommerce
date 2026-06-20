@@ -22,57 +22,29 @@ interface NavItem {
   subcategories?: SubCategory[];
 }
 
-const navItems: NavItem[] = [
-  { title: "Home", href: "/" },
-  { title: "All Products", href: "/products" },
-  {
-    title: "Stationery",
-    href: "/collections/stationery",
-    subcategories: [
-      { title: "Pens & Refills", href: "/collections/stationery?category=Pens" },
-      { title: "Notebooks & Diaries", href: "/collections/office-supplies?category=Notebooks" },
-      { title: "Pencils & Erasers", href: "/collections/stationery?category=Pencils" },
-      { title: "Desk Organizers", href: "/collections/stationery" },
-    ],
-  },
-  {
-    title: "Office Supplies",
-    href: "/collections/office-supplies",
-    subcategories: [
-      { title: "Notebooks", href: "/collections/office-supplies?category=Notebooks" },
-      { title: "Files & Folders", href: "/collections/office-supplies" },
-      { title: "Calculators", href: "/collections/office-supplies" },
-    ],
-  },
-  {
-    title: "Art Supplies",
-    href: "/collections/art-supplies",
-    subcategories: [
-      { title: "Markers & Liners", href: "/collections/art-supplies" },
-      { title: "Sketchbooks", href: "/collections/art-supplies" },
-      { title: "Paints", href: "/collections/art-supplies" },
-    ],
-  },
-  {
-    title: "Craft Material",
-    href: "/collections/craft-material",
-    subcategories: [
-      { title: "Washi Tapes", href: "/collections/craft-material" },
-      { title: "Adhesives", href: "/collections/craft-material" },
-    ],
-  },
-  { title: "Best Sellers", href: "/collections/best-sellers" },
-  {
-    title: "Birthday/Party Items",
-    href: "/collections/birthday-party-items",
-    subcategories: [
-      { title: "Party Decoration", href: "/collections/birthday-party-items" },
-      { title: "Candles & Poppers", href: "/collections/birthday-party-items" },
-    ],
-  },
-];
+interface MobileMenuProps {
+  categories: any[];
+}
 
-export default function MobileMenu() {
+export default function MobileMenu({ categories = [] }: MobileMenuProps) {
+  const navItems: NavItem[] = [
+    { title: "Home", href: "/" },
+    { title: "All Products", href: "/products" },
+    ...(categories.length > 0
+      ? [
+          {
+            title: "Categories",
+            href: "#",
+            subcategories: categories.map((cat: any) => ({
+              title: cat.name,
+              href: `/collections/${cat.slug}`,
+            })),
+          },
+        ]
+      : []),
+    { title: "Best Sellers", href: "/collections/best-sellers" },
+  ];
+
   const { isMobileMenuOpen, setMobileMenuOpen, setCartOpen } = useUIStore();
   const items = useCartStore((state) => state.items);
   const cartCount = items.reduce((total, item) => total + item.quantity, 0);

@@ -34,8 +34,40 @@ export async function middleware(request: NextRequest) {
   // 1. Always refresh the session first
   const response = await updateSession(request);
 
-  // 2. Check protected routes
-  if (isProtectedRoute(request.nextUrl.pathname)) {
+  const pathname = request.nextUrl.pathname;
+
+  // 2. Protect admin routes (redirect unauthenticated to /admin/login)
+  if (
+    pathname.startsWith("/admin") &&
+    pathname !== "/admin/login" &&
+    !pathname.startsWith("/admin/auth/callback") &&
+    !pathname.startsWith("/admin/forgot-password")
+  ) {
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll();
+          },
+          setAll() {},
+        },
+      }
+    );
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      const loginUrl = new URL("/admin/login", request.url);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
+  // 3. Check protected customer routes
+  if (isProtectedRoute(pathname)) {
     // Create a lightweight Supabase client to check auth
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -59,7 +91,7 @@ export async function middleware(request: NextRequest) {
 
     if (!user) {
       const loginUrl = new URL("/account/login", request.url);
-      loginUrl.searchParams.set("redirect", request.nextUrl.pathname);
+      loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
     }
   }

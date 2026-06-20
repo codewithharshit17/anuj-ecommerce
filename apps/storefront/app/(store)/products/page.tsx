@@ -7,16 +7,9 @@ import { ChevronRight, Grid3x3, List, Search } from "lucide-react";
 import ProductCard from "@/components/store/products/ProductCard";
 import SkeletonCard from "@/components/store/ui/SkeletonCard";
 import { StorefrontProduct } from "@/components/store/products/ProductCard";
-import { getProducts, getProductsByCategory, searchProducts } from "@/lib/actions/product-actions";
+import { getProducts, getProductsByCategory, searchProducts, getCategories } from "@/lib/actions/product-actions";
 
 
-
-const categoriesList = [
-  { label: "All", value: "" },
-  { label: "Pens", value: "pens" },
-  { label: "Notebooks", value: "notebooks" },
-  { label: "Art Supplies", value: "art-supplies" },
-];
 
 const sortOptions = [
   "Most Popular",
@@ -32,6 +25,25 @@ export default function ProductsPage() {
   const [sortBy, setSortBy] = useState("Most Popular");
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [categoriesList, setCategoriesList] = useState<{ label: string; value: string }[]>([
+    { label: "All", value: "" },
+  ]);
+
+  useEffect(() => {
+    const fetchCats = async () => {
+      try {
+        const cats = await getCategories();
+        setCategoriesList([
+          { label: "All", value: "" },
+          ...cats.map((c) => ({ label: c.name, value: c.slug })),
+        ]);
+      } catch (err) {
+        console.error("Error loading categories for pills:", err);
+      }
+    };
+    fetchCats();
+  }, []);
+
 
   useEffect(() => {
     const fetchProducts = async () => {

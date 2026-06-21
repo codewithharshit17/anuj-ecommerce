@@ -48,3 +48,22 @@ export async function uploadImage(
     throw error;
   }
 }
+
+/**
+ * Deletes an image from Cloudinary using its public_id.
+ * @param publicId - The Cloudinary public ID.
+ */
+export async function deleteImage(publicId: string): Promise<{ result: string }> {
+  if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+    throw new Error("Cloudinary environment variables (CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET) are not configured.");
+  }
+
+  try {
+    const cloudinaryInstance = getConfiguredCloudinary();
+    const result = await cloudinaryInstance.uploader.destroy(publicId);
+    return result;
+  } catch (error) {
+    console.error("[Cloudinary Delete] Failed to delete image:", error);
+    throw error;
+  }
+}

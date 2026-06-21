@@ -8,6 +8,7 @@ import ProductCard from "@/components/store/products/ProductCard";
 import SkeletonCard from "@/components/store/ui/SkeletonCard";
 import { StorefrontProduct } from "@/components/store/products/ProductCard";
 import { getProducts, getProductsByCategory, searchProducts, getCategories } from "@/lib/actions/product-actions";
+import { PLACEHOLDER_IMAGE } from "@/lib/utils";
 
 
 
@@ -225,7 +226,7 @@ export default function ProductsPage() {
                   <ProductCard product={product} />
                 ) : (
                   <div className="bg-white border border-[var(--ag-gray-200)] p-4 rounded-[var(--radius-lg)] flex gap-4 items-center">
-                    <img src={product.images.find(i => i.isPrimary)?.url || product.images[0]?.url || ""} alt="" className="w-20 h-20 object-cover rounded-[var(--radius-sm)] border shrink-0 bg-[var(--ag-gray-100)]" />
+                    <img src={product.images.find(i => i.isPrimary)?.url || product.images[0]?.url || PLACEHOLDER_IMAGE} alt="" className="w-20 h-20 object-cover rounded-[var(--radius-sm)] border shrink-0 bg-[var(--ag-gray-100)]" />
                     <div className="flex-1 min-w-0">
                       <span className="text-[10px] font-bold text-[var(--ag-gray-500)] uppercase tracking-wider">{product.category?.name}</span>
                       <h4 className="font-bold text-sm text-[var(--ag-dark)] truncate">{product.name}</h4>

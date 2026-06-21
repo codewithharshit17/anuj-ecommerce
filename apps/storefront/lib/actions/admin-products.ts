@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth/require-admin";
 import { logActivity } from "@/lib/audit/log-activity";
 import { revalidatePath } from "next/cache";
+import { deleteImage } from "@/lib/cloudinary/upload-image";
 
 // Helper to generate a unique slug
 async function getUniqueSlug(name: string, currentId?: string) {
@@ -36,10 +37,13 @@ export async function createProduct(formData: {
   mrp: number;
   categoryId: string;
   lowStockThreshold?: number;
-  imageUrl?: string;
+  images?: { url: string; publicId?: string; isPrimary: boolean; sortOrder: number }[];
   stock: number; // for default single variant
   isActive?: boolean;
   isFeatured?: boolean;
+  brandName?: string;
+  brandDescription?: string;
+  specifications?: Record<string, string>;
 }) {
   const admin = await requireAdmin();
 
@@ -58,19 +62,28 @@ export async function createProduct(formData: {
         lowStockThreshold: formData.lowStockThreshold ?? 10,
         isActive: formData.isActive ?? true,
         isFeatured: formData.isFeatured ?? false,
+        brandName: formData.brandName ?? null,
+        brandDescription: formData.brandDescription ?? null,
+        specifications: formData.specifications ? JSON.parse(JSON.stringify(formData.specifications)) : {},
       },
     });
 
-    // Create primary image
-    if (formData.imageUrl) {
-      await prisma.productImage.create({
-        data: {
-          productId: product.id,
-          url: formData.imageUrl,
-          alt: formData.name,
-          isPrimary: true,
-        },
-      });
+    // Create multiple images
+    if (formData.images && formData.images.length > 0) {
+      await Promise.all(
+        formData.images.map((img) =>
+          prisma.productImage.create({
+            data: {
+              productId: product.id,
+              url: img.url,
+              publicId: img.publicId ?? null,
+              sortOrder: img.sortOrder,
+              alt: formData.name,
+              isPrimary: img.isPrimary,
+            },
+          })
+        )
+      );
     }
 
     // Create default variant for inventory tracking
@@ -116,10 +129,13 @@ export async function updateProduct(
     mrp: number;
     categoryId: string;
     lowStockThreshold?: number;
-    imageUrl?: string;
+    images?: { url: string; publicId?: string; isPrimary: boolean; sortOrder: number }[];
     stock: number; // updates the default/first variant
     isActive?: boolean;
     isFeatured?: boolean;
+    brandName?: string;
+    brandDescription?: string;
+    specifications?: Record<string, string>;
   }
 ) {
   const admin = await requireAdmin();
@@ -140,6 +156,9 @@ export async function updateProduct(
         lowStockThreshold: formData.lowStockThreshold ?? 10,
         isActive: formData.isActive ?? true,
         isFeatured: formData.isFeatured ?? false,
+        brandName: formData.brandName ?? null,
+        brandDescription: formData.brandDescription ?? null,
+        specifications: formData.specifications ? JSON.parse(JSON.stringify(formData.specifications)) : {},
       },
       include: {
         images: true,
@@ -147,23 +166,59 @@ export async function updateProduct(
       },
     });
 
-    // Handle primary image update
-    if (formData.imageUrl) {
-      const primaryImage = product.images.find((img) => img.isPrimary);
-      if (primaryImage) {
-        await prisma.productImage.update({
-          where: { id: primaryImage.id },
-          data: { url: formData.imageUrl },
-        });
-      } else {
-        await prisma.productImage.create({
-          data: {
-            productId: product.id,
-            url: formData.imageUrl,
-            alt: formData.name,
-            isPrimary: true,
+    // Update product images
+    if (formData.images) {
+      const currentImages = product.images;
+      const newUrls = formData.images.map((img) => img.url);
+
+      // Find images to delete
+      const imagesToDelete = currentImages.filter((img) => !newUrls.includes(img.url));
+
+      // 1. Delete removed images from Cloudinary
+      for (const img of imagesToDelete) {
+        if (img.publicId) {
+          try {
+            await deleteImage(img.publicId);
+          } catch (e) {
+            console.error(`Failed to delete asset ${img.publicId} from Cloudinary:`, e);
+          }
+        }
+      }
+
+      // 2. Delete removed images from database
+      if (imagesToDelete.length > 0) {
+        await prisma.productImage.deleteMany({
+          where: {
+            id: { in: imagesToDelete.map((img) => img.id) },
           },
         });
+      }
+
+      // 3. Upsert remaining/new images
+      for (const img of formData.images) {
+        const existing = currentImages.find((cImg) => cImg.url === img.url);
+
+        if (existing) {
+          await prisma.productImage.update({
+            where: { id: existing.id },
+            data: {
+              isPrimary: img.isPrimary,
+              sortOrder: img.sortOrder,
+              publicId: img.publicId ?? existing.publicId,
+            },
+          });
+        } else {
+          await prisma.productImage.create({
+            data: {
+              productId: id,
+              url: img.url,
+              publicId: img.publicId ?? null,
+              sortOrder: img.sortOrder,
+              alt: formData.name,
+              isPrimary: img.isPrimary,
+            },
+          });
+        }
       }
     }
 

@@ -39,10 +39,19 @@ export default async function EditProductPage({ params }: PageProps) {
     mrp: product.mrp,
     categoryId: product.categoryId,
     lowStockThreshold: product.lowStockThreshold,
-    imageUrl: product.images.find((img) => img.isPrimary)?.url || product.images[0]?.url || "",
+    images: product.images.map((img) => ({
+      id: img.id,
+      url: img.url,
+      publicId: img.publicId ?? undefined,
+      isPrimary: img.isPrimary,
+      sortOrder: img.sortOrder,
+    })).sort((a, b) => a.sortOrder - b.sortOrder),
     stock: product.variants[0]?.stock || 0,
     isActive: product.isActive,
     isFeatured: product.isFeatured,
+    brandName: product.brandName,
+    brandDescription: product.brandDescription,
+    specifications: product.specifications,
   };
 
   return (

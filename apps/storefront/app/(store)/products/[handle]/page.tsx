@@ -14,6 +14,8 @@ import ProductCard from "@/components/store/products/ProductCard";
 import { useCartStore } from "@/lib/store/cart-store";
 import { useUIStore } from "@/components/store/ui-store";
 import { useAuthStore } from "@/lib/store/auth-store";
+import { PLACEHOLDER_IMAGE } from "@/lib/utils";
+import { getPublicReviews, checkUserCanReview } from "@/lib/actions/reviews";
 
 interface PageProps {
   params: Promise<{ handle: string }>;
@@ -31,6 +33,22 @@ export default function ProductDetailPage({ params }: PageProps) {
   const [cartSuccess, setCartSuccess] = useState(false);
   const [relatedProducts, setRelatedProducts] = useState<StorefrontProduct[]>([]);
   const { isAuthenticated } = useAuthStore();
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [canReview, setCanReview] = useState(false);
+  const [canReviewReason, setCanReviewReason] = useState<string | null>(null);
+
+  const fetchReviewsAndAuth = async (productId: string) => {
+    try {
+      const publicReviews = await getPublicReviews(productId);
+      setReviews(publicReviews);
+
+      const canReviewStatus = await checkUserCanReview(productId);
+      setCanReview(canReviewStatus.canReview);
+      setCanReviewReason(canReviewStatus.reason ?? null);
+    } catch (err) {
+      console.error("Error loading reviews/auth:", err);
+    }
+  };
 
   // Fetch product & related items
   useEffect(() => {
@@ -40,7 +58,9 @@ export default function ProductDetailPage({ params }: PageProps) {
         const fetchedProd = await getProductBySlug(handle) as StorefrontProduct;
         setProduct(fetchedProd);
         
-
+        if (fetchedProd) {
+          fetchReviewsAndAuth(fetchedProd.id);
+        }
 
         // Fetch related products
         if (fetchedProd && fetchedProd.categoryId) {
@@ -87,7 +107,7 @@ export default function ProductDetailPage({ params }: PageProps) {
       id: product.id,
       name: product.name,
       price: activePrice,
-      image: product.images.find(i => i.isPrimary)?.url || product.images[0]?.url || "",
+      image: product.images.find(i => i.isPrimary)?.url || product.images[0]?.url || PLACEHOLDER_IMAGE,
       quantity: quantity,
       stock: stock,
     });
@@ -130,7 +150,7 @@ export default function ProductDetailPage({ params }: PageProps) {
           
           {/* Left Column: ImageGallery */}
           <div className="lg:col-span-7">
-            <ImageGallery images={product.images.map(img => img.url)} />
+            <ImageGallery images={product.images.length > 0 ? product.images.map(img => img.url) : [PLACEHOLDER_IMAGE]} />
           </div>
 
           {/* Right Column: Info details */}
@@ -149,12 +169,25 @@ export default function ProductDetailPage({ params }: PageProps) {
 
             {/* Stars Review Row */}
             <div className="flex items-center gap-2 text-xs font-semibold">
-              <div className="flex items-center gap-0.5 text-amber-500">
-                {"★".repeat(5)}
-              </div>
-              <span className="text-[var(--ag-dark)]">4.5</span>
-              <span className="text-[var(--ag-gray-500)]">|</span>
-              <span className="text-[var(--ag-gray-500)]">12 ratings</span>
+              {reviews.length > 0 ? (
+                <>
+                  <div className="flex items-center gap-0.5 text-amber-500">
+                    {[1, 2, 3, 4, 5].map((s) => {
+                      const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+                      return (
+                        <span key={s} className="text-sm">{s <= Math.round(avgRating) ? "★" : "☆"}</span>
+                      );
+                    })}
+                  </div>
+                  <span className="text-[var(--ag-dark)]">
+                    {(reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)}
+                  </span>
+                  <span className="text-[var(--ag-gray-500)]">|</span>
+                  <span className="text-[var(--ag-gray-500)]">{reviews.length} rating{reviews.length > 1 ? "s" : ""}</span>
+                </>
+              ) : (
+                <span className="text-zinc-400 dark:text-zinc-550 italic text-[11px] font-semibold">No reviews yet</span>
+              )}
               <span className="text-[var(--ag-gray-500)]">|</span>
               {product.variants[0]?.stock > 0 ? (
                 <span className="text-emerald-600 flex items-center gap-1">
@@ -251,9 +284,16 @@ export default function ProductDetailPage({ params }: PageProps) {
         {/* Product Details Tabs */}
         <ProductTabs
           description={product.description || ""}
-          brand={product.category?.name || "Personal Marketing Store"}
-          reviewCount={12}
-          specifications={{}}
+          brandName={product.brandName || product.category?.name || "Personal Marketing Store"}
+          brandDescription={product.brandDescription || undefined}
+          specifications={(product.specifications as Record<string, string>) || {}}
+          productId={product.id}
+          reviews={reviews}
+          canReview={canReview}
+          canReviewReason={canReviewReason}
+          onReviewSubmitted={() => {
+            fetchReviewsAndAuth(product.id);
+          }}
         />
 
         {/* You Might Also Like */}

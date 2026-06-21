@@ -21,6 +21,8 @@ model User {
   orders       Order[]
   wishlist     Wishlist?
   activityLogs AdminActivityLog[]
+  reviews      Review[]
+  reviewReplies ReviewReply[]
 }
 
 model Address {
@@ -63,12 +65,16 @@ model Product {
   lowStockThreshold Int              @default(10)
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
+  brandName         String?
+  brandDescription  String?
+  specifications    Json?            @default("{}")
   cartItems         CartItem[]
   orderItems        OrderItem[]
   category          Category         @relation(fields: [categoryId], references: [id])
   images            ProductImage[]
   variants          ProductVariant[]
   wishlistItems     WishlistItem[]
+  reviews           Review[]
 
   @@index([slug])
 }
@@ -78,6 +84,8 @@ model ProductImage {
   productId String
   url       String
   alt       String?
+  publicId  String?
+  sortOrder Int     @default(0)
   isPrimary Boolean @default(false)
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
@@ -199,4 +207,45 @@ model AdminActivityLog {
   entityId    String
   metadata    Json?
   createdAt   DateTime @default(now())
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Review {
+  id        String       @id @default(cuid())
+  productId String
+  userId    String
+  rating    Int
+  title     String
+  comment   String
+  status    ReviewStatus @default(PENDING)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  product Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reply   ReviewReply?
+
+  @@unique([productId, userId])
+  @@index([productId])
+  @@index([userId])
+}
+
+model ReviewReply {
+  id        String   @id @default(cuid())
+  reviewId  String   @unique
+  adminId   String
+  comment   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  admin  User   @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([reviewId])
+  @@index([adminId])
 }

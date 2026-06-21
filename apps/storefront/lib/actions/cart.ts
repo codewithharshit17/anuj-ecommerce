@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/prisma";
+import { PLACEHOLDER_IMAGE } from "@/lib/utils";
 
 interface ZustandCartItem {
   id: string; // productId
@@ -53,7 +54,7 @@ export async function fetchDbCart(): Promise<ZustandCartItem[]> {
       const primaryImage =
         item.product.images[0]?.url ||
         item.product.images.find(() => true)?.url ||
-        "";
+        PLACEHOLDER_IMAGE;
 
       const stock = item.product.variants[0]?.stock ?? 0;
 

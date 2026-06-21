@@ -8,6 +8,7 @@ import { requireAuth } from "@/lib/auth/require-auth";
 import prisma from "@/lib/prisma";
 import { Package, ShoppingBag, ArrowRight, CreditCard } from "lucide-react";
 import Link from "next/link";
+import { PLACEHOLDER_IMAGE } from "@/lib/utils";
 
 export const metadata = {
   title: "My Orders — Personal Marketing Store",
@@ -121,7 +122,7 @@ export default async function OrdersPage() {
                     const primaryImage =
                       item.product.images.find((img) => img.isPrimary)?.url ||
                       item.product.images[0]?.url ||
-                      "";
+                      PLACEHOLDER_IMAGE;
 
                     return (
                       <div key={item.id} className="flex gap-4 py-4.5 first:pt-0 last:pb-0">

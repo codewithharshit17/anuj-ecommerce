@@ -2,7 +2,7 @@
 
 import React, { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Save, Sparkles, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Sparkles, Loader2, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { createProduct, updateProduct } from "@/lib/actions/admin-products";
 
@@ -13,6 +13,8 @@ const IMAGE_PRESETS = [
   { name: "Notebooks", url: "https://images.unsplash.com/photo-1531346878377-a5be20888e57?w=800&auto=format&fit=crop" },
   { name: "Balloons", url: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800&auto=format&fit=crop" },
 ];
+
+import ProductMediaManager, { MediaManagerImage } from "@/components/admin/ProductMediaManager";
 
 interface Category {
   id: string;
@@ -29,10 +31,13 @@ interface ProductFormProps {
     mrp: number;
     categoryId: string;
     lowStockThreshold: number;
-    imageUrl?: string;
+    images?: { id?: string; url: string; publicId?: string; isPrimary: boolean; sortOrder: number }[];
     stock: number;
     isActive: boolean;
     isFeatured: boolean;
+    brandName?: string | null;
+    brandDescription?: string | null;
+    specifications?: any;
   };
 }
 
@@ -49,9 +54,18 @@ export default function ProductFormClient({ categories, initialData }: ProductFo
   const [mrp, setMrp] = useState(initialData?.mrp.toString() ?? "");
   const [stock, setStock] = useState(initialData?.stock.toString() ?? "0");
   const [lowStockThreshold, setLowStockThreshold] = useState(initialData?.lowStockThreshold.toString() ?? "10");
-  const [imageUrl, setImageUrl] = useState(initialData?.imageUrl ?? "");
+  const [images, setImages] = useState<MediaManagerImage[]>(initialData?.images ?? []);
   const [isActive, setIsActive] = useState(initialData?.isActive ?? true);
   const [isFeatured, setIsFeatured] = useState(initialData?.isFeatured ?? false);
+  
+  // Brand & Specs states
+  const [brandName, setBrandName] = useState(initialData?.brandName ?? "");
+  const [brandDescription, setBrandDescription] = useState(initialData?.brandDescription ?? "");
+  
+  const initialSpecs = initialData?.specifications
+    ? Object.entries(initialData.specifications as Record<string, string>).map(([k, v]) => ({ key: k, value: v }))
+    : [];
+  const [specs, setSpecs] = useState<{ key: string; value: string }[]>(initialSpecs);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,6 +76,14 @@ export default function ProductFormClient({ categories, initialData }: ProductFo
     if (!price || parseFloat(price) <= 0) return setError("Please enter a valid price");
     if (!mrp || parseFloat(mrp) <= 0) return setError("Please enter a valid MRP");
 
+    // Construct specifications JSON
+    const specificationsObj: Record<string, string> = {};
+    specs.forEach((spec) => {
+      if (spec.key.trim()) {
+        specificationsObj[spec.key.trim()] = spec.value.trim();
+      }
+    });
+
     const payload = {
       name,
       description: description.trim() || undefined,
@@ -69,10 +91,18 @@ export default function ProductFormClient({ categories, initialData }: ProductFo
       mrp: parseFloat(mrp),
       categoryId,
       lowStockThreshold: parseInt(lowStockThreshold) || 10,
-      imageUrl: imageUrl.trim() || undefined,
+      images: images.map((img) => ({
+        url: img.url,
+        publicId: img.publicId,
+        isPrimary: img.isPrimary,
+        sortOrder: img.sortOrder,
+      })),
       stock: parseInt(stock) || 0,
       isActive,
       isFeatured,
+      brandName: brandName.trim() || undefined,
+      brandDescription: brandDescription.trim() || undefined,
+      specifications: specificationsObj,
     };
 
     startTransition(async () => {
@@ -211,6 +241,93 @@ export default function ProductFormClient({ categories, initialData }: ProductFo
               </div>
             </div>
           </div>
+
+          {/* Brand Information */}
+          <div className="bg-white dark:bg-zinc-950 p-6 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-4">
+            <h2 className="text-base font-semibold font-display">Brand Information</h2>
+            <div className="grid grid-cols-1 gap-4">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                  Brand Name
+                </label>
+                <input
+                  type="text"
+                  value={brandName}
+                  onChange={(e) => setBrandName(e.target.value)}
+                  placeholder="e.g. Muji"
+                  className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                  Brand Description
+                </label>
+                <textarea
+                  value={brandDescription}
+                  onChange={(e) => setBrandDescription(e.target.value)}
+                  placeholder="Brand history, quality standards, or values..."
+                  rows={3}
+                  className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 resize-y"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Product Specifications */}
+          <div className="bg-white dark:bg-zinc-950 p-6 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-semibold font-display">Product Specifications</h2>
+              <button
+                type="button"
+                onClick={() => setSpecs([...specs, { key: "", value: "" }])}
+                className="text-xs py-1.5 px-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors cursor-pointer font-bold shadow-sm"
+              >
+                Add Row
+              </button>
+            </div>
+            
+            {specs.length > 0 ? (
+              <div className="space-y-3">
+                {specs.map((spec, index) => (
+                  <div key={index} className="flex gap-3 items-center">
+                    <input
+                      type="text"
+                      placeholder="Key (e.g. Pages)"
+                      value={spec.key}
+                      onChange={(e) => {
+                        const newSpecs = [...specs];
+                        newSpecs[index].key = e.target.value;
+                        setSpecs(newSpecs);
+                      }}
+                      className="flex-1 px-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Value (e.g. 200)"
+                      value={spec.value}
+                      onChange={(e) => {
+                        const newSpecs = [...specs];
+                        newSpecs[index].value = e.target.value;
+                        setSpecs(newSpecs);
+                      }}
+                      className="flex-1 px-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSpecs(specs.filter((_, idx) => idx !== index));
+                      }}
+                      className="p-2 border border-zinc-200 dark:border-zinc-800 hover:bg-red-50 dark:hover:bg-red-950/20 text-zinc-450 hover:text-red-600 dark:hover:text-red-400 rounded-lg transition-all cursor-pointer"
+                    >
+                      <Trash2 className="size-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-zinc-400 dark:text-zinc-500 italic">No specifications added. Click &quot;Add Row&quot; to start.</p>
+            )}
+          </div>
         </div>
 
         {/* Right side controls */}
@@ -239,44 +356,12 @@ export default function ProductFormClient({ categories, initialData }: ProductFo
 
           {/* Image selection */}
           <div className="bg-white dark:bg-zinc-950 p-6 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-4">
-            <h2 className="text-base font-semibold font-display">Product Image</h2>
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
-                Image URL
-              </label>
-              <input
-                type="text"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="https://images.unsplash.com/..."
-                className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-            </div>
-
-            {/* Presets */}
-            <div className="space-y-2">
-              <span className="text-[10px] text-zinc-400 font-semibold uppercase flex items-center gap-1">
-                <Sparkles className="size-3 text-red-500" /> Choose Preset Mockup
-              </span>
-              <div className="grid grid-cols-2 gap-2">
-                {IMAGE_PRESETS.map((preset) => (
-                  <button
-                    key={preset.name}
-                    type="button"
-                    onClick={() => setImageUrl(preset.url)}
-                    className="text-xs py-1.5 px-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-250 dark:border-zinc-800 rounded-md hover:bg-zinc-100 transition-colors truncate"
-                  >
-                    {preset.name}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {imageUrl && (
-              <div className="relative aspect-video rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800">
-                <img src={imageUrl} alt="Preview" className="object-cover w-full h-full" />
-              </div>
-            )}
+            <h2 className="text-base font-semibold font-display">Product Media</h2>
+            <ProductMediaManager
+              images={images}
+              onChange={setImages}
+              productName={name}
+            />
           </div>
 
           {/* Visibility and Featured flags */}

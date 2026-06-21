@@ -8,6 +8,7 @@ import { useUIStore } from "@/components/store/ui-store";
 import { useCartStore } from "@/lib/store/cart-store";
 import { Prisma } from "@prisma/client";
 import { useState } from "react";
+import { PLACEHOLDER_IMAGE } from "@/lib/utils";
 
 export type StorefrontProduct = Prisma.ProductGetPayload<{
   include: { images: true; variants: true; category: true };
@@ -25,7 +26,7 @@ export default function ProductCard({ product, showVendor = true, showBadge = tr
   const [isHovered, setIsHovered] = useState(false);
 
   // Images
-  const primaryImage = product.images.find(img => img.isPrimary)?.url || product.images[0]?.url || "";
+  const primaryImage = product.images.find(img => img.isPrimary)?.url || product.images[0]?.url || PLACEHOLDER_IMAGE;
   const secondaryImage = product.images.filter(img => !img.isPrimary)[0]?.url || primaryImage;
   const hasSecondaryImage = product.images.length > 1;
 

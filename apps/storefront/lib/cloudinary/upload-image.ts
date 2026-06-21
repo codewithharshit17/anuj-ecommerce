@@ -1,4 +1,4 @@
-import { cloudinary } from "./index";
+import { getConfiguredCloudinary } from "./index";
 
 export const CLOUDINARY_FOLDERS = {
   TEST: "pms/test",
@@ -30,7 +30,8 @@ export async function uploadImage(
   }
 
   try {
-    const result = await cloudinary.uploader.upload(file, {
+    const cloudinaryInstance = getConfiguredCloudinary();
+    const result = await cloudinaryInstance.uploader.upload(file, {
       folder,
       resource_type: "auto",
     });

@@ -21,6 +21,8 @@ export async function POST() {
 
     const checkout = await validateCheckout(user.id);
 
+    console.log("CHECKOUT RESULT:", checkout);
+
     if (!checkout.valid) {
       return NextResponse.json(
         {

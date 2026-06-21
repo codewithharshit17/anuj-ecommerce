@@ -269,3 +269,20 @@ export async function setDefaultAddressAction(addressId: string): Promise<{ succ
     return { error: "Failed to set default address." };
   }
 }
+
+// ── Check Default Address ───────────────────────────────────────────
+export async function hasDefaultAddressAction(): Promise<boolean> {
+  try {
+    const user = await getAuthUser();
+    const defaultAddress = await prisma.address.findFirst({
+      where: {
+        userId: user.id,
+        isDefault: true,
+      },
+    });
+    return !!defaultAddress;
+  } catch {
+    return false;
+  }
+}
+

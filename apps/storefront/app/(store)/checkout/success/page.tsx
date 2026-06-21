@@ -85,7 +85,7 @@ export default function CheckoutSuccessPage() {
             Order Placed Successfully!
           </h1>
           <p className="text-sm font-semibold text-[var(--ag-gray-500)] mt-1.5">
-            Thank you for shopping with KAPI PEN. Your order has been confirmed.
+            Thank you for shopping with Personal Marketing Store. Your order has been confirmed.
           </p>
         </div>
 

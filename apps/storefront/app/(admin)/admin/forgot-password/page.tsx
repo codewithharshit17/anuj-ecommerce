@@ -140,7 +140,7 @@ function ForgotPasswordForm() {
       </div>
 
       <p className="text-center text-[10px] text-zinc-400 mt-5 font-mono">
-        KAPI PEN · Admin
+        Personal Marketing Store · Admin
       </p>
     </div>
   );

@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useCartStore } from "@/lib/store/cart-store";
 import { useCheckoutStore, CheckoutStep } from "@/lib/store/checkout-store";
+import { hasDefaultAddressAction } from "@/lib/actions/address";
 
 interface RazorpayPaymentResponse {
   razorpay_payment_id: string;
@@ -114,6 +115,7 @@ export default function CheckoutPage() {
   const [paymentError, setPaymentError] = useState("");
   const [paymentPayload, setPaymentPayload] =
     useState<RazorpayPaymentResponse | null>(null);
+  const [hasDefaultAddress, setHasDefaultAddress] = useState<boolean>(true);
 
   // Focus Refs
   const fullNameRef = useRef<HTMLInputElement>(null);
@@ -173,6 +175,15 @@ export default function CheckoutPage() {
     } else if (step === "shipping" && addressLine1Ref.current) {
       addressLine1Ref.current.focus();
     }
+  }, [step]);
+
+  // Check default address on mount and step changes
+  useEffect(() => {
+    const checkAddress = async () => {
+      const exists = await hasDefaultAddressAction();
+      setHasDefaultAddress(exists);
+    };
+    checkAddress();
   }, [step]);
 
   // Calculations
@@ -344,7 +355,7 @@ export default function CheckoutPage() {
         key: razorpayKeyId,
         amount: data.amount,
         currency: data.currency,
-        name: "KAPI PEN",
+        name: "Personal Marketing Store",
         description: "Stationery Purchase",
         order_id: data.orderId,
         prefill: {
@@ -1037,6 +1048,24 @@ export default function CheckoutPage() {
                       </div>
                     )}
 
+                    {!hasDefaultAddress && (
+                      <div className="p-4 rounded-[var(--radius-lg)] bg-red-500/10 border border-red-500/25 flex flex-col gap-3 mt-4 text-xs font-semibold text-red-500">
+                        <div className="flex gap-2 items-center">
+                          <AlertCircle size={16} className="shrink-0" />
+                          <div>
+                            <p className="font-bold">Default address is required.</p>
+                            <p className="text-[11px] opacity-90">Please add a delivery address to continue.</p>
+                          </div>
+                        </div>
+                        <Link
+                          href="/account/addresses?returnTo=/checkout"
+                          className="w-full sm:w-auto text-center px-4 py-2 bg-[var(--ag-red)] hover:bg-[var(--ag-red-hover)] text-white font-black text-xs rounded-[var(--radius-lg)] transition-all cursor-pointer shadow-sm select-none"
+                        >
+                          Add / Manage Address
+                        </Link>
+                      </div>
+                    )}
+
                     <div className="pt-6 flex justify-between gap-4">
                       <button
                         onClick={handlePrevStep}
@@ -1046,7 +1075,7 @@ export default function CheckoutPage() {
                       </button>
                       <button
                         onClick={handlePlaceOrder}
-                        disabled={loading}
+                        disabled={loading || !hasDefaultAddress}
                         className="px-8 py-3 bg-[var(--ag-red)] hover:bg-[var(--ag-red-hover)] disabled:bg-[var(--ag-red)]/50 text-white font-black text-xs rounded-[var(--radius-lg)] transition-all cursor-pointer flex items-center gap-2 shadow-md hover:shadow-lg select-none active:scale-98"
                       >
                         {loading ? "PROCESSING..." : "PLACE ORDER & PAY"}

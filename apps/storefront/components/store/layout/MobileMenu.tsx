@@ -102,9 +102,9 @@ export default function MobileMenu({ categories = [] }: MobileMenuProps) {
             {/* Header */}
             <div className="p-4 border-b border-[var(--ag-gray-200)] dark:border-neutral-800 flex items-center justify-between bg-white dark:bg-neutral-900">
               <div className="flex items-center gap-2">
-                <img src="/logo.jpg" alt="KAPI PEN Store Logo" className="h-8 w-auto object-contain" />
+                <img src="/logo.jpg" alt="Personal Marketing Store Logo" className="h-8 w-auto object-contain" />
                 <span className="font-display font-black text-sm leading-tight tracking-tight text-[var(--ag-dark)] dark:text-[var(--foreground)]">
-                  KAPI PEN<br/>Store
+                  Personal Marketing<br/>Store
                 </span>
               </div>
               <div className="flex items-center gap-1.5">

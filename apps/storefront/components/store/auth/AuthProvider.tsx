@@ -13,7 +13,7 @@ import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { useCartStore } from "@/lib/store/cart-store";
-import { mergeCartAction } from "@/lib/actions/cart";
+import { mergeCartAction, fetchDbCart } from "@/lib/actions/cart";
 import { createClient } from "@/lib/supabase/client";
 
 export default function AuthProvider({
@@ -66,17 +66,36 @@ export default function AuthProvider({
     if (loading) return;
 
     const syncUserData = async () => {
+      const cartStore = useCartStore.getState();
       if (isAuthenticated) {
         try {
-          const guestCartItems = useCartStore.getState().items;
-          const mergedCartItems = await mergeCartAction(guestCartItems);
-          useCartStore.getState().setCartItems(mergedCartItems);
+          const guestCartItems = cartStore.items;
+          const currentUserId = useAuthStore.getState().user?.id;
+
+          if (cartStore.userId !== currentUserId) {
+            let finalItems;
+            if (cartStore.userId === null) {
+              finalItems = await mergeCartAction(guestCartItems);
+            } else {
+              finalItems = await fetchDbCart();
+            }
+            cartStore.setCartItems(finalItems);
+            cartStore.setUserId(currentUserId || null);
+          } else {
+            // Just refresh from DB to make sure we are in sync
+            const dbItems = await fetchDbCart();
+            cartStore.setCartItems(dbItems);
+          }
         } catch (err) {
           console.error("[AuthProvider] Data sync failed:", err);
         }
       } else {
         // Reset state on logout
-        useCartStore.getState().setCartItems([]);
+        // Only clear if the cart currently belongs to a logged-in user
+        if (cartStore.userId !== null) {
+          cartStore.setCartItems([]);
+          cartStore.setUserId(null);
+        }
       }
     };
 

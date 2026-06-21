@@ -123,7 +123,7 @@ export default function ProductCard({ product, showVendor = true, showBadge = tr
             <div className="flex items-center justify-between gap-2">
               {showVendor && (
                 <span className="text-[9px] font-black uppercase tracking-widest text-[var(--ag-gray-500)]">
-                  {product.category?.name || "KAPI PEN"}
+                  {product.category?.name || "Personal Marketing Store"}
                 </span>
               )}
               

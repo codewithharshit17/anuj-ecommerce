@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { MapPin, Plus, Home, Star, Edit, Trash2, Check, X, Loader2 } from "lucide-react";
 import {
   addAddressAction,
@@ -25,6 +26,10 @@ interface AddressesClientProps {
 }
 
 export default function AddressesClient({ initialAddresses }: AddressesClientProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get("returnTo");
+
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -46,7 +51,11 @@ export default function AddressesClient({ initialAddresses }: AddressesClientPro
       if (result.success) {
         setIsAdding(false);
         setAddState({});
-        window.location.reload();
+        if (returnTo) {
+          router.push(returnTo);
+        } else {
+          window.location.reload();
+        }
       } else {
         setAddState(result);
       }
@@ -68,7 +77,11 @@ export default function AddressesClient({ initialAddresses }: AddressesClientPro
       if (result.success) {
         setEditingId(null);
         setEditState({});
-        window.location.reload();
+        if (returnTo) {
+          router.push(returnTo);
+        } else {
+          window.location.reload();
+        }
       } else {
         setEditState(result);
       }
@@ -86,7 +99,11 @@ export default function AddressesClient({ initialAddresses }: AddressesClientPro
       try {
         const res = await deleteAddressAction(id);
         if (res.success) {
-          window.location.reload();
+          if (returnTo) {
+            router.push(returnTo);
+          } else {
+            window.location.reload();
+          }
         }
       } catch (err) {
         console.error(err);
@@ -101,7 +118,11 @@ export default function AddressesClient({ initialAddresses }: AddressesClientPro
     try {
       const res = await setDefaultAddressAction(id);
       if (res.success) {
-        window.location.reload();
+        if (returnTo) {
+          router.push(returnTo);
+        } else {
+          window.location.reload();
+        }
       }
     } catch (err) {
       console.error(err);

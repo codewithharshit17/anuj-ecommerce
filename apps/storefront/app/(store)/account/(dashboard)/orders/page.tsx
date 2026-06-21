@@ -10,7 +10,7 @@ import { Package, ShoppingBag, ArrowRight, CreditCard } from "lucide-react";
 import Link from "next/link";
 
 export const metadata = {
-  title: "My Orders — KAPI PEN",
+  title: "My Orders — Personal Marketing Store",
 };
 
 export default async function OrdersPage() {

@@ -23,10 +23,10 @@ export default function Footer() {
         {/* Column 1: Brand details & Newsletter */}
         <div className="lg:col-span-5 flex flex-col gap-6">
           <Link href="/" className="flex items-center gap-2.5 group w-fit">
-            <img src="/logo.jpg" alt="KAPI PEN Store Logo" className="h-14 w-auto object-contain" />
+            <img src="/logo.jpg" alt="Personal Marketing Store Logo" className="h-14 w-auto object-contain" />
             <div className="flex flex-col">
               <span className="text-xl font-display font-black tracking-tight leading-none text-[var(--ag-dark)]">
-                KAPI PEN Store
+                Personal Marketing Store
               </span>
             </div>
           </Link>

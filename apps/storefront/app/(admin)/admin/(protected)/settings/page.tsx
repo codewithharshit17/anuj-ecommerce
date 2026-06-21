@@ -6,7 +6,7 @@
 import { Settings, Hammer } from "lucide-react";
 
 export const metadata = {
-  title: "Settings — KAPI PEN Admin",
+  title: "Settings — Personal Marketing Store Admin",
 };
 
 export default function AdminSettingsPage() {

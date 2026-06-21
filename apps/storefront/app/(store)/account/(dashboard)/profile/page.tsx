@@ -9,7 +9,7 @@ import { getPrismaUser } from "@/lib/auth/get-user";
 import ProfileForm from "./ProfileForm";
 
 export const metadata = {
-  title: "My Profile — KAPI PEN",
+  title: "My Profile — Personal Marketing Store",
 };
 
 export default async function ProfilePage() {

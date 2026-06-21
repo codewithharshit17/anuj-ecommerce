@@ -37,7 +37,7 @@ export default function Newsletter() {
               Unlock 10% Off Your First Order
             </h2>
             <p className="text-sm text-white/75 font-semibold leading-relaxed mb-8">
-              Subscribe to the KAPI PEN newsletter to receive secret discounts, product release updates, and stationery guides.
+              Subscribe to the Personal Marketing Store newsletter to receive secret discounts, product release updates, and stationery guides.
             </p>
 
             <AnimatePresence mode="wait">

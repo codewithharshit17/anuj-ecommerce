@@ -51,7 +51,7 @@ export default function Sidebar({ adminName }: SidebarProps) {
       <div className="h-16 flex items-center px-6 border-b border-zinc-900 bg-zinc-950/50 backdrop-blur-md">
         <Link href="/dashboard" className="flex items-center gap-2">
           <span className="text-xl font-bold tracking-tight font-display text-gradient-coral">
-            KAPI PEN
+            Personal Marketing Store
           </span>
           <span className="text-[10px] bg-red-500/10 text-red-500 font-semibold px-2 py-0.5 rounded-full border border-red-500/20">
             ADMIN

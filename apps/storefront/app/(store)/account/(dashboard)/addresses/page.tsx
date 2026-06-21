@@ -10,7 +10,7 @@ import prisma from "@/lib/prisma";
 import AddressesClient from "./AddressesClient";
 
 export const metadata = {
-  title: "My Addresses — KAPI PEN",
+  title: "My Addresses — Personal Marketing Store",
 };
 
 export default async function AddressesPage() {

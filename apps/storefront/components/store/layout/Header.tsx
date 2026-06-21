@@ -226,10 +226,10 @@ export default function Header({ categories = [] }: HeaderProps) {
         >
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
-            <img src="/logo.jpg" alt="KAPI PEN Store Logo" className="h-12 w-auto object-contain" />
+            <img src="/logo.jpg" alt="Personal Marketing Store Logo" className="h-12 w-auto object-contain" />
             <div className="hidden sm:block">
               <span className="text-xl font-display font-black tracking-tight leading-none text-[var(--ag-dark)]">
-                KAPI PEN Store
+                Personal Marketing Store
               </span>
             </div>
           </Link>

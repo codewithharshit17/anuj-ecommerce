@@ -6,7 +6,7 @@
  * - Server Action via `useActionState` for progressive enhancement
  * - Google OAuth button
  * - Full validation, loading state, error display
- * - KAPI PEN brand design tokens
+ * - Personal Marketing Store brand design tokens
  */
 "use client";
 
@@ -51,7 +51,7 @@ export default function RegisterPage() {
               Create Account
             </h1>
             <p className="text-xs text-[var(--ag-gray-500)] font-medium text-center">
-              Join KAPI PEN for premium stationery benefits
+              Join Personal Marketing Store for premium stationery benefits
             </p>
           </div>
 

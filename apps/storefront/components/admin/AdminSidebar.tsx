@@ -73,7 +73,7 @@ export default function AdminSidebar({ adminName, adminEmail }: AdminSidebarProp
           </div>
           <div className="overflow-hidden">
             <p className="text-sm font-bold tracking-tight text-zinc-900 group-hover:text-zinc-700 transition-colors leading-none">
-              KAPI PEN
+              Personal Marketing Store
             </p>
             <p className="text-[9px] font-semibold text-red-500 uppercase tracking-[0.15em] leading-none mt-0.5">
               Admin Portal

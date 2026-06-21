@@ -1,5 +1,5 @@
 export const BRAND = {
-  name: "KAPI PEN",
+  name: "Personal Marketing Store",
   tagline: "Pens, Stationery & Art Supplies",
 
   colors: {

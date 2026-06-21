@@ -130,7 +130,7 @@ export default function ProductDetailPage({ params }: PageProps) {
             <div>
               {/* Brand Chip */}
               <span className="inline-block bg-[var(--ag-gray-200)] text-[var(--ag-gray-800)] text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full mb-3">
-                {product.category?.name || "KAPI PEN"}
+                {product.category?.name || "Personal Marketing Store"}
               </span>
 
               {/* Title */}
@@ -234,7 +234,7 @@ export default function ProductDetailPage({ params }: PageProps) {
         {/* Product Details Tabs */}
         <ProductTabs
           description={product.description || ""}
-          brand={product.category?.name || "KAPI PEN"}
+          brand={product.category?.name || "Personal Marketing Store"}
           reviewCount={12}
           specifications={{}}
         />

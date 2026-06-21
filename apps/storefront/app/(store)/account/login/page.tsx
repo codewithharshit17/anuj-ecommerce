@@ -8,7 +8,7 @@
  * - Server Action via `useActionState`
  * - Google OAuth button
  * - Error display (from both form validation and URL params)
- * - KAPI PEN brand design
+ * - Personal Marketing Store brand design
  */
 "use client";
 

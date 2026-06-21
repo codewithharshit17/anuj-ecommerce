@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "KAPI PEN — Pens, Stationery & Art Supplies",
+  title: "Personal Marketing Store — Pens, Stationery & Art Supplies",
   description:
     "India's premium wholesale stationery store. Shop pens, notebooks, planners, art supplies & more. COD available above ₹500.",
   keywords: ["stationery", "pens", "notebooks", "art supplies", "wholesale"],

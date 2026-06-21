@@ -4,7 +4,7 @@
  * AdminLoginForm — Client Component
  *
  * Redesigned with a split-panel layout:
- * - Left:  KAPI PEN Admin branding panel (dark, decorative)
+ * - Left:  Personal Marketing Store Admin branding panel (dark, decorative)
  * - Right: Login form (higher contrast, clear inputs, Google OAuth)
  */
 
@@ -54,7 +54,7 @@ export default function AdminLoginForm({ urlError }: { urlError?: string }) {
                 <span className="text-sm font-black text-white">K</span>
               </div>
               <div>
-                <p className="text-sm font-bold text-zinc-900 leading-none">KAPI PEN</p>
+                <p className="text-sm font-bold text-zinc-900 leading-none">Personal Marketing Store</p>
                 <p className="text-[10px] font-semibold text-red-500 uppercase tracking-[0.15em] mt-0.5">
                   Admin Portal
                 </p>
@@ -66,7 +66,7 @@ export default function AdminLoginForm({ urlError }: { urlError?: string }) {
               Manage your store from one place
             </h2>
             <p className="text-sm text-zinc-600 leading-relaxed">
-              Full control over orders, products, customers, and analytics — purpose-built for KAPI PEN.
+              Full control over orders, products, customers, and analytics — purpose-built for Personal Marketing Store.
             </p>
           </div>
 
@@ -103,7 +103,7 @@ export default function AdminLoginForm({ urlError }: { urlError?: string }) {
             <div className="size-8 rounded-lg bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center">
               <span className="text-xs font-black text-white">K</span>
             </div>
-            <p className="text-sm font-bold text-zinc-900">KAPI PEN Admin</p>
+            <p className="text-sm font-bold text-zinc-900">Personal Marketing Store Admin</p>
           </div>
 
           <div className="mb-7">

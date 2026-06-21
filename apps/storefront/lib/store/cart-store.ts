@@ -13,11 +13,13 @@ export interface CartItem {
 
 interface CartStore {
   items: CartItem[];
+  userId: string | null;
   addItem: (item: CartItem) => Promise<void>;
   removeItem: (id: string) => Promise<void>;
   increaseQuantity: (id: string) => Promise<void>;
   decreaseQuantity: (id: string) => Promise<void>;
   setCartItems: (items: CartItem[]) => void;
+  setUserId: (userId: string | null) => void;
 }
 
 async function syncDb(items: CartItem[], set: (state: Partial<CartStore>) => void) {
@@ -36,8 +38,10 @@ export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
+      userId: null,
 
       setCartItems: (items) => set({ items }),
+      setUserId: (userId) => set({ userId }),
 
       addItem: async (item) => {
         const currentItems = get().items;

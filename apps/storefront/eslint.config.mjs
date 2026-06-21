@@ -8,6 +8,8 @@ const eslintConfig = defineConfig([
   {
     rules: {
       "@next/next/no-img-element": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": "off",
     },
   },
   // Override default ignores of eslint-config-next.
@@ -18,6 +20,7 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
     "fix-dark-mode.js",
+    "scratch/**",
   ]),
 ]);
 

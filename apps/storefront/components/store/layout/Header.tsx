@@ -15,6 +15,7 @@ import ThemeToggle from "@/components/store/ui/ThemeToggle";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { logout } from "@/lib/actions/auth/logout";
+import { createClient } from "@/lib/supabase/client";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -490,6 +491,8 @@ export default function Header({ categories = [] }: HeaderProps) {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem 
                     onSelect={async () => {
+                      const supabase = createClient();
+                      await supabase.auth.signOut();
                       await logout();
                     }}
                     className="text-[var(--ag-red)] hover:bg-[var(--ag-red)]/5 focus:bg-[var(--ag-red)]/5"

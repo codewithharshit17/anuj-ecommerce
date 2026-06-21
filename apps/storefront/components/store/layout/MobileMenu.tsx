@@ -10,6 +10,7 @@ import Link from "next/link";
 import ThemeToggle from "@/components/store/ui/ThemeToggle";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { logout } from "@/lib/actions/auth/logout";
+import { createClient } from "@/lib/supabase/client";
 
 interface SubCategory {
   title: string;
@@ -234,6 +235,8 @@ export default function MobileMenu({ categories = [] }: MobileMenuProps) {
                           <button
                             onClick={async () => {
                               handleLinkClick();
+                              const supabase = createClient();
+                              await supabase.auth.signOut();
                               await logout();
                             }}
                             className="py-1.5 px-2 text-xs font-semibold text-[var(--ag-red)] hover:bg-[var(--ag-red)]/5 rounded-lg transition-colors flex items-center gap-2 w-full text-left cursor-pointer"

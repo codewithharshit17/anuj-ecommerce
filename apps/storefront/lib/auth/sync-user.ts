@@ -58,6 +58,23 @@ export async function syncUserToPrisma(user: SupabaseUser) {
   try {
     const { firstName, lastName } = extractName(user);
 
+    // 1. Safe primary key ID reconciliation
+    // Check if a User record with the same email already exists in Prisma under a different ID (e.g. a fake signup ID)
+    const existingUserByEmail = await prisma.user.findUnique({
+      where: { email: user.email! }
+    });
+
+    if (existingUserByEmail && existingUserByEmail.id !== user.id) {
+      // Execute raw SQL update to re-key the primary key user ID.
+      // Database foreign key constraints have ON UPDATE CASCADE, which propagates to all related tables automatically.
+      await prisma.$executeRawUnsafe(
+        `UPDATE "User" SET id = $1 WHERE id = $2`,
+        user.id,
+        existingUserByEmail.id
+      );
+    }
+
+    // 2. Perform standard upsert
     await prisma.user.upsert({
       where: { id: user.id },
       create: {

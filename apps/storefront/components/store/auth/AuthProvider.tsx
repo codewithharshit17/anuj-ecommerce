@@ -10,9 +10,11 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { useCartStore } from "@/lib/store/cart-store";
 import { mergeCartAction } from "@/lib/actions/cart";
+import { createClient } from "@/lib/supabase/client";
 
 export default function AuthProvider({
   children,
@@ -21,6 +23,8 @@ export default function AuthProvider({
 }) {
   const initialize = useAuthStore((s) => s.initialize);
   const { isAuthenticated, loading } = useAuthStore();
+  const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     let cleanup: (() => void) | undefined;
@@ -33,6 +37,29 @@ export default function AuthProvider({
       cleanup?.();
     };
   }, [initialize]);
+
+  // Synchronize auth state and refresh router cache on navigation changes (e.g., Server Action redirect)
+  useEffect(() => {
+    const syncSession = async () => {
+      const supabase = createClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      const currentStoreUser = useAuthStore.getState().user;
+
+      if (session?.user?.id !== currentStoreUser?.id) {
+        useAuthStore.setState({
+          user: session?.user ?? null,
+          isAuthenticated: !!session?.user,
+          loading: false,
+        });
+        router.refresh();
+      }
+    };
+
+    syncSession();
+  }, [pathname, router]);
 
   // Synchronize cart database state on auth changes
   useEffect(() => {

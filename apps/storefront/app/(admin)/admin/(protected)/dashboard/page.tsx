@@ -54,6 +54,23 @@ export default async function DashboardPage() {
     return totalStock < p.lowStockThreshold;
   }).length;
 
+  // Inventory widgets counts
+  const totalProducts = productsWithVariants.length;
+  let inStockProducts = 0;
+  let lowStockProducts = 0;
+  let outOfStockProducts = 0;
+
+  productsWithVariants.forEach((p) => {
+    const totalStock = p.variants.reduce((sum, v) => sum + v.stock, 0);
+    if (totalStock === 0) {
+      outOfStockProducts++;
+    } else if (totalStock < p.lowStockThreshold) {
+      lowStockProducts++;
+    } else {
+      inStockProducts++;
+    }
+  });
+
   // Daily revenue for the last 30 days
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -129,12 +146,12 @@ export default async function DashboardPage() {
             <div>
               <p className="text-sm font-semibold">Inventory Alert</p>
               <p className="text-xs text-amber-700 dark:text-amber-400">
-                There are {lowStockThresholdCount} products currently running below their low-stock threshold.
+                {lowStockThresholdCount} products require restocking
               </p>
             </div>
           </div>
           <Link
-            href="/admin/products?filter=low-stock"
+            href="/admin/inventory"
             className="text-xs font-semibold px-3 py-1.5 bg-amber-600/10 hover:bg-amber-600/20 text-amber-800 dark:text-amber-300 rounded-lg transition-colors border border-amber-600/20"
           >
             Review Inventory
@@ -217,6 +234,62 @@ export default async function DashboardPage() {
               <ArrowDownRight className="size-3.5 mr-0.5" />
               2.3%
             </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Inventory Health Section */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-bold font-display text-zinc-900 dark:text-zinc-50">
+          Inventory Status
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Total Products */}
+          <div className="bg-white dark:bg-zinc-950 p-6 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col justify-between">
+            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+              Total Products
+            </p>
+            <div className="flex items-baseline justify-between mt-2">
+              <span className="text-2xl font-bold tracking-tight">
+                {totalProducts}
+              </span>
+            </div>
+          </div>
+          
+          {/* In Stock */}
+          <div className="bg-white dark:bg-zinc-950 p-6 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col justify-between">
+            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+              Products In Stock
+            </p>
+            <div className="flex items-baseline justify-between mt-2">
+              <span className="text-2xl font-bold tracking-tight text-emerald-600 dark:text-emerald-450">
+                {inStockProducts}
+              </span>
+            </div>
+          </div>
+
+          {/* Low Stock */}
+          <div className="bg-white dark:bg-zinc-950 p-6 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col justify-between">
+            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+              Low Stock Products
+            </p>
+            <div className="flex items-baseline justify-between mt-2">
+              <span className="text-2xl font-bold tracking-tight text-amber-600 dark:text-amber-450">
+                {lowStockProducts}
+              </span>
+            </div>
+          </div>
+
+          {/* Out of Stock */}
+          <div className="bg-white dark:bg-zinc-950 p-6 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col justify-between">
+            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+              Out of Stock Products
+            </p>
+            <div className="flex items-baseline justify-between mt-2">
+              <span className="text-2xl font-bold tracking-tight text-rose-600 dark:text-rose-450">
+                {outOfStockProducts}
+              </span>
+            </div>
           </div>
         </div>
       </div>

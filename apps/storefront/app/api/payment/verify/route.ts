@@ -114,7 +114,11 @@ async function createOrderFromVerifiedPayment(
       include: {
         items: {
           include: {
-            product: true,
+            product: {
+              include: {
+                variants: true,
+              },
+            },
             variant: true,
           },
         },
@@ -135,10 +139,14 @@ async function createOrderFromVerifiedPayment(
       }
 
       // Stock validation
-      if (
-        item.variant &&
-        item.quantity > item.variant.stock
-      ) {
+      const defaultVariant = item.variant || item.product.variants[0];
+      if (!defaultVariant) {
+        throw new PaymentVerificationError(
+          `Variant not found for product ${item.product.name}`
+        );
+      }
+
+      if (item.quantity > defaultVariant.stock) {
         throw new PaymentVerificationError(
           `Insufficient stock for ${item.product.name}`
         );
@@ -146,11 +154,41 @@ async function createOrderFromVerifiedPayment(
 
       return {
         productId: item.productId,
-        variantId: item.variantId,
+        variantId: item.variantId || defaultVariant.id,
         quantity: item.quantity,
         price,
       };
     });
+
+    // Decrement stock for each variant and check to prevent negative inventory
+    for (const item of orderItems) {
+      const targetVariantId = item.variantId;
+      if (!targetVariantId) {
+        throw new PaymentVerificationError("Variant ID missing for stock decrement.");
+      }
+
+      const variant = await tx.productVariant.findUnique({
+        where: { id: targetVariantId },
+        select: { stock: true },
+      });
+
+      if (!variant) {
+        throw new PaymentVerificationError("Variant not found for stock decrement.");
+      }
+
+      if (variant.stock < item.quantity) {
+        throw new PaymentVerificationError(`Insufficient stock for variant.`);
+      }
+
+      await tx.productVariant.update({
+        where: { id: targetVariantId },
+        data: {
+          stock: {
+            decrement: item.quantity,
+          },
+        },
+      });
+    }
 
     const totalAmount = orderItems.reduce(
       (sum, item) => sum + item.price * item.quantity,

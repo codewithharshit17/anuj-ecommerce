@@ -81,6 +81,7 @@ export default function CartDrawer() {
       price: prod.price,
       image: prod.images.find(i => i.isPrimary)?.url || prod.images[0]?.url || "",
       quantity: 1,
+      stock: prod.variants[0]?.stock || 0,
     });
   };
 

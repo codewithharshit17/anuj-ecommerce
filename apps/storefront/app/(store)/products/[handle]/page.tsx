@@ -74,6 +74,13 @@ export default function ProductDetailPage({ params }: PageProps) {
   const discount = originalPrice > activePrice ? Math.round(((originalPrice - activePrice) / originalPrice) * 100) : 0;
 
   const handleAddToCart = async () => {
+    if (!product) return;
+    const stock = product.variants[0]?.stock ?? 0;
+    if (quantity > stock) {
+      alert(`Only ${stock} units available.`);
+      return;
+    }
+
     setAddingToCart(true);
     
     addItem({
@@ -82,6 +89,7 @@ export default function ProductDetailPage({ params }: PageProps) {
       price: activePrice,
       image: product.images.find(i => i.isPrimary)?.url || product.images[0]?.url || "",
       quantity: quantity,
+      stock: stock,
     });
 
     setTimeout(() => {
@@ -148,10 +156,16 @@ export default function ProductDetailPage({ params }: PageProps) {
               <span className="text-[var(--ag-gray-500)]">|</span>
               <span className="text-[var(--ag-gray-500)]">12 ratings</span>
               <span className="text-[var(--ag-gray-500)]">|</span>
-              <span className="text-emerald-600 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-ping" />
-                In Stock
-              </span>
+              {product.variants[0]?.stock > 0 ? (
+                <span className="text-emerald-600 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-ping" />
+                  In Stock
+                </span>
+              ) : (
+                <span className="text-red-650 flex items-center gap-1 font-bold">
+                  Out of Stock
+                </span>
+              )}
             </div>
 
             {/* Price Tags */}
@@ -188,10 +202,12 @@ export default function ProductDetailPage({ params }: PageProps) {
             <div className="flex flex-col sm:flex-row gap-3 mt-2">
               <button
                 onClick={handleAddToCart}
-                disabled={addingToCart}
+                disabled={addingToCart || (product.variants[0]?.stock ?? 0) <= 0}
                 className="flex-1 h-13 bg-[var(--ag-red)] hover:bg-[var(--ag-red-hover)] disabled:bg-[var(--ag-gray-500)] text-white text-sm font-bold rounded-[var(--radius-md)] flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all select-none"
               >
-                {addingToCart ? (
+                {(product.variants[0]?.stock ?? 0) <= 0 ? (
+                  "OUT OF STOCK"
+                ) : addingToCart ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 ) : cartSuccess ? (
                   <>
@@ -206,7 +222,8 @@ export default function ProductDetailPage({ params }: PageProps) {
 
               <button
                 onClick={handleBuyNow}
-                className="flex-1 h-13 bg-white hover:bg-[var(--ag-gray-100)] border-2 border-[var(--ag-red)] text-[var(--ag-red)] text-sm font-bold rounded-[var(--radius-md)] flex items-center justify-center gap-2 transition-colors select-none"
+                disabled={(product.variants[0]?.stock ?? 0) <= 0}
+                className="flex-1 h-13 bg-white hover:bg-[var(--ag-gray-100)] border-2 border-[var(--ag-red)] disabled:border-neutral-350 disabled:text-neutral-400 disabled:hover:bg-transparent text-[var(--ag-red)] text-sm font-bold rounded-[var(--radius-md)] flex items-center justify-center gap-2 transition-colors select-none"
               >
                 <CreditCard size={16} /> BUY NOW
               </button>

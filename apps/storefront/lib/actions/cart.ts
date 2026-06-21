@@ -9,6 +9,7 @@ interface ZustandCartItem {
   price: number;
   image: string;
   quantity: number;
+  stock: number;
 }
 
 async function getAuthUser() {
@@ -36,7 +37,10 @@ export async function fetchDbCart(): Promise<ZustandCartItem[]> {
         items: {
           include: {
             product: {
-              include: { images: { where: { isPrimary: true }, take: 1 } },
+              include: {
+                images: { where: { isPrimary: true }, take: 1 },
+                variants: { take: 1 },
+              },
             },
           },
         },
@@ -51,12 +55,15 @@ export async function fetchDbCart(): Promise<ZustandCartItem[]> {
         item.product.images.find(() => true)?.url ||
         "";
 
+      const stock = item.product.variants[0]?.stock ?? 0;
+
       return {
         id: item.productId,
         name: item.product.name,
         price: item.product.price,
         image: primaryImage,
         quantity: item.quantity,
+        stock,
       };
     });
   } catch (error) {

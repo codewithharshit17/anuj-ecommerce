@@ -54,6 +54,7 @@ export default function ProductCard({ product, showVendor = true, showBadge = tr
       price: price,
       image: primaryImage,
       quantity: 1,
+      stock: inventory,
     });
     setCartOpen(true);
   };

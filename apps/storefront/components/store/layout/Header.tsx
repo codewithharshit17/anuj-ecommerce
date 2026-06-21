@@ -141,6 +141,7 @@ export default function Header({ categories = [] }: HeaderProps) {
       price: prod.price,
       image: prod.images.find(i => i.isPrimary)?.url || prod.images[0]?.url || "",
       quantity: 1,
+      stock: prod.variants[0]?.stock || 0,
     });
     setCartOpen(true);
     setIsSearchFocused(false);

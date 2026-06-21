@@ -13,6 +13,7 @@ interface CartItemProps {
     image: string;
     quantity: number;
     variantName?: string;
+    stock: number;
   };
 }
 
@@ -64,7 +65,8 @@ export default function CartItemComponent({ item }: CartItemProps) {
             </motion.span>
             <button
               onClick={() => increaseQuantity(item.id)}
-              className="px-2.5 h-full flex items-center justify-center hover:bg-white dark:hover:bg-neutral-700 text-[var(--ag-gray-800)] dark:text-neutral-300 transition-colors cursor-pointer"
+              disabled={item.quantity >= item.stock}
+              className="px-2.5 h-full flex items-center justify-center hover:bg-white dark:hover:bg-neutral-700 text-[var(--ag-gray-800)] dark:text-neutral-300 disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer"
               aria-label="Increase quantity"
             >
               <Plus size={11} className="stroke-[2.5]" />

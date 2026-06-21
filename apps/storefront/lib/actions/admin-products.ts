@@ -299,3 +299,57 @@ export async function deleteProduct(id: string) {
     return { success: false, error: err.message || "Failed to delete product" };
   }
 }
+
+export async function updateProductStock(productId: string, newStock: number) {
+  const admin = await requireAdmin();
+
+  try {
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
+      include: { variants: true }
+    });
+
+    if (!product) {
+      return { success: false, error: "Product not found" };
+    }
+
+    if (product.variants.length > 0) {
+      await prisma.productVariant.update({
+        where: { id: product.variants[0].id },
+        data: { stock: newStock },
+      });
+    } else {
+      await prisma.productVariant.create({
+        data: {
+          productId: product.id,
+          optionName: "Default",
+          optionValue: "Standard",
+          stock: newStock,
+          price: product.price,
+        },
+      });
+    }
+
+    // Audit log
+    await logActivity({
+      adminId: admin.id,
+      action: "PRODUCT_STOCK_UPDATED",
+      entityType: "Product",
+      entityId: productId,
+      metadata: {
+        name: product.name,
+        newStock,
+      },
+    });
+
+    revalidatePath("/admin/inventory");
+    revalidatePath("/admin/products");
+    revalidatePath("/admin/dashboard");
+    revalidatePath("/products");
+    return { success: true };
+  } catch (error: unknown) {
+    const err = error as Error;
+    console.error("[updateProductStock] Error:", err);
+    return { success: false, error: err.message || "Failed to update stock" };
+  }
+}

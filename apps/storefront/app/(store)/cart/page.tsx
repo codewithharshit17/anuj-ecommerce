@@ -250,7 +250,8 @@ export default function CartPage() {
                         </span>
                         <button
                           onClick={() => increaseQuantity(item.id)}
-                          className="w-8 h-8 flex items-center justify-center transition-colors hover:bg-[#F5F0EB]"
+                          disabled={item.quantity >= item.stock}
+                          className="w-8 h-8 flex items-center justify-center transition-colors hover:bg-[#F5F0EB] disabled:opacity-30 disabled:hover:bg-transparent"
                           style={{ color: "var(--brand-navy)" }}
                           aria-label="Increase quantity"
                         >

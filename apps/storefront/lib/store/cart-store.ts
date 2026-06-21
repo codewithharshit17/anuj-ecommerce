@@ -9,6 +9,7 @@ export interface CartItem {
   price: number;
   image: string;
   quantity: number;
+  stock: number;
 }
 
 interface CartStore {
@@ -49,12 +50,21 @@ export const useCartStore = create<CartStore>()(
         let newItems;
 
         if (existingItem) {
+          const totalQty = existingItem.quantity + item.quantity;
+          if (totalQty > item.stock) {
+            alert(`Only ${item.stock} units available.`);
+            return;
+          }
           newItems = currentItems.map((i) =>
             i.id === item.id
-              ? { ...i, quantity: i.quantity + item.quantity }
+              ? { ...i, quantity: totalQty }
               : i
           );
         } else {
+          if (item.quantity > item.stock) {
+            alert(`Only ${item.stock} units available.`);
+            return;
+          }
           newItems = [...currentItems, item];
         }
 
@@ -69,6 +79,14 @@ export const useCartStore = create<CartStore>()(
       },
 
       increaseQuantity: async (id) => {
+        const item = get().items.find((i) => i.id === id);
+        if (!item) return;
+
+        if (item.quantity >= item.stock) {
+          alert(`Only ${item.stock} units available.`);
+          return;
+        }
+
         const newItems = get().items.map((item) =>
           item.id === id ? { ...item, quantity: item.quantity + 1 } : item
         );

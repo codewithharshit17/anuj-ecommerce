@@ -4,7 +4,11 @@ import { Prisma } from "@prisma/client";
 const checkoutCartInclude = {
   items: {
     include: {
-      product: true,
+      product: {
+        include: {
+          variants: true,
+        },
+      },
       variant: true,
     },
   },
@@ -76,14 +80,21 @@ export async function validateCheckout(
         return sum;
       }
 
-      if (item.variantId && !item.variant) {
+      const defaultVariant = item.variant || item.product.variants[0];
+      if (!defaultVariant) {
         errors.push(
-          `Product variant no longer exists: ${item.variantId}.`
+          `Product variant no longer exists for: ${item.product?.name || item.productId}.`
         );
         return sum;
       }
 
-      const unitPrice = item.variant?.price ?? item.product.price;
+      if (item.quantity > defaultVariant.stock) {
+        errors.push(
+          `Only ${defaultVariant.stock} units available for ${item.product.name}.`
+        );
+      }
+
+      const unitPrice = defaultVariant.price ?? item.product.price;
 
       if (
         unitPrice === null ||

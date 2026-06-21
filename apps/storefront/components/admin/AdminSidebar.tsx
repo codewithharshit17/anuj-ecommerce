@@ -14,6 +14,7 @@ import {
   LogOut,
   User,
   Store,
+  Boxes,
 } from "lucide-react";
 import { adminLogout } from "@/lib/actions/auth/admin-logout";
 import { useTransition } from "react";
@@ -37,6 +38,7 @@ const MENU_ITEMS = [
     items: [
       { name: "Products", href: "/admin/products", icon: Package },
       { name: "Categories", href: "/admin/categories", icon: FolderTree },
+      { name: "Inventory", href: "/admin/inventory", icon: Boxes },
     ],
   },
   {

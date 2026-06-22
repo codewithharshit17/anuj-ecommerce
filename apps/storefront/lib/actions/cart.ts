@@ -57,11 +57,14 @@ export async function fetchDbCart(): Promise<ZustandCartItem[]> {
         PLACEHOLDER_IMAGE;
 
       const stock = item.product.variants[0]?.stock ?? 0;
+      const activePrice = item.product.salePrice !== null && item.product.salePrice !== undefined 
+        ? item.product.salePrice 
+        : item.product.price;
 
       return {
         id: item.productId,
         name: item.product.name,
-        price: item.product.price,
+        price: activePrice,
         image: primaryImage,
         quantity: item.quantity,
         stock,

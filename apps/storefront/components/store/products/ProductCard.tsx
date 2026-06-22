@@ -31,9 +31,10 @@ export default function ProductCard({ product, showVendor = true, showBadge = tr
   const hasSecondaryImage = product.images.length > 1;
 
   // Price variables
-  const price = product.price;
-  const originalPrice = product.mrp;
+  const price = product.salePrice !== null && product.salePrice !== undefined ? product.salePrice : product.price;
+  const originalPrice = product.salePrice !== null && product.salePrice !== undefined ? product.price : product.mrp;
   const discount = originalPrice > price ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0;
+  const isPromoOffer = product.salePrice !== null && product.salePrice !== undefined;
 
   // Inventory logic
   const inventory = product.variants[0]?.stock || 0;
@@ -96,8 +97,8 @@ export default function ProductCard({ product, showVendor = true, showBadge = tr
 
           {/* Discount badge */}
           {showBadge && discount > 0 && (
-            <div className="absolute top-3 left-3 bg-[var(--ag-red)] text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-sm">
-              SAVE {discount}%
+            <div className="absolute top-3 left-3 bg-[var(--ag-red)] text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-sm animate-pulse">
+              {isPromoOffer ? `${discount}% OFF` : `SAVE ${discount}%`}
             </div>
           )}
 

@@ -37,6 +37,7 @@ export default async function EditProductPage({ params }: PageProps) {
     description: product.description,
     price: product.price,
     mrp: product.mrp,
+    salePrice: product.salePrice,
     categoryId: product.categoryId,
     lowStockThreshold: product.lowStockThreshold,
     images: product.images.map((img) => ({

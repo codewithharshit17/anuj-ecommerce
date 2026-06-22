@@ -16,6 +16,7 @@ import {
   Store,
   Boxes,
   MessageSquare,
+  Sparkles,
 } from "lucide-react";
 import { adminLogout } from "@/lib/actions/auth/admin-logout";
 import { useTransition } from "react";
@@ -30,6 +31,7 @@ const MENU_ITEMS = [
     group: "GENERAL",
     items: [
       { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+      { name: "Promotions", href: "/admin/promotions", icon: Sparkles },
       { name: "Orders", href: "/admin/orders", icon: ShoppingBag },
       { name: "Customers", href: "/admin/customers", icon: Users },
     ],

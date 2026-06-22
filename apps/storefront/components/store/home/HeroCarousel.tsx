@@ -7,6 +7,21 @@ import { useEffect, useState, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Sparkles, Award } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { PromotionTargetType } from "@prisma/client";
+
+interface CarouselPromotion {
+  id: string;
+  title: string;
+  subtitle: string;
+  imageUrl: string;
+  buttonText: string;
+  redirectType: PromotionTargetType;
+  slug: string;
+}
+
+interface HeroCarouselProps {
+  promotions?: CarouselPromotion[];
+}
 
 interface Slide {
   image: string;
@@ -18,37 +33,33 @@ interface Slide {
   tagline: string;
 }
 
-const slides: Slide[] = [
-  {
-    image: "https://images.unsplash.com/photo-1517842645767-c639042777db?w=1600&auto=format&fit=crop&q=80",
-    mobileImage: "https://images.unsplash.com/photo-1517842645767-c639042777db?w=600&auto=format&fit=crop&q=80",
-    tagline: "Japanese Craftsmanship",
-    title: "Elevate Your Daily Writing",
-    subtitle: "Discover our premium selection of Japanese needle-point pens and luxury writing tools.",
-    ctaText: "Shop Fine Pens",
-    ctaHref: "/collections/stationery",
-  },
-  {
-    image: "https://images.unsplash.com/photo-1531346878377-a5be20888e57?w=1600&auto=format&fit=crop&q=80",
-    mobileImage: "https://images.unsplash.com/photo-1531346878377-a5be20888e57?w=600&auto=format&fit=crop&q=80",
-    tagline: "Italian Leathers & Fine Bounds",
-    title: "Uncompromising Paper Quality",
-    subtitle: "Premium thread-bound notebooks and leather diaries designed for seamless creativity.",
-    ctaText: "Shop Notebooks",
-    ctaHref: "/collections/office-supplies",
-  },
-  {
-    image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=1600&auto=format&fit=crop&q=80",
-    mobileImage: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600&auto=format&fit=crop&q=80",
-    tagline: "Professional Art Supplies",
-    title: "Craft Your Perfect Vision",
-    subtitle: "Fine art markers, sketchbooks, and pigments from the world's most trusted brands.",
-    ctaText: "Explore Art Supplies",
-    ctaHref: "/collections/art-supplies",
-  },
-];
+const permanentSlide: Slide = {
+  image: "https://images.unsplash.com/photo-1517842645767-c639042777db?w=1600&auto=format&fit=crop&q=80",
+  mobileImage: "https://images.unsplash.com/photo-1517842645767-c639042777db?w=600&auto=format&fit=crop&q=80",
+  tagline: "Japanese Craftsmanship",
+  title: "Elevate Your Daily Writing",
+  subtitle: "Discover our premium selection of Japanese needle-point pens and luxury writing tools.",
+  ctaText: "Shop Fine Pens",
+  ctaHref: "/collections/stationery",
+};
 
-export default function HeroCarousel() {
+export default function HeroCarousel({ promotions = [] }: HeroCarouselProps) {
+  // Construct list of slides: always start with the permanent branding slide, then append promotions
+  const slides: Slide[] = [
+    permanentSlide,
+    ...promotions.map((promo) => ({
+      image: promo.imageUrl,
+      mobileImage: promo.imageUrl,
+      tagline: promo.subtitle || "Limited Time Offer",
+      title: promo.title,
+      subtitle: promo.subtitle || "Shop the custom campaign offer today.",
+      ctaText: promo.buttonText,
+      ctaHref: promo.redirectType === PromotionTargetType.PRODUCT 
+        ? `/products/${promo.slug}` 
+        : `/category/${promo.slug}`,
+    })),
+  ];
+
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
     Autoplay({ delay: 5000, stopOnInteraction: true }),
   ]);
@@ -84,9 +95,10 @@ export default function HeroCarousel() {
       <div className="overflow-hidden w-full" ref={emblaRef}>
         <div className="flex">
           {slides.map((slide, index) => (
-            <div
+            <Link
+              href={slide.ctaHref}
               key={index}
-              className="flex-[0_0_100%] min-w-0 relative aspect-[4/3] md:aspect-[21/8]"
+              className="flex-[0_0_100%] min-w-0 relative aspect-[4/3] md:aspect-[21/8] block cursor-pointer group/slide"
             >
               {/* Desktop Image */}
               <img
@@ -102,7 +114,7 @@ export default function HeroCarousel() {
               />
 
               {/* Text Content overlaying the slide */}
-              <div className="absolute inset-0 flex flex-col justify-center px-8 sm:px-16 md:px-24 text-white z-10 max-w-2xl">
+              <div className="absolute inset-0 flex flex-col justify-center px-8 sm:px-16 md:px-24 text-white z-10 max-w-2xl pointer-events-none">
                 <AnimatePresence mode="wait">
                   {selectedIndex === index && (
                     <motion.div
@@ -126,18 +138,17 @@ export default function HeroCarousel() {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                       >
-                        <Link
-                          href={slide.ctaHref}
-                          className="inline-flex items-center justify-center px-7 py-4 bg-[var(--ag-red)] hover:bg-[var(--ag-red-hover)] text-white font-black text-sm rounded-[var(--radius-lg)] transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5"
+                        <div
+                          className="inline-flex items-center justify-center px-7 py-4 bg-[var(--ag-red)] hover:bg-[var(--ag-red-hover)] text-white font-black text-sm rounded-[var(--radius-lg)] transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 cursor-pointer pointer-events-auto"
                         >
                           {slide.ctaText}
-                        </Link>
+                        </div>
                       </motion.div>
                     </motion.div>
                   )}
                 </AnimatePresence>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
@@ -165,18 +176,20 @@ export default function HeroCarousel() {
       </button>
 
       {/* Indicators */}
-      <div className="absolute bottom-6 right-6 sm:right-16 flex justify-center gap-2.5 z-20">
-        {scrollSnaps.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => scrollTo(index)}
-            className={`h-2 rounded-full transition-all duration-300 ${
-              index === selectedIndex ? "w-7 bg-[var(--ag-red)]" : "w-2 bg-white/40 hover:bg-white"
-            }`}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
-      </div>
+      {scrollSnaps.length > 1 && (
+        <div className="absolute bottom-6 right-6 sm:right-16 flex justify-center gap-2.5 z-20">
+          {scrollSnaps.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => scrollTo(index)}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                index === selectedIndex ? "w-7 bg-[var(--ag-red)]" : "w-2 bg-white/40 hover:bg-white"
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

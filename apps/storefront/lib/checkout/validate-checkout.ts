@@ -94,7 +94,9 @@ export async function validateCheckout(
         );
       }
 
-      const unitPrice = defaultVariant.price ?? item.product.price;
+      const unitPrice = item.product.salePrice !== null && item.product.salePrice !== undefined 
+        ? item.product.salePrice 
+        : (defaultVariant.price ?? item.product.price);
 
       if (
         unitPrice === null ||

@@ -225,22 +225,37 @@ export default function ProductsPage() {
                 {viewMode === "grid" ? (
                   <ProductCard product={product} />
                 ) : (
-                  <div className="bg-white border border-[var(--ag-gray-200)] p-4 rounded-[var(--radius-lg)] flex gap-4 items-center">
-                    <img src={product.images.find(i => i.isPrimary)?.url || product.images[0]?.url || PLACEHOLDER_IMAGE} alt="" className="w-20 h-20 object-cover rounded-[var(--radius-sm)] border shrink-0 bg-[var(--ag-gray-100)]" />
-                    <div className="flex-1 min-w-0">
-                      <span className="text-[10px] font-bold text-[var(--ag-gray-500)] uppercase tracking-wider">{product.category?.name}</span>
-                      <h4 className="font-bold text-sm text-[var(--ag-dark)] truncate">{product.name}</h4>
-                      <p className="text-xs text-[var(--ag-gray-500)] line-clamp-1 mt-0.5">{product.description}</p>
-                    </div>
-                    <div className="text-right shrink-0">
-                      <span className="text-base font-extrabold text-[var(--ag-red)]">₹{product.price}</span>
-                      <div className="mt-2">
-                        <Link href={`/products/${product.slug}`} className="px-3.5 py-1.5 bg-[var(--ag-dark)] text-white text-[10px] font-black rounded-[var(--radius-sm)] hover:bg-[var(--ag-red)] transition-colors">
-                          VIEW
-                        </Link>
+                  (() => {
+                    const price = product.salePrice !== null && product.salePrice !== undefined ? product.salePrice : product.price;
+                    const originalPrice = product.salePrice !== null && product.salePrice !== undefined ? product.price : product.mrp;
+                    const discount = originalPrice > price ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0;
+                    return (
+                      <div className="bg-white border border-[var(--ag-gray-200)] p-4 rounded-[var(--radius-lg)] flex gap-4 items-center">
+                        <img src={product.images.find(i => i.isPrimary)?.url || product.images[0]?.url || PLACEHOLDER_IMAGE} alt="" className="w-20 h-20 object-cover rounded-[var(--radius-sm)] border shrink-0 bg-[var(--ag-gray-100)]" />
+                        <div className="flex-1 min-w-0">
+                          <span className="text-[10px] font-bold text-[var(--ag-gray-500)] uppercase tracking-wider">{product.category?.name}</span>
+                          <h4 className="font-bold text-sm text-[var(--ag-dark)] truncate">{product.name}</h4>
+                          <p className="text-xs text-[var(--ag-gray-500)] line-clamp-1 mt-0.5">{product.description}</p>
+                        </div>
+                        <div className="text-right shrink-0 flex flex-col items-end gap-1.5">
+                          <span className="text-base font-extrabold text-[var(--ag-red)]">₹{price}</span>
+                          {originalPrice > price && (
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-xs text-[var(--ag-gray-500)] line-through">₹{originalPrice}</span>
+                              <span className="bg-[var(--ag-red)] text-white text-[8px] font-black px-1.5 py-0.5 rounded-sm">
+                                {product.salePrice !== null && product.salePrice !== undefined ? `${discount}% OFF` : `SAVE ${discount}%`}
+                              </span>
+                            </div>
+                          )}
+                          <div className="mt-2">
+                            <Link href={`/products/${product.slug}`} className="px-3.5 py-1.5 bg-[var(--ag-dark)] text-white text-[10px] font-black rounded-[var(--radius-sm)] hover:bg-[var(--ag-red)] transition-colors">
+                              VIEW
+                            </Link>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
+                    );
+                  })()
                 )}
               </div>
             ))}

@@ -9,9 +9,25 @@ import BudgetSection from "@/components/store/home/BudgetSection";
 import ReviewsCarousel from "@/components/store/home/ReviewsCarousel";
 import BlogSection from "@/components/store/home/BlogSection";
 import { getCategories } from "@/lib/actions/product-actions";
+import prisma from "@/lib/prisma";
 
 export default async function Home() {
-  const categories = await getCategories();
+  const currentDate = new Date();
+  
+  const [categories, activePromotions] = await Promise.all([
+    getCategories(),
+    prisma.promotion.findMany({
+      where: {
+        isActive: true,
+        isDeleted: false,
+        startDate: { lte: currentDate },
+        endDate: { gte: currentDate },
+      },
+      orderBy: {
+        displayOrder: "asc",
+      },
+    }),
+  ]);
 
   const mappedCategories = categories.map((cat) => ({
     id: cat.id,
@@ -20,13 +36,42 @@ export default async function Home() {
     href: `/collections/${cat.slug}`,
   }));
 
+  // Map promotions to fetch target slugs
+  const promotionsWithSlugs = await Promise.all(
+    activePromotions.map(async (promo) => {
+      let slug = "";
+      if (promo.redirectType === "PRODUCT") {
+        const prod = await prisma.product.findUnique({
+          where: { id: promo.redirectId },
+          select: { slug: true },
+        });
+        slug = prod?.slug || "";
+      } else if (promo.redirectType === "CATEGORY") {
+        const cat = await prisma.category.findUnique({
+          where: { id: promo.redirectId },
+          select: { slug: true },
+        });
+        slug = cat?.slug || "";
+      }
+      return {
+        id: promo.id,
+        title: promo.title,
+        subtitle: promo.subtitle || "",
+        imageUrl: promo.imageUrl,
+        buttonText: promo.buttonText,
+        redirectType: promo.redirectType,
+        slug,
+      };
+    })
+  );
+
   // Render a responsive grid of 9 columns if few categories, otherwise a scrollable 18-column track
   const columns = mappedCategories.length > 9 ? 18 : 9;
 
   return (
     <>
       {/* 1. Hero Section */}
-      <HeroCarousel />
+      <HeroCarousel promotions={promotionsWithSlugs} />
 
       {/* 2. Trust Bar */}
       <TrustBar />

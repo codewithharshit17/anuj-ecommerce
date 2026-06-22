@@ -59,6 +59,7 @@ model Product {
   description       String?
   price             Float
   mrp               Float
+  salePrice         Float?
   isActive          Boolean          @default(true)
   isFeatured        Boolean          @default(false)
   categoryId        String
@@ -266,5 +267,28 @@ enum SupportRequestStatus {
   IN_PROGRESS
   RESOLVED
   CLOSED
+}
+
+enum PromotionTargetType {
+  PRODUCT
+  CATEGORY
+}
+
+model Promotion {
+  id            String              @id @default(cuid())
+  title         String
+  subtitle      String?
+  description   String?
+  imageUrl      String
+  buttonText    String
+  redirectType  PromotionTargetType
+  redirectId    String
+  isActive      Boolean             @default(true)
+  isDeleted     Boolean             @default(false)
+  startDate     DateTime
+  endDate       DateTime
+  displayOrder  Int                 @default(0)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
 }
 

@@ -89,8 +89,9 @@ export default function ProductDetailPage({ params }: PageProps) {
   }
 
   // Find price of active variant (or default first variant)
-  const activePrice = product.price;
-  const originalPrice = product.mrp;
+  const isPromoOffer = product.salePrice !== null && product.salePrice !== undefined;
+  const activePrice = product.salePrice ?? product.price;
+  const originalPrice = isPromoOffer ? product.price : product.mrp;
   const discount = originalPrice > activePrice ? Math.round(((originalPrice - activePrice) / originalPrice) * 100) : 0;
 
   const handleAddToCart = async () => {
@@ -202,16 +203,27 @@ export default function ProductDetailPage({ params }: PageProps) {
             </div>
 
             {/* Price Tags */}
-            <div className="flex items-baseline gap-3 p-4 bg-white rounded-[var(--radius-lg)] border border-[var(--ag-gray-200)] w-fit">
-              <span className="text-2xl font-extrabold text-[var(--ag-red)]">
-                ₹{activePrice}
-              </span>
-              <span className="text-sm text-[var(--ag-gray-500)] line-through">
-                ₹{originalPrice}
-              </span>
-              <span className="bg-[var(--ag-red)] text-white text-[10px] font-black px-2 py-0.5 rounded-md">
-                -{discount}% OFF
-              </span>
+            <div className="flex flex-col gap-2">
+              {isPromoOffer && (
+                <div className="flex items-center gap-1.5 p-2 bg-red-50 border border-red-200 text-[var(--ag-red)] rounded-[var(--radius-lg)] text-[10px] font-black w-fit animate-pulse">
+                  🔥 Limited Time Offer
+                </div>
+              )}
+              <div className="flex items-baseline gap-3 p-4 bg-white rounded-[var(--radius-lg)] border border-[var(--ag-gray-200)] w-fit">
+                <span className="text-2xl font-extrabold text-[var(--ag-red)]">
+                  ₹{activePrice}
+                </span>
+                {originalPrice > activePrice && (
+                  <>
+                    <span className="text-sm text-[var(--ag-gray-500)] line-through">
+                      ₹{originalPrice}
+                    </span>
+                    <span className="bg-[var(--ag-red)] text-white text-[10px] font-black px-2 py-0.5 rounded-md">
+                      {isPromoOffer ? `${discount}% OFF` : `-${discount}% OFF`}
+                    </span>
+                  </>
+                )}
+              </div>
             </div>
 
             {/* Description intro */}

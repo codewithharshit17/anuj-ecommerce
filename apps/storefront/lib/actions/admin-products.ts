@@ -35,6 +35,7 @@ export async function createProduct(formData: {
   description?: string;
   price: number;
   mrp: number;
+  salePrice?: number | null;
   categoryId: string;
   lowStockThreshold?: number;
   images?: { url: string; publicId?: string; isPrimary: boolean; sortOrder: number }[];
@@ -47,6 +48,16 @@ export async function createProduct(formData: {
 }) {
   const admin = await requireAdmin();
 
+  // Validation checks for salePrice
+  if (formData.salePrice !== undefined && formData.salePrice !== null) {
+    if (formData.salePrice <= 0) {
+      return { success: false, error: "Sale Price must be greater than 0." };
+    }
+    if (formData.salePrice >= formData.price) {
+      return { success: false, error: "Sale Price must be less than Original Price." };
+    }
+  }
+
   try {
     const slug = await getUniqueSlug(formData.name);
 
@@ -58,6 +69,7 @@ export async function createProduct(formData: {
         description: formData.description ?? null,
         price: formData.price,
         mrp: formData.mrp,
+        salePrice: formData.salePrice ?? null,
         categoryId: formData.categoryId,
         lowStockThreshold: formData.lowStockThreshold ?? 10,
         isActive: formData.isActive ?? true,
@@ -127,6 +139,7 @@ export async function updateProduct(
     description?: string;
     price: number;
     mrp: number;
+    salePrice?: number | null;
     categoryId: string;
     lowStockThreshold?: number;
     images?: { url: string; publicId?: string; isPrimary: boolean; sortOrder: number }[];
@@ -140,6 +153,16 @@ export async function updateProduct(
 ) {
   const admin = await requireAdmin();
 
+  // Validation checks for salePrice
+  if (formData.salePrice !== undefined && formData.salePrice !== null) {
+    if (formData.salePrice <= 0) {
+      return { success: false, error: "Sale Price must be greater than 0." };
+    }
+    if (formData.salePrice >= formData.price) {
+      return { success: false, error: "Sale Price must be less than Original Price." };
+    }
+  }
+
   try {
     const slug = await getUniqueSlug(formData.name, id);
 
@@ -152,6 +175,7 @@ export async function updateProduct(
         description: formData.description ?? null,
         price: formData.price,
         mrp: formData.mrp,
+        salePrice: formData.salePrice ?? null,
         categoryId: formData.categoryId,
         lowStockThreshold: formData.lowStockThreshold ?? 10,
         isActive: formData.isActive ?? true,

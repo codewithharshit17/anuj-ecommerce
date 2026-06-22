@@ -29,6 +29,7 @@ interface ProductFormProps {
     description: string | null;
     price: number;
     mrp: number;
+    salePrice?: number | null;
     categoryId: string;
     lowStockThreshold: number;
     images?: { id?: string; url: string; publicId?: string; isPrimary: boolean; sortOrder: number }[];
@@ -52,6 +53,7 @@ export default function ProductFormClient({ categories, initialData }: ProductFo
   const [categoryId, setCategoryId] = useState(initialData?.categoryId ?? "");
   const [price, setPrice] = useState(initialData?.price.toString() ?? "");
   const [mrp, setMrp] = useState(initialData?.mrp.toString() ?? "");
+  const [salePrice, setSalePrice] = useState(initialData?.salePrice?.toString() ?? "");
   const [stock, setStock] = useState(initialData?.stock.toString() ?? "0");
   const [lowStockThreshold, setLowStockThreshold] = useState(initialData?.lowStockThreshold.toString() ?? "10");
   const [images, setImages] = useState<MediaManagerImage[]>(initialData?.images ?? []);
@@ -76,6 +78,17 @@ export default function ProductFormClient({ categories, initialData }: ProductFo
     if (!price || parseFloat(price) <= 0) return setError("Please enter a valid price");
     if (!mrp || parseFloat(mrp) <= 0) return setError("Please enter a valid MRP");
 
+    const parsedPrice = parseFloat(price);
+    const parsedSalePrice = salePrice.trim() ? parseFloat(salePrice) : null;
+    if (parsedSalePrice !== null) {
+      if (isNaN(parsedSalePrice) || parsedSalePrice <= 0) {
+        return setError("Sale Price must be greater than 0.");
+      }
+      if (parsedSalePrice >= parsedPrice) {
+        return setError("Sale Price must be less than Original Price.");
+      }
+    }
+
     // Construct specifications JSON
     const specificationsObj: Record<string, string> = {};
     specs.forEach((spec) => {
@@ -89,6 +102,7 @@ export default function ProductFormClient({ categories, initialData }: ProductFo
       description: description.trim() || undefined,
       price: parseFloat(price),
       mrp: parseFloat(mrp),
+      salePrice: parsedSalePrice,
       categoryId,
       lowStockThreshold: parseInt(lowStockThreshold) || 10,
       images: images.map((img) => ({
@@ -183,10 +197,10 @@ export default function ProductFormClient({ categories, initialData }: ProductFo
           <div className="bg-white dark:bg-zinc-950 p-6 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-4">
             <h2 className="text-base font-semibold font-display">Pricing & Inventory</h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
-                  Sale Price (₹) *
+                  Original Price (₹) *
                 </label>
                 <input
                   type="number"
@@ -208,6 +222,20 @@ export default function ProductFormClient({ categories, initialData }: ProductFo
                   value={mrp}
                   onChange={(e) => setMrp(e.target.value)}
                   placeholder="0.00"
+                  className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                  Sale Price (₹) (Offer)
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={salePrice}
+                  onChange={(e) => setSalePrice(e.target.value)}
+                  placeholder="Leave blank if no offer"
                   className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
                 />
               </div>

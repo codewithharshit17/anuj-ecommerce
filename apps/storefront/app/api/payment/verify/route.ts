@@ -131,7 +131,9 @@ async function createOrderFromVerifiedPayment(
     }
 
     const orderItems = cart.items.map((item) => {
-      const price = item.variant?.price ?? item.product.price;
+      const price = item.product.salePrice !== null && item.product.salePrice !== undefined 
+        ? item.product.salePrice 
+        : (item.variant?.price ?? item.product.price);
 
       if (!Number.isFinite(price) || price <= 0) {
         throw new PaymentVerificationError(

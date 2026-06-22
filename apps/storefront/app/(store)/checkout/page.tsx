@@ -20,6 +20,7 @@ import {
 import { useCartStore } from "@/lib/store/cart-store";
 import { useCheckoutStore, CheckoutStep } from "@/lib/store/checkout-store";
 import { hasDefaultAddressAction } from "@/lib/actions/address";
+import { getCheckoutDetails, createCodOrderAction } from "@/lib/actions/checkout";
 
 interface RazorpayPaymentResponse {
   razorpay_payment_id: string;
@@ -89,13 +90,11 @@ export default function CheckoutPage() {
     shipping,
     deliveryMethod,
     paymentMethod,
-    appliedCoupon,
     setStep,
     setContact,
     setShipping,
     setDeliveryMethod,
     setPaymentMethod,
-    setAppliedCoupon,
   } = useCheckoutStore();
 
   // Local validation error states
@@ -105,9 +104,11 @@ export default function CheckoutPage() {
   const [shippingErrors, setShippingErrors] = useState<Record<string, string>>(
     {},
   );
-  const [couponCode, setCouponCode] = useState("");
-  const [couponError, setCouponError] = useState("");
-  const [couponSuccess, setCouponSuccess] = useState("");
+  const [originalSubtotal, setOriginalSubtotal] = useState(() =>
+    cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  );
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [offers, setOffers] = useState<{ id: string; title: string; description: string }[]>([]);
   const [loading, setLoading] = useState(false);
   const [razorpayLoaded, setRazorpayLoaded] = useState(
     () => typeof window !== "undefined" && Boolean(window.Razorpay),
@@ -116,6 +117,19 @@ export default function CheckoutPage() {
   const [paymentPayload, setPaymentPayload] =
     useState<RazorpayPaymentResponse | null>(null);
   const [hasDefaultAddress, setHasDefaultAddress] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (cartItems.length > 0) {
+      const itemsParam = cartItems.map((item) => ({ id: item.id, quantity: item.quantity }));
+      getCheckoutDetails(itemsParam).then((res) => {
+        if (res.success) {
+          setOriginalSubtotal(res.originalSubtotal);
+          setDiscountAmount(res.discountAmount);
+          setOffers(res.offers);
+        }
+      });
+    }
+  }, [cartItems]);
 
   // Focus Refs
   const fullNameRef = useRef<HTMLInputElement>(null);
@@ -187,28 +201,16 @@ export default function CheckoutPage() {
   }, [step]);
 
   // Calculations
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0,
-  );
-
-  // Coupon Discount
-  let discountAmount = 0;
-  if (appliedCoupon) {
-    if (appliedCoupon.discountType === "percentage") {
-      discountAmount = Math.round(subtotal * (appliedCoupon.amount / 100));
-    } else {
-      discountAmount = Math.min(appliedCoupon.amount, subtotal);
-    }
-  }
+  const subtotal = originalSubtotal;
 
   // Shipping logic
-  const isFreeShippingThreshold = subtotal >= 999;
+  const activeSubtotal = originalSubtotal - discountAmount;
+  const isFreeShippingThreshold = activeSubtotal >= 999;
   const shippingFee =
     deliveryMethod === "express" ? 99 : isFreeShippingThreshold ? 0 : 49;
 
   // Tax calculation (GST 18% included in product prices, but we show breakdown for transparency/premium feel)
-  const taxableValue = subtotal - discountAmount;
+  const taxableValue = activeSubtotal;
   const gstTax = Math.round(taxableValue * 0.18);
   const grandTotal = taxableValue + shippingFee;
 
@@ -271,50 +273,34 @@ export default function CheckoutPage() {
     else if (step === "payment") setStep("delivery");
   };
 
-  // Coupon apply
-  const handleApplyCoupon = (e: React.FormEvent) => {
-    e.preventDefault();
-    setCouponError("");
-    setCouponSuccess("");
+  // Coupon code functionality removed.
 
-    const code = couponCode.trim().toUpperCase();
-    if (!code) {
-      setCouponError("Please enter a coupon code");
-      return;
-    }
-
-    if (code === "WELCOME10") {
-      setAppliedCoupon({
-        code: "WELCOME10",
-        discountType: "percentage",
-        amount: 10,
-      });
-      setCouponSuccess("WELCOME10 applied successfully! 10% discount added.");
-      setCouponCode("");
-    } else if (code === "KAPI50") {
-      setAppliedCoupon({
-        code: "KAPI50",
-        discountType: "fixed",
-        amount: 50,
-      });
-      setCouponSuccess("KAPI50 applied successfully! ₹50 discount added.");
-      setCouponCode("");
-    } else {
-      setCouponError("Invalid coupon code. Try WELCOME10 or KAPI50.");
-    }
-  };
-
-  const handleRemoveCoupon = () => {
-    setAppliedCoupon(null);
-    setCouponSuccess("");
-    setCouponError("");
-  };
-
-  // Create Razorpay order and open Checkout modal.
+  // Create Razorpay order or COD order.
   if (loading) return;
   const handlePlaceOrder = async () => {
     setPaymentError("");
     setPaymentPayload(null);
+
+    if (paymentMethod === "COD") {
+      setLoading(true);
+      try {
+        const res = await createCodOrderAction();
+        if (res.success) {
+          // Clear cart items in store
+          useCartStore.setState({ items: [] });
+          // Redirect to success page
+          router.push(`/checkout/success?orderId=${res.orderId}`);
+        } else {
+          setPaymentError(res.error || "Failed to place Cash on Delivery order.");
+          setLoading(false);
+        }
+      } catch (err: any) {
+        console.error("[COD Placement Error]", err);
+        setPaymentError(err.message || "Failed to place Cash on Delivery order.");
+        setLoading(false);
+      }
+      return;
+    }
 
     if (!razorpayLoaded || !window.Razorpay) {
       setPaymentError("Payment gateway is still loading. Please try again.");
@@ -348,6 +334,7 @@ export default function CheckoutPage() {
               ? data.error
               : "Unable to start payment. Please try again.";
         setPaymentError(message);
+        setLoading(false);
         return;
       }
 
@@ -368,10 +355,10 @@ export default function CheckoutPage() {
         },
         modal: {
           ondismiss: () => {
-            setPaymentError(
-              "Payment was cancelled. You can try again when ready.",
-            );
-            setLoading(false);
+             setPaymentError(
+               "Payment was cancelled. You can try again when ready.",
+             );
+             setLoading(false);
           },
         },
         handler: async (payload) => {
@@ -899,11 +886,11 @@ export default function CheckoutPage() {
                     </h2>
 
                     <div className="grid md:grid-cols-2 gap-4">
-                      {/* UPI */}
+                      {/* Online Payment */}
                       <button
-                        onClick={() => setPaymentMethod("upi")}
+                        onClick={() => setPaymentMethod("ONLINE")}
                         className={`flex flex-col p-4 rounded-[var(--radius-xl)] border text-left transition-colors cursor-pointer gap-2 ${
-                          paymentMethod === "upi"
+                          paymentMethod === "ONLINE"
                             ? "border-[var(--ag-red)] bg-[var(--ag-red)]/5 dark:bg-[var(--ag-red)]/10"
                             : "border-[var(--ag-gray-200)] dark:border-neutral-850 hover:bg-[var(--ag-gray-100)] dark:hover:bg-neutral-850"
                         }`}
@@ -911,90 +898,32 @@ export default function CheckoutPage() {
                         <div className="flex items-center gap-2.5">
                           <div
                             className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
-                              paymentMethod === "upi"
+                              paymentMethod === "ONLINE"
                                 ? "border-[var(--ag-red)] bg-[var(--ag-red)]"
                                 : "border-gray-400"
                             }`}
                           >
-                            {paymentMethod === "upi" && (
+                            {paymentMethod === "ONLINE" && (
                               <div className="w-1.5 h-1.5 rounded-full bg-white" />
                             )}
                           </div>
                           <span className="font-black text-sm text-[var(--ag-dark)] dark:text-white">
-                            UPI / Instant Pay
+                            Online Payment
                           </span>
                         </div>
-                        <p className="text-[10px] font-semibold text-[var(--ag-gray-500)] leading-tight ml-6">
-                          Pay instantly using Google Pay, PhonePe, or Paytm.
-                        </p>
-                      </button>
-
-                      {/* Credit/Debit Card */}
-                      <button
-                        onClick={() => setPaymentMethod("card")}
-                        className={`flex flex-col p-4 rounded-[var(--radius-xl)] border text-left transition-colors cursor-pointer gap-2 ${
-                          paymentMethod === "card"
-                            ? "border-[var(--ag-red)] bg-[var(--ag-red)]/5 dark:bg-[var(--ag-red)]/10"
-                            : "border-[var(--ag-gray-200)] dark:border-neutral-850 hover:bg-[var(--ag-gray-100)] dark:hover:bg-neutral-850"
-                        }`}
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <div
-                            className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
-                              paymentMethod === "card"
-                                ? "border-[var(--ag-red)] bg-[var(--ag-red)]"
-                                : "border-gray-400"
-                            }`}
-                          >
-                            {paymentMethod === "card" && (
-                              <div className="w-1.5 h-1.5 rounded-full bg-white" />
-                            )}
-                          </div>
-                          <span className="font-black text-sm text-[var(--ag-dark)] dark:text-white">
-                            Credit / Debit Card
-                          </span>
+                        <div className="text-[10px] font-semibold text-[var(--ag-gray-500)] leading-tight ml-6 space-y-1">
+                          <p>Secure payment via Razorpay.</p>
+                          <p className="text-[9px] uppercase tracking-wider text-[var(--ag-red)]/85">
+                            Supports: UPI · Cards · Net Banking · Wallets · EMI
+                          </p>
                         </div>
-                        <p className="text-[10px] font-semibold text-[var(--ag-gray-500)] leading-tight ml-6">
-                          Visa, Mastercard, RuPay, and Amex accepted.
-                        </p>
-                      </button>
-
-                      {/* Net Banking */}
-                      <button
-                        onClick={() => setPaymentMethod("netbanking")}
-                        className={`flex flex-col p-4 rounded-[var(--radius-xl)] border text-left transition-colors cursor-pointer gap-2 ${
-                          paymentMethod === "netbanking"
-                            ? "border-[var(--ag-red)] bg-[var(--ag-red)]/5 dark:bg-[var(--ag-red)]/10"
-                            : "border-[var(--ag-gray-200)] dark:border-neutral-850 hover:bg-[var(--ag-gray-100)] dark:hover:bg-neutral-850"
-                        }`}
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <div
-                            className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
-                              paymentMethod === "netbanking"
-                                ? "border-[var(--ag-red)] bg-[var(--ag-red)]"
-                                : "border-gray-400"
-                            }`}
-                          >
-                            {paymentMethod === "netbanking" && (
-                              <div className="w-1.5 h-1.5 rounded-full bg-white" />
-                            )}
-                          </div>
-                          <span className="font-black text-sm text-[var(--ag-dark)] dark:text-white">
-                            Net Banking
-                          </span>
-                        </div>
-                        <p className="text-[10px] font-semibold text-[var(--ag-gray-500)] leading-tight ml-6">
-                          Secure checkout via top banks including HDFC, ICICI,
-                          SBI.
-                        </p>
                       </button>
 
                       {/* Cash on Delivery */}
                       <button
-                        onClick={() => setPaymentMethod("cod")}
+                        onClick={() => setPaymentMethod("COD")}
                         className={`flex flex-col p-4 rounded-[var(--radius-xl)] border text-left transition-colors cursor-pointer gap-2 ${
-                          paymentMethod === "cod"
+                          paymentMethod === "COD"
                             ? "border-[var(--ag-red)] bg-[var(--ag-red)]/5 dark:bg-[var(--ag-red)]/10"
                             : "border-[var(--ag-gray-200)] dark:border-neutral-850 hover:bg-[var(--ag-gray-100)] dark:hover:bg-neutral-850"
                         }`}
@@ -1002,12 +931,12 @@ export default function CheckoutPage() {
                         <div className="flex items-center gap-2.5">
                           <div
                             className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
-                              paymentMethod === "cod"
+                              paymentMethod === "COD"
                                 ? "border-[var(--ag-red)] bg-[var(--ag-red)]"
                                 : "border-gray-400"
                             }`}
                           >
-                            {paymentMethod === "cod" && (
+                            {paymentMethod === "COD" && (
                               <div className="w-1.5 h-1.5 rounded-full bg-white" />
                             )}
                           </div>
@@ -1016,7 +945,7 @@ export default function CheckoutPage() {
                           </span>
                         </div>
                         <p className="text-[10px] font-semibold text-[var(--ag-gray-500)] leading-tight ml-6">
-                          Pay cash at the door. ₹25 handling fee may apply.
+                          Pay when your order is delivered.
                         </p>
                       </button>
                     </div>
@@ -1078,7 +1007,7 @@ export default function CheckoutPage() {
                         disabled={loading || !hasDefaultAddress}
                         className="px-8 py-3 bg-[var(--ag-red)] hover:bg-[var(--ag-red-hover)] disabled:bg-[var(--ag-red)]/50 text-white font-black text-xs rounded-[var(--radius-lg)] transition-all cursor-pointer flex items-center gap-2 shadow-md hover:shadow-lg select-none active:scale-98"
                       >
-                        {loading ? "PROCESSING..." : "PLACE ORDER & PAY"}
+                        {loading ? "PROCESSING..." : paymentMethod === "COD" ? "PLACE ORDER" : "PLACE ORDER & PAY"}
                       </button>
                     </div>
                   </motion.div>
@@ -1144,53 +1073,30 @@ export default function CheckoutPage() {
                     </div>
                   ))}
                 </div>
-              </div>
-
-              {/* Coupon System */}
+                   {/* Offers Applied */}
               <div className="bg-white dark:bg-[#1E1E1E] border border-[var(--ag-gray-200)] dark:border-neutral-850 rounded-[var(--radius-xl)] p-5 shadow-xs">
                 <h3 className="text-xs font-black text-[var(--ag-dark)] dark:text-white uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                  <Tag size={13} className="text-[var(--ag-red)]" /> Apply
-                  Coupon
+                  <Tag size={13} className="text-[var(--ag-red)]" /> Offers Applied
                 </h3>
 
-                {appliedCoupon ? (
-                  <div className="flex items-center justify-between bg-emerald-500/10 border border-emerald-500/25 p-2.5 rounded-[var(--radius-lg)] text-emerald-600 text-xs font-bold">
-                    <span>Code Applied: {appliedCoupon.code}</span>
-                    <button
-                      onClick={handleRemoveCoupon}
-                      className="text-red-500 hover:underline cursor-pointer"
-                    >
-                      Remove
-                    </button>
+                {offers.length > 0 ? (
+                  <div className="space-y-2">
+                    {offers.map((offer) => (
+                      <div
+                        key={offer.id}
+                        className="p-2.5 bg-emerald-500/10 border border-emerald-500/25 rounded-[var(--radius-lg)] text-emerald-600 text-[10px] font-bold"
+                      >
+                        <div className="font-extrabold text-xs">{offer.title}</div>
+                        {offer.description && (
+                          <div className="text-[9px] opacity-75 mt-0.5">{offer.description}</div>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 ) : (
-                  <form onSubmit={handleApplyCoupon} className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="WELCOME10 or KAPI50"
-                      value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value)}
-                      className="flex-1 px-3 py-2 border border-[var(--ag-gray-200)] dark:border-neutral-700 bg-[var(--ag-gray-100)] dark:bg-neutral-850 rounded-[var(--radius-lg)] text-xs font-bold outline-none focus:border-[var(--ag-red)] transition-all"
-                    />
-                    <button
-                      type="submit"
-                      className="px-4 py-2 bg-[var(--ag-dark)] text-white hover:bg-[var(--ag-red)] font-black text-xs rounded-[var(--radius-lg)] transition-all cursor-pointer"
-                    >
-                      APPLY
-                    </button>
-                  </form>
+                  <p className="text-[11px] text-[var(--ag-gray-500)] font-bold">No active offers</p>
                 )}
-                {couponError && (
-                  <p className="text-[10px] text-red-500 font-bold mt-1.5 flex items-center gap-1">
-                    <AlertCircle size={10} /> {couponError}
-                  </p>
-                )}
-                {couponSuccess && (
-                  <p className="text-[10px] text-emerald-500 font-bold mt-1.5 flex items-center gap-1">
-                    <Check size={10} /> {couponSuccess}
-                  </p>
-                )}
-              </div>
+              </div>           </div>
 
               {/* Totals Summary breakdown */}
               <div className="bg-white dark:bg-[#1E1E1E] border border-[var(--ag-gray-200)] dark:border-neutral-850 rounded-[var(--radius-xl)] p-5 shadow-xs space-y-4">

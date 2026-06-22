@@ -19,7 +19,7 @@ export interface ShippingAddress {
 }
 
 export type DeliveryMethod = "standard" | "express";
-export type PaymentMethod = "upi" | "card" | "netbanking" | "cod";
+export type PaymentMethod = "ONLINE" | "COD";
 
 interface CheckoutStore {
   step: CheckoutStep;
@@ -27,18 +27,12 @@ interface CheckoutStore {
   shipping: ShippingAddress;
   deliveryMethod: DeliveryMethod;
   paymentMethod: PaymentMethod;
-  appliedCoupon: {
-    code: string;
-    discountType: "percentage" | "fixed";
-    amount: number;
-  } | null;
 
   setStep: (step: CheckoutStep) => void;
   setContact: (contact: Partial<ContactInfo>) => void;
   setShipping: (shipping: Partial<ShippingAddress>) => void;
   setDeliveryMethod: (method: DeliveryMethod) => void;
   setPaymentMethod: (method: PaymentMethod) => void;
-  setAppliedCoupon: (coupon: CheckoutStore["appliedCoupon"]) => void;
   resetCheckout: () => void;
 }
 
@@ -64,8 +58,7 @@ export const useCheckoutStore = create<CheckoutStore>()(
       contact: initialContact,
       shipping: initialShipping,
       deliveryMethod: "standard",
-      paymentMethod: "upi",
-      appliedCoupon: null,
+      paymentMethod: "ONLINE",
 
       setStep: (step) => set({ step }),
       setContact: (contact) =>
@@ -74,15 +67,13 @@ export const useCheckoutStore = create<CheckoutStore>()(
         set((state) => ({ shipping: { ...state.shipping, ...shipping } })),
       setDeliveryMethod: (deliveryMethod) => set({ deliveryMethod }),
       setPaymentMethod: (paymentMethod) => set({ paymentMethod }),
-      setAppliedCoupon: (appliedCoupon) => set({ appliedCoupon }),
       resetCheckout: () =>
         set({
           step: "contact",
           contact: initialContact,
           shipping: initialShipping,
           deliveryMethod: "standard",
-          paymentMethod: "upi",
-          appliedCoupon: null,
+          paymentMethod: "ONLINE",
         }),
     }),
     {

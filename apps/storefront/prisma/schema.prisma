@@ -156,6 +156,7 @@ model Order {
   orderNumber       String        @unique
   status            OrderStatus   @default(PENDING)
   paymentStatus     PaymentStatus @default(PENDING)
+  paymentMethod     PaymentMethod @default(ONLINE)
   totalAmount       Float
   razorpayOrderId   String?       @unique
   razorpayPaymentId String?       @unique
@@ -291,4 +292,10 @@ model Promotion {
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
 }
+
+enum PaymentMethod {
+  ONLINE
+  COD
+}
+
 

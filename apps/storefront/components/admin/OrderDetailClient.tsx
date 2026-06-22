@@ -36,6 +36,7 @@ interface OrderDetail {
   orderNumber: string;
   status: OrderStatus;
   paymentStatus: string;
+  paymentMethod: string;
   totalAmount: number;
   razorpayOrderId: string | null;
   razorpayPaymentId: string | null;
@@ -280,9 +281,15 @@ export default function OrderDetailClient({ order }: OrderDetailClientProps) {
           {/* Payment metadata */}
           <div className="bg-white dark:bg-zinc-950 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm p-6 space-y-4">
             <h3 className="text-base font-semibold font-display flex items-center gap-2">
-              <CreditCard className="size-4 text-zinc-500" /> Razorpay Verification
+              <CreditCard className="size-4 text-zinc-500" /> Payment Details
             </h3>
             <div className="space-y-3">
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-zinc-500">Payment Method</span>
+                <span className="font-bold text-zinc-900 dark:text-zinc-100">
+                  {order.paymentMethod === "COD" ? "Cash on Delivery" : "Online Payment"}
+                </span>
+              </div>
               <div className="flex justify-between items-center text-xs">
                 <span className="text-zinc-500">Payment Status</span>
                 <span
@@ -296,7 +303,7 @@ export default function OrderDetailClient({ order }: OrderDetailClientProps) {
                 </span>
               </div>
               {order.razorpayOrderId && (
-                <div className="space-y-1">
+                <div className="space-y-1 pt-1 border-t border-zinc-100 dark:border-zinc-800/60">
                   <p className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">
                     Razorpay Order ID
                   </p>

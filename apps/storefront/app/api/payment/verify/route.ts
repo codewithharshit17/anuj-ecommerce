@@ -3,8 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/prisma";
 import { generateOrderNumber } from "@/lib/orders/generate-order-number";
-import { OrderStatus, PaymentStatus } from "@prisma/client";
+import { OrderStatus, PaymentStatus, PaymentMethod } from "@prisma/client";
 import { sendOrderConfirmationEmail } from "@/lib/email";
+import { createOrderFromCart } from "@/lib/actions/checkout";
 
 interface VerifyPaymentPayload {
   razorpay_order_id: string;
@@ -92,139 +93,18 @@ async function createOrderFromVerifiedPayment(
   userId: string,
   payload: VerifyPaymentPayload
 ) {
-  return prisma.$transaction(async (tx) => {
-    // Prevent duplicate orders for the same payment
-    const existingOrder = await tx.order.findUnique({
-      where: {
-        razorpayPaymentId: payload.razorpay_payment_id,
-      },
-      select: {
-        id: true,
-        orderNumber: true,
-      },
+  try {
+    return await createOrderFromCart({
+      userId,
+      paymentMethod: PaymentMethod.ONLINE,
+      paymentStatus: PaymentStatus.COMPLETED,
+      status: OrderStatus.PROCESSING,
+      razorpayOrderId: payload.razorpay_order_id,
+      razorpayPaymentId: payload.razorpay_payment_id,
     });
-
-    if (existingOrder) {
-      return existingOrder;
-    }
-
-    const cart = await tx.cart.findUnique({
-      where: {
-        userId,
-      },
-      include: {
-        items: {
-          include: {
-            product: {
-              include: {
-                variants: true,
-              },
-            },
-            variant: true,
-          },
-        },
-      },
-    });
-
-    if (!cart || cart.items.length === 0) {
-      throw new PaymentVerificationError("Cart is empty.");
-    }
-
-    const orderItems = cart.items.map((item) => {
-      const price = item.product.salePrice !== null && item.product.salePrice !== undefined 
-        ? item.product.salePrice 
-        : (item.variant?.price ?? item.product.price);
-
-      if (!Number.isFinite(price) || price <= 0) {
-        throw new PaymentVerificationError(
-          `Invalid price for ${item.product.name}`
-        );
-      }
-
-      // Stock validation
-      const defaultVariant = item.variant || item.product.variants[0];
-      if (!defaultVariant) {
-        throw new PaymentVerificationError(
-          `Variant not found for product ${item.product.name}`
-        );
-      }
-
-      if (item.quantity > defaultVariant.stock) {
-        throw new PaymentVerificationError(
-          `Insufficient stock for ${item.product.name}`
-        );
-      }
-
-      return {
-        productId: item.productId,
-        variantId: item.variantId || defaultVariant.id,
-        quantity: item.quantity,
-        price,
-      };
-    });
-
-    // Decrement stock for each variant and check to prevent negative inventory
-    for (const item of orderItems) {
-      const targetVariantId = item.variantId;
-      if (!targetVariantId) {
-        throw new PaymentVerificationError("Variant ID missing for stock decrement.");
-      }
-
-      const variant = await tx.productVariant.findUnique({
-        where: { id: targetVariantId },
-        select: { stock: true },
-      });
-
-      if (!variant) {
-        throw new PaymentVerificationError("Variant not found for stock decrement.");
-      }
-
-      if (variant.stock < item.quantity) {
-        throw new PaymentVerificationError(`Insufficient stock for variant.`);
-      }
-
-      await tx.productVariant.update({
-        where: { id: targetVariantId },
-        data: {
-          stock: {
-            decrement: item.quantity,
-          },
-        },
-      });
-    }
-
-    const totalAmount = orderItems.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0
-    );
-
-    const order = await tx.order.create({
-      data: {
-        userId,
-        orderNumber: generateOrderNumber(),
-        totalAmount,
-        status: OrderStatus.PROCESSING,
-        paymentStatus: PaymentStatus.COMPLETED,
-        razorpayOrderId: payload.razorpay_order_id,
-        razorpayPaymentId: payload.razorpay_payment_id,
-        items: {
-          create: orderItems,
-        },
-      },
-      select: {
-        id: true,
-        orderNumber: true,
-      },
-    });
-
-    await tx.cartItem.deleteMany({
-      where: {
-        cartId: cart.id,
-      },
-    });
-
-    return order;
-  });
+  } catch (error: any) {
+    throw new PaymentVerificationError(error.message || "Payment verification failed.");
+  }
 }
 
 

@@ -142,6 +142,7 @@ export async function sendOrderConfirmationEmail(props: { orderId: string }) {
       orderNumber: order.orderNumber,
       customerName: `${order.user.firstName || ""} ${order.user.lastName || ""}`.trim() || "Customer",
       orderDate: order.createdAt.toLocaleDateString(),
+      paymentMethod: order.paymentMethod,
       items,
       subtotal,
       total,

@@ -17,6 +17,7 @@ export const OrderConfirmationEmail = ({
   orderNumber = "ORD-000000",
   customerName = "Customer",
   orderDate = new Date().toLocaleDateString(),
+  paymentMethod = "ONLINE",
   items = [],
   subtotal = 0,
   total = 0,
@@ -60,11 +61,28 @@ export const OrderConfirmationEmail = ({
                   <td style={{ textAlign: "right" as const, color: "#1e293b" }}>{orderDate}</td>
                 </tr>
                 <tr>
+                  <td style={{ color: "#64748b", padding: "4px 0" }}>Payment Method:</td>
+                  <td style={{ textAlign: "right" as const, color: "#1e293b", fontWeight: "bold" }}>
+                    {paymentMethod === "COD" ? "Cash on Delivery" : "Online Payment"}
+                  </td>
+                </tr>
+                <tr>
                   <td style={{ color: "#64748b", padding: "4px 0" }}>Payment Status:</td>
-                  <td style={{ textAlign: "right" as const, color: "#0f766e", fontWeight: "bold" }}>PAID</td>
+                  <td style={{ 
+                    textAlign: "right" as const, 
+                    color: paymentMethod === "COD" ? "#b45309" : "#0f766e", 
+                    fontWeight: "bold" 
+                  }}>
+                    {paymentMethod === "COD" ? "PENDING" : "PAID"}
+                  </td>
                 </tr>
               </tbody>
             </table>
+            {paymentMethod === "COD" && (
+              <Text style={{ fontSize: "12px", color: "#b45309", fontWeight: "bold", marginTop: "8px", textAlign: "center" }}>
+                You will pay when the order is delivered.
+              </Text>
+            )}
           </Section>
 
           {/* Items List */}

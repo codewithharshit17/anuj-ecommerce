@@ -147,15 +147,24 @@ export default async function OrdersPage() {
 
                 {/* Razorpay structure & Total billing footer */}
                 <div className="bg-[var(--ag-gray-100)]/30 dark:bg-neutral-900/10 px-5 py-4 border-t border-[var(--ag-gray-200)] dark:border-neutral-800/80 flex flex-wrap gap-4 items-center justify-between">
-                  {/* Future-ready Razorpay Metadata */}
+                  {/* Payment Method & Metadata */}
                   <div className="flex items-center gap-1.5 text-xs font-semibold text-[var(--ag-gray-500)]">
-                    <CreditCard size={14} />
-                    <span>Razorpay: </span>
-                    <span className="font-mono text-[11px] text-[var(--ag-dark)] dark:text-gray-300">
-                      {order.razorpayOrderId || "N/A"}
+                    <CreditCard size={14} className="shrink-0" />
+                    <span>Payment: </span>
+                    <span className="font-bold text-[var(--ag-dark)] dark:text-gray-300">
+                      {order.paymentMethod === "COD" ? "Cash on Delivery" : "Online Payment"}
                     </span>
-                    <span className="text-[10px] text-[var(--ag-gray-500)] font-bold">
-                      ({order.paymentStatus})
+                    {order.paymentMethod === "ONLINE" && order.razorpayOrderId && (
+                      <span className="font-mono text-[11px] text-[var(--ag-gray-500)] hidden sm:inline">
+                        ({order.razorpayOrderId})
+                      </span>
+                    )}
+                    <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border ${
+                      order.paymentStatus === "COMPLETED"
+                        ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400 border-emerald-200/50 dark:border-emerald-900/30"
+                        : "bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400 border-amber-200/50 dark:border-amber-900/30"
+                    }`}>
+                      {order.paymentStatus}
                     </span>
                   </div>
 

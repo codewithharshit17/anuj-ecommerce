@@ -23,6 +23,7 @@ export interface OrderConfirmationEmailProps {
   orderNumber: string;
   customerName: string;
   orderDate: string;
+  paymentMethod: "ONLINE" | "COD";
   items: OrderItemPayload[];
   subtotal: number;
   total: number;

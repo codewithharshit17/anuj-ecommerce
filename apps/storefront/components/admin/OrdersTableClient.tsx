@@ -21,6 +21,7 @@ interface OrderRow {
   orderNumber: string;
   totalAmount: number;
   paymentStatus: string;
+  paymentMethod: string;
   status: OrderStatus;
   createdAt: Date | string;
   user: {
@@ -117,6 +118,7 @@ function OrdersTable({ initialOrders }: OrdersTableClientProps) {
                 <th className="px-6 py-4">Customer</th>
                 <th className="px-6 py-4">Date</th>
                 <th className="px-6 py-4">Total</th>
+                <th className="px-6 py-4">Method</th>
                 <th className="px-6 py-4">Payment</th>
                 <th className="px-6 py-4">Status</th>
                 <th className="px-6 py-4 text-right">Actions</th>
@@ -125,7 +127,7 @@ function OrdersTable({ initialOrders }: OrdersTableClientProps) {
             <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800 text-sm">
               {filteredOrders.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-zinc-400">
+                  <td colSpan={8} className="px-6 py-12 text-center text-zinc-400">
                     <div className="flex flex-col items-center gap-2 justify-center py-6">
                       <ShoppingBag className="size-8 stroke-[1.5] text-zinc-300" />
                       <p className="text-sm font-medium">No orders yet — they&apos;ll show up here the moment a customer checks out</p>
@@ -164,6 +166,17 @@ function OrdersTable({ initialOrders }: OrdersTableClientProps) {
                       </td>
                       <td className="px-6 py-4 font-semibold text-zinc-900 dark:text-zinc-100">
                         ₹{order.totalAmount.toLocaleString("en-IN")}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${
+                            order.paymentMethod === "ONLINE"
+                              ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-450 border-emerald-200 dark:border-emerald-900/30"
+                              : "bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-450 border border-amber-200 dark:border-amber-900/30"
+                          }`}
+                        >
+                          {order.paymentMethod}
+                        </span>
                       </td>
                       <td className="px-6 py-4">
                         <span

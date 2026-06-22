@@ -6,9 +6,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
 const promos = [
-  "Free shipping on orders above ₹999!",
-  "Use code KAPI10 to get 10% off your first purchase!",
-  "Premium Stationery and Art Supplies delivered across India",
+  "Free shipping on orders above ₹999 — across India",
+  "New arrivals every week — pens, notebooks & art tools",
+  "Premium stationery curated for creators and writers",
 ];
 
 const SOCIAL_LINKS = [

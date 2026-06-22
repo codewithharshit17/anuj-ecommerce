@@ -71,7 +71,7 @@ export default function BudgetSection() {
   }, [activeChip]);
 
   return (
-    <section className="py-12 bg-[var(--ag-gray-100)] select-none">
+    <section className="py-section bg-[var(--ag-gray-100)] select-none">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         
         {/* Section Header */}

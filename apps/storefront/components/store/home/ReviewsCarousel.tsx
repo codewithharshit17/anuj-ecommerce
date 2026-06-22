@@ -93,7 +93,7 @@ export default function ReviewsCarousel() {
   };
 
   return (
-    <section className="py-12 bg-white dark:bg-neutral-900 select-none">
+    <section className="py-section bg-[#F8F7F4] dark:bg-neutral-950 select-none">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         
         {/* Header */}

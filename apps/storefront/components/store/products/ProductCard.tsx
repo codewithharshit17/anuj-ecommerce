@@ -97,7 +97,7 @@ export default function ProductCard({ product, showVendor = true, showBadge = tr
 
           {/* Discount badge */}
           {showBadge && discount > 0 && (
-            <div className="absolute top-3 left-3 bg-[var(--ag-red)] text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-sm animate-pulse">
+            <div className="absolute top-3 left-3 bg-[var(--ag-red)] text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-sm">
               {isPromoOffer ? `${discount}% OFF` : `SAVE ${discount}%`}
             </div>
           )}

@@ -50,7 +50,7 @@ export default function CategoryGrid({ title, subtitle, categories, columns }: C
   }
 
   return (
-    <section className="py-12 bg-white dark:bg-neutral-900 select-none">
+    <section className="py-section bg-white dark:bg-neutral-900 select-none">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         
         {/* Section Header */}
@@ -89,14 +89,14 @@ export default function CategoryGrid({ title, subtitle, categories, columns }: C
               >
                 {/* Image Wrapper */}
                 <div
-                  className={`w-full aspect-square overflow-hidden bg-[var(--ag-gray-100)] dark:bg-neutral-800 border border-[var(--ag-gray-200)] dark:border-neutral-700 relative transition-transform duration-300 group-hover:scale-1.04 ${
+                  className={`w-full aspect-square overflow-hidden bg-[var(--ag-gray-100)] dark:bg-neutral-800 border border-[var(--ag-gray-200)] dark:border-neutral-700 relative transition-transform duration-300 group-hover:scale-[1.04] ${
                     isScrollable ? "rounded-full" : "rounded-[var(--radius-lg)]"
                   }`}
                 >
                   <img
                     src={cat.image}
                     alt={cat.title}
-                    className="w-full h-full object-cover transition-transform duration-300 ease-out-expo group-hover:scale-1.06"
+                    className="w-full h-full object-cover transition-transform duration-300 ease-out-expo group-hover:scale-[1.06]"
                     loading="lazy"
                   />
                 </div>

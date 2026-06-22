@@ -93,7 +93,7 @@ export default function ProductCarousel({
 
 
   return (
-    <section className="py-12 bg-white dark:bg-neutral-900 border-b border-[var(--ag-gray-200)] dark:border-neutral-800 select-none">
+    <section className="py-section bg-white dark:bg-neutral-900 border-b border-[var(--ag-gray-200)] dark:border-neutral-800 select-none">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         
         {/* Header */}

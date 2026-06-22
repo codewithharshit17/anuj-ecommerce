@@ -1,11 +1,8 @@
 // apps/storefront/components/store/home/TrustBar.tsx
-"use client";
-
-import { motion } from "framer-motion";
 import { ShieldCheck, Truck, CreditCard, RotateCcw } from "lucide-react";
 
 interface TrustItem {
-  icon: React.ComponentType<{ size?: string | number; className?: string }>;
+  icon: React.ComponentType<{ size?: string | number; className?: string; strokeWidth?: number }>;
   title: string;
   description: string;
 }
@@ -35,30 +32,33 @@ const trustItems: TrustItem[] = [
 
 export default function TrustBar() {
   return (
-    <section className="w-full bg-white dark:bg-neutral-900 py-6 border-b border-[var(--ag-gray-200)] dark:border-neutral-800 select-none">
+    <section
+      className="w-full bg-white dark:bg-neutral-900 border-b border-[var(--ag-gray-200)] dark:border-neutral-800 select-none"
+      aria-label="Trust signals"
+    >
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 divide-x-0 lg:divide-x divide-[var(--ag-gray-200)] dark:divide-neutral-800">
           {trustItems.map((item, index) => {
             const Icon = item.icon;
             return (
-              <motion.div
+              <div
                 key={index}
-                whileHover={{ y: -2 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                className="flex items-center gap-4 p-4 rounded-[var(--radius-lg)] bg-[var(--ag-gray-100)] dark:bg-[#1E1E1E] border border-[var(--ag-gray-200)] dark:border-neutral-850 hover:shadow-sm hover:border-[var(--ag-red)]/35 dark:hover:border-[var(--ag-red)]/35 transition-all duration-300"
+                className="flex items-center gap-3.5 py-5 px-6 first:pl-0 last:pr-0"
               >
-                <div className="w-10 h-10 rounded-full bg-[var(--ag-red)]/10 text-[var(--ag-red)] flex items-center justify-center shrink-0">
-                  <Icon size={20} className="stroke-[2.5]" />
-                </div>
+                <Icon
+                  size={18}
+                  strokeWidth={1.75}
+                  className="text-[var(--ag-gray-500)] dark:text-neutral-500 shrink-0"
+                />
                 <div className="min-w-0">
-                  <h4 className="text-xs sm:text-sm font-black text-[var(--ag-dark)] dark:text-[var(--foreground)] tracking-tight leading-tight mb-1">
+                  <h4 className="text-xs font-bold text-[var(--ag-dark)] dark:text-[var(--foreground)] leading-tight mb-0.5">
                     {item.title}
                   </h4>
-                  <p className="text-[10px] sm:text-xs font-semibold text-[var(--ag-gray-500)] leading-tight truncate">
+                  <p className="text-[11px] text-[var(--ag-gray-500)] dark:text-neutral-500 leading-snug">
                     {item.description}
                   </p>
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>

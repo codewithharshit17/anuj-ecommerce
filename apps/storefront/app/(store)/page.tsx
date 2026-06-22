@@ -7,7 +7,7 @@ import ProductCarousel from "@/components/store/home/ProductCarousel";
 import PromoCards from "@/components/store/home/PromoCards";
 import BudgetSection from "@/components/store/home/BudgetSection";
 import ReviewsCarousel from "@/components/store/home/ReviewsCarousel";
-import BlogSection from "@/components/store/home/BlogSection";
+import InfiniteShowcase from "@/components/store/home/InfiniteShowcase";
 import { getCategories } from "@/lib/actions/product-actions";
 import prisma from "@/lib/prisma";
 
@@ -77,19 +77,9 @@ export default async function Home() {
       <TrustBar />
 
       {/* 3. Shop By Category */}
-      <div className="bg-white dark:bg-neutral-900 pt-8 pb-4">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center md:text-left">
-          <h2 className="text-2xl sm:text-3xl font-display font-black text-[var(--ag-dark)] dark:text-[var(--foreground)] tracking-tight">
-            Shop By Category
-          </h2>
-          <p className="text-sm text-[var(--ag-gray-500)] mt-2 font-medium">
-            Browse our curated collections of premium writing instruments, office essentials, and fine art supplies.
-          </p>
-        </div>
-      </div>
       <CategoryGrid
-        title="Curated Collections"
-        subtitle="Explore premium notebooks, pens, and art essentials from our live catalog."
+        title="Shop By Category"
+        subtitle="Browse our curated collections of premium writing instruments, notebooks, and art tools."
         categories={mappedCategories}
         columns={columns}
       />
@@ -122,24 +112,14 @@ export default async function Home() {
       />
 
       {/* 8. Offers & Deals */}
-      <div className="bg-[var(--ag-gray-100)] dark:bg-neutral-950/40 py-8 border-b border-[var(--ag-gray-200)] dark:border-neutral-800">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center md:text-left">
-          <h2 className="text-xl sm:text-2xl font-display font-black text-[var(--ag-dark)] dark:text-[var(--foreground)] section-title-underline pb-1">
-            Offers & Deals
-          </h2>
-          <p className="text-sm text-[var(--ag-gray-500)] mt-2 font-medium">
-            Discover limited-time discounts and curated budget collections.
-          </p>
-        </div>
-      </div>
       <PromoCards />
       <BudgetSection />
 
       {/* 9. Customer Reviews */}
       <ReviewsCarousel />
 
-      {/* 10. Blog / Guides Section */}
-      <BlogSection />
+      {/* 10. Infinite Showcase Experience */}
+      <InfiniteShowcase />
 
     </>
   );

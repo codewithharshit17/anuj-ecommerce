@@ -618,4 +618,9 @@
     background: linear-gradient(90deg, var(--brand-coral), var(--brand-gold), var(--brand-coral));
     border: none;
   }
+
+  /* Standardized section spacing */
+  .py-section {
+    @apply py-14 sm:py-18;
+  }
 }

@@ -14,25 +14,25 @@ interface PromoCard {
 
 const promoCards: PromoCard[] = [
   {
-    image: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600&auto=format&fit=crop&q=80",
-    categoryName: "Party Supplies",
-    tagline: "Balloons, candles & decor",
-    ctaText: "Shop Party",
-    href: "/collections/birthday-party-items",
+    image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600&auto=format&fit=crop&q=80",
+    categoryName: "Writing Instruments",
+    tagline: "Fountain pens, gel pens & fine liners",
+    ctaText: "Shop Pens",
+    href: "/collections/pens",
   },
   {
     image: "https://images.unsplash.com/photo-1531346878377-a5be20888e57?w=600&auto=format&fit=crop&q=80",
-    categoryName: "Premium Journals",
-    tagline: "Unruled, dotted & thread-bound",
-    ctaText: "Explore Books",
-    href: "/collections/office-supplies",
+    categoryName: "Journals & Notebooks",
+    tagline: "Dotted, lined & thread-bound formats",
+    ctaText: "Shop Notebooks",
+    href: "/collections/notebooks",
   },
   {
-    image: "https://images.unsplash.com/photo-1517842645767-c639042777db?w=600&auto=format&fit=crop&q=80",
-    categoryName: "Organizer Tools",
-    tagline: "Aesthetic desk organization products",
-    ctaText: "Shop Desk",
-    href: "/collections/stationery",
+    image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600&auto=format&fit=crop&q=80",
+    categoryName: "Art & Illustration",
+    tagline: "Brush pens, watercolours & sketch tools",
+    ctaText: "Shop Art",
+    href: "/collections/art-supplies",
   },
 ];
 
@@ -40,6 +40,15 @@ export default function PromoCards() {
   return (
     <section className="py-12 bg-white dark:bg-neutral-900 select-none">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        {/* Section Header */}
+        <div className="mb-8 text-center md:text-left">
+          <h2 className="text-xl sm:text-2xl font-display font-black text-[var(--ag-dark)] dark:text-[var(--foreground)] section-title-underline pb-1">
+            Offers & Deals
+          </h2>
+          <p className="text-sm text-[var(--ag-gray-500)] mt-2 font-medium">
+            Discover limited-time discounts and curated collections.
+          </p>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {promoCards.map((card, i) => (
             <motion.div

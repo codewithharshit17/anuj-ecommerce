@@ -8,7 +8,6 @@ import PromoCards from "@/components/store/home/PromoCards";
 import BudgetSection from "@/components/store/home/BudgetSection";
 import ReviewsCarousel from "@/components/store/home/ReviewsCarousel";
 import BlogSection from "@/components/store/home/BlogSection";
-import Newsletter from "@/components/store/home/Newsletter";
 import { getCategories } from "@/lib/actions/product-actions";
 
 export default async function Home() {
@@ -97,8 +96,6 @@ export default async function Home() {
       {/* 10. Blog / Guides Section */}
       <BlogSection />
 
-      {/* 11. Newsletter Subscription Section */}
-      <Newsletter />
     </>
   );
 }

@@ -1,26 +1,13 @@
-"use client";
-
 import Link from "next/link";
-import { useState } from "react";
-import { Send } from "lucide-react";
 
 export default function Footer() {
-  const [email, setEmail] = useState("");
   const currentYear = new Date().getFullYear();
-
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email) {
-      alert(`Subscribed successfully with ${email}!`);
-      setEmail("");
-    }
-  };
 
   return (
     <footer className="bg-white dark:bg-neutral-900 border-t border-[var(--ag-gray-200)] text-[var(--ag-dark)] pt-16 pb-8 select-none">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 border-b border-[var(--ag-gray-200)] pb-12">
         
-        {/* Column 1: Brand details & Newsletter */}
+        {/* Column 1: Brand details */}
         <div className="lg:col-span-5 flex flex-col gap-6">
           <Link href="/" className="flex items-center gap-2.5 group w-fit">
             <img src="/logo.jpg" alt="Personal Marketing Store Logo" className="h-14 w-auto object-contain" />
@@ -33,29 +20,6 @@ export default function Footer() {
           <p className="text-sm text-[var(--ag-gray-500)] leading-relaxed max-w-sm">
             Curating premium writing instruments, refined journals, and professional tools for students and artists who appreciate the art of fine writing.
           </p>
-
-          <form onSubmit={handleSubscribe} className="flex flex-col gap-2 max-w-sm mt-2">
-            <label htmlFor="newsletter-email" className="text-xs font-bold uppercase tracking-wider text-[var(--ag-gray-500)]">
-              Join Our Newsletter
-            </label>
-            <div className="relative flex items-center">
-              <input
-                id="newsletter-email"
-                type="email"
-                placeholder="Enter your email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-5 pr-12 py-3 rounded-full border border-[var(--ag-gray-200)] text-sm font-semibold focus:border-[var(--ag-red)] focus:ring-4 focus:ring-[var(--ag-red)]/10 outline-none transition-all"
-              />
-              <button
-                type="submit"
-                className="absolute right-1 w-9 h-9 bg-[var(--ag-red)] hover:bg-[var(--ag-red-hover)] text-white rounded-full flex items-center justify-center transition-colors shadow-sm"
-                aria-label="Sign up"
-              >
-                <Send size={14} />
-              </button>
-            </div>
-          </form>
         </div>
 
         {/* Column 2: Delivery & Returns */}

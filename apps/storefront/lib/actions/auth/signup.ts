@@ -9,6 +9,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { syncUserToPrisma } from "@/lib/auth/sync-user";
+import { sendWelcomeEmail } from "@/lib/email";
 
 // ── Types ────────────────────────────────────────────────────────────
 
@@ -86,6 +87,13 @@ export async function signUp(
   // 3. Sync to Prisma
   if (data.user) {
     await syncUserToPrisma(data.user);
+    // Non-blocking welcome email trigger
+    sendWelcomeEmail({
+      email: data.user.email!,
+      firstName: firstName,
+    }).catch((err) => {
+      console.error("[signup] Welcome email sending failed:", err);
+    });
   }
 
   // 4. Redirect on success

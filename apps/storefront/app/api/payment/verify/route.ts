@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/prisma";
 import { generateOrderNumber } from "@/lib/orders/generate-order-number";
 import { OrderStatus, PaymentStatus } from "@prisma/client";
+import { sendOrderConfirmationEmail } from "@/lib/email";
 
 interface VerifyPaymentPayload {
   razorpay_order_id: string;
@@ -273,6 +274,11 @@ export async function POST(request: NextRequest) {
 
     
     const order = await createOrderFromVerifiedPayment(user.id, body);
+
+    // Non-blocking order confirmation email trigger
+    sendOrderConfirmationEmail({ orderId: order.id }).catch((err) => {
+      console.error("[verify] Order confirmation email sending failed:", err);
+    });
 
     return NextResponse.json({
       success: true,

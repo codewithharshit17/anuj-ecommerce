@@ -5,6 +5,7 @@ import { requireAdmin } from "@/lib/auth/require-admin";
 import { logActivity } from "@/lib/audit/log-activity";
 import { revalidatePath } from "next/cache";
 import { OrderStatus } from "@prisma/client";
+import { sendOrderStatusEmail } from "@/lib/email";
 
 // Legal transitions check
 function isTransitionLegal(current: OrderStatus, target: OrderStatus): boolean {
@@ -44,11 +45,28 @@ export async function updateOrderStatus(orderId: string, targetStatus: OrderStat
       };
     }
 
+    const statusChanged = order.status !== targetStatus;
+
     // Update database
     await prisma.order.update({
       where: { id: orderId },
       data: { status: targetStatus },
     });
+
+    // Trigger order status update email non-blocking
+    if (
+      statusChanged &&
+      (targetStatus === OrderStatus.PROCESSING ||
+        targetStatus === OrderStatus.SHIPPED ||
+        targetStatus === OrderStatus.DELIVERED)
+    ) {
+      sendOrderStatusEmail({
+        orderId,
+        status: targetStatus as "PROCESSING" | "SHIPPED" | "DELIVERED",
+      }).catch((err) => {
+        console.error("[admin-orders] Status update email sending failed:", err);
+      });
+    }
 
     // Write audit log
     await logActivity({

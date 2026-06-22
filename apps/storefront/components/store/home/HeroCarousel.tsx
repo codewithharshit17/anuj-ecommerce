@@ -34,13 +34,13 @@ interface Slide {
 }
 
 const permanentSlide: Slide = {
-  image: "https://images.unsplash.com/photo-1517842645767-c639042777db?w=1600&auto=format&fit=crop&q=80",
-  mobileImage: "https://images.unsplash.com/photo-1517842645767-c639042777db?w=600&auto=format&fit=crop&q=80",
-  tagline: "Japanese Craftsmanship",
-  title: "Elevate Your Daily Writing",
-  subtitle: "Discover our premium selection of Japanese needle-point pens and luxury writing tools.",
-  ctaText: "Shop Fine Pens",
-  ctaHref: "/collections/stationery",
+  image: "/hero-banner.png",
+  mobileImage: "/hero-banner.png",
+  tagline: "",
+  title: "",
+  subtitle: "",
+  ctaText: "",
+  ctaHref: "/collections/pens",
 };
 
 export default function HeroCarousel({ promotions = [] }: HeroCarouselProps) {
@@ -104,50 +104,60 @@ export default function HeroCarousel({ promotions = [] }: HeroCarouselProps) {
               <img
                 src={slide.image}
                 alt=""
-                className="hidden md:block absolute inset-0 w-full h-full object-cover brightness-[0.6]"
+                className={`hidden md:block absolute inset-0 w-full h-full object-cover ${index === 0 ? "" : "brightness-[0.6]"}`}
               />
               {/* Mobile Image */}
               <img
                 src={slide.mobileImage}
                 alt=""
-                className="block md:hidden absolute inset-0 w-full h-full object-cover brightness-[0.55]"
+                className={`block md:hidden absolute inset-0 w-full h-full object-cover ${index === 0 ? "" : "brightness-[0.55]"}`}
               />
 
               {/* Text Content overlaying the slide */}
-              <div className="absolute inset-0 flex flex-col justify-center px-8 sm:px-16 md:px-24 text-white z-10 max-w-2xl pointer-events-none">
-                <AnimatePresence mode="wait">
-                  {selectedIndex === index && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 15 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -15 }}
-                      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                      className="flex flex-col items-start"
-                    >
-                      <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-[var(--ag-yellow)] mb-3 bg-white/10 dark:bg-black/25 backdrop-blur-xs px-3 py-1 rounded-full border border-white/10">
-                        <Sparkles size={10} className="stroke-[3]" />
-                        {slide.tagline}
-                      </span>
-                      <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-black leading-tight tracking-tight mb-4 drop-shadow-md">
-                        {slide.title}
-                      </h2>
-                      <p className="text-xs sm:text-sm md:text-base text-white/80 font-medium mb-7 drop-shadow-sm leading-relaxed max-w-xl">
-                        {slide.subtitle}
-                      </p>
+              {(slide.tagline || slide.title || slide.subtitle || slide.ctaText) && (
+                <div className="absolute inset-0 flex flex-col justify-center px-8 sm:px-16 md:px-24 text-white z-10 max-w-2xl pointer-events-none">
+                  <AnimatePresence mode="wait">
+                    {selectedIndex === index && (
                       <motion.div
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -15 }}
+                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                        className="flex flex-col items-start"
                       >
-                        <div
-                          className="inline-flex items-center justify-center px-7 py-4 bg-[var(--ag-red)] hover:bg-[var(--ag-red-hover)] text-white font-black text-sm rounded-[var(--radius-lg)] transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 cursor-pointer pointer-events-auto"
-                        >
-                          {slide.ctaText}
-                        </div>
+                        {slide.tagline && (
+                          <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-[var(--ag-yellow)] mb-3 bg-white/10 dark:bg-black/25 backdrop-blur-xs px-3 py-1 rounded-full border border-white/10">
+                            <Sparkles size={10} className="stroke-[3]" />
+                            {slide.tagline}
+                          </span>
+                        )}
+                        {slide.title && (
+                          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-black leading-tight tracking-tight mb-4 drop-shadow-md">
+                            {slide.title}
+                          </h2>
+                        )}
+                        {slide.subtitle && (
+                          <p className="text-xs sm:text-sm md:text-base text-white/80 font-medium mb-7 drop-shadow-sm leading-relaxed max-w-xl">
+                            {slide.subtitle}
+                          </p>
+                        )}
+                        {slide.ctaText && (
+                          <motion.div
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                          >
+                            <div
+                              className="inline-flex items-center justify-center px-7 py-4 bg-[var(--ag-red)] hover:bg-[var(--ag-red-hover)] text-white font-black text-sm rounded-[var(--radius-lg)] transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 cursor-pointer pointer-events-auto"
+                            >
+                              {slide.ctaText}
+                            </div>
+                          </motion.div>
+                        )}
                       </motion.div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )}
             </Link>
           ))}
         </div>

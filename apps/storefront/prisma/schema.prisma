@@ -249,3 +249,22 @@ model ReviewReply {
   @@index([reviewId])
   @@index([adminId])
 }
+
+model SupportRequest {
+  id        String               @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  message   String
+  status    SupportRequestStatus @default(OPEN)
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+}
+
+enum SupportRequestStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+

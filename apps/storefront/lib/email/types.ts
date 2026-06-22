@@ -35,3 +35,17 @@ export interface OrderStatusEmailProps {
   status: "PROCESSING" | "SHIPPED" | "DELIVERED";
   storeUrl: string;
 }
+
+export interface ContactAdminEmailProps {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
+export interface ContactReceivedEmailProps {
+  name: string;
+  subject: string;
+  message: string;
+}
+

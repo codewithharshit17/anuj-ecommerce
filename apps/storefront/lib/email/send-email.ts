@@ -5,6 +5,8 @@ import { resend } from "./resend";
 import WelcomeEmail from "./templates/welcome-email";
 import OrderConfirmationEmail from "./templates/order-confirmation";
 import OrderStatusEmail from "./templates/order-status";
+import ContactAdminEmail from "./templates/contact-admin";
+import ContactReceivedEmail from "./templates/contact-received";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -193,6 +195,62 @@ export async function sendOrderStatusEmail(props: { orderId: string; status: "PR
     });
   } catch (error) {
     console.error("[sendOrderStatusEmail] Failed to process order status update email:", error);
+    return { success: false, error };
+  }
+}
+
+/**
+ * Sends a notification email to the admin regarding a new contact request.
+ */
+export async function sendContactAdminEmail(props: {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}) {
+  try {
+    const to = process.env.ADMIN_EMAIL || process.env.EMAIL_FROM || "admin@pms.com";
+    const reactElement = React.createElement(ContactAdminEmail, {
+      name: props.name,
+      email: props.email,
+      subject: props.subject,
+      message: props.message,
+    });
+
+    return await sendMail({
+      to,
+      subject: `New Support Request: ${props.subject}`,
+      reactElement,
+    });
+  } catch (error) {
+    console.error("[sendContactAdminEmail] Failed to process admin contact email:", error);
+    return { success: false, error };
+  }
+}
+
+/**
+ * Sends an automated confirmation reply to the customer when they submit the contact form.
+ */
+export async function sendContactReceivedEmail(props: {
+  to: string;
+  name: string;
+  subject: string;
+  message: string;
+}) {
+  try {
+    const reactElement = React.createElement(ContactReceivedEmail, {
+      name: props.name,
+      subject: props.subject,
+      message: props.message,
+    });
+
+    return await sendMail({
+      to: props.to,
+      subject: `Support Request Received: ${props.subject}`,
+      reactElement,
+    });
+  } catch (error) {
+    console.error("[sendContactReceivedEmail] Failed to process customer contact receipt email:", error);
     return { success: false, error };
   }
 }

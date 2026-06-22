@@ -135,17 +135,16 @@ export async function sendOrderConfirmationEmail(props: { orderId: string }) {
       };
     });
 
-    const subtotal = order.totalAmount; // Assuming free shipping
-    const total = order.totalAmount;
-
     const reactElement = React.createElement(OrderConfirmationEmail, {
       orderNumber: order.orderNumber,
       customerName: `${order.user.firstName || ""} ${order.user.lastName || ""}`.trim() || "Customer",
       orderDate: order.createdAt.toLocaleDateString(),
       paymentMethod: order.paymentMethod,
       items,
-      subtotal,
-      total,
+      subtotal: order.subtotal,
+      discount: order.discountAmount,
+      shipping: order.shippingFee,
+      total: order.totalAmount,
       shippingAddress,
     });
 

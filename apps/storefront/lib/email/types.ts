@@ -26,6 +26,8 @@ export interface OrderConfirmationEmailProps {
   paymentMethod: "ONLINE" | "COD";
   items: OrderItemPayload[];
   subtotal: number;
+  discount: number;
+  shipping: number;
   total: number;
   shippingAddress: ShippingAddressPayload;
 }

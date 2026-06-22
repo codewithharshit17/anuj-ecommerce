@@ -6,6 +6,7 @@ import { generateOrderNumber } from "@/lib/orders/generate-order-number";
 import { OrderStatus, PaymentStatus, PaymentMethod } from "@prisma/client";
 import { sendOrderConfirmationEmail } from "@/lib/email";
 import { createOrderFromCart } from "@/lib/actions/checkout";
+import { validateCheckout } from "@/lib/checkout/validate-checkout";
 
 interface VerifyPaymentPayload {
   razorpay_order_id: string;
@@ -91,9 +92,15 @@ function verifyRazorpaySignature(
 
 async function createOrderFromVerifiedPayment(
   userId: string,
-  payload: VerifyPaymentPayload
+  payload: VerifyPaymentPayload,
+  deliveryMethod: string
 ) {
   try {
+    const checkout = await validateCheckout(userId, deliveryMethod);
+    if (!checkout.valid) {
+      throw new PaymentVerificationError("Checkout verification failed: " + checkout.errors.join(" "));
+    }
+
     return await createOrderFromCart({
       userId,
       paymentMethod: PaymentMethod.ONLINE,
@@ -101,6 +108,9 @@ async function createOrderFromVerifiedPayment(
       status: OrderStatus.PROCESSING,
       razorpayOrderId: payload.razorpay_order_id,
       razorpayPaymentId: payload.razorpay_payment_id,
+      subtotal: checkout.subtotal,
+      discountAmount: checkout.discount,
+      shippingFee: checkout.shipping,
     });
   } catch (error: any) {
     throw new PaymentVerificationError(error.message || "Payment verification failed.");
@@ -128,7 +138,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body: unknown = await request.json().catch(() => null);
+    const body: any = await request.json().catch(() => null);
 
     if (!isVerifyPaymentPayload(body)) {
       return NextResponse.json(
@@ -154,8 +164,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    
-    const order = await createOrderFromVerifiedPayment(user.id, body);
+    const deliveryMethod = (body as any).deliveryMethod || "standard";
+    const order = await createOrderFromVerifiedPayment(user.id, body, deliveryMethod);
 
     // Non-blocking order confirmation email trigger
     sendOrderConfirmationEmail({ orderId: order.id }).catch((err) => {

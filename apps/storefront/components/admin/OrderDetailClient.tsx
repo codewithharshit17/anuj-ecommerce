@@ -37,6 +37,9 @@ interface OrderDetail {
   status: OrderStatus;
   paymentStatus: string;
   paymentMethod: string;
+  subtotal: number;
+  shippingFee: number;
+  discountAmount: number;
   totalAmount: number;
   razorpayOrderId: string | null;
   razorpayPaymentId: string | null;
@@ -230,11 +233,31 @@ export default function OrderDetailClient({ order }: OrderDetailClientProps) {
             </div>
 
             {/* Total aggregation bar */}
-            <div className="border-t border-zinc-200 dark:border-zinc-800 pt-4 flex justify-between items-baseline">
-              <span className="text-sm font-semibold text-zinc-500">Order Grand Total</span>
-              <span className="text-xl font-bold text-red-600 dark:text-red-500 font-display">
-                ₹{order.totalAmount.toLocaleString("en-IN")}
-              </span>
+            <div className="border-t border-zinc-200 dark:border-zinc-800 pt-4 space-y-2 text-sm text-zinc-500 font-semibold">
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+                <span className="text-zinc-900 dark:text-zinc-100">
+                  ₹{order.subtotal.toLocaleString("en-IN")}
+                </span>
+              </div>
+              {order.discountAmount > 0 && (
+                <div className="flex justify-between text-emerald-600">
+                  <span>Discount</span>
+                  <span>- ₹{order.discountAmount.toLocaleString("en-IN")}</span>
+                </div>
+              )}
+              <div className="flex justify-between">
+                <span>Shipping Fee</span>
+                <span className="text-zinc-900 dark:text-zinc-100">
+                  {order.shippingFee === 0 ? "FREE" : `₹${order.shippingFee.toLocaleString("en-IN")}`}
+                </span>
+              </div>
+              <div className="flex justify-between items-baseline pt-2 border-t border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold">
+                <span>Order Grand Total</span>
+                <span className="text-xl font-bold text-red-600 dark:text-red-500 font-display">
+                  ₹{order.totalAmount.toLocaleString("en-IN")}
+                </span>
+              </div>
             </div>
           </div>
         </div>

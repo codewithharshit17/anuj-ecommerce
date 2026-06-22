@@ -20,6 +20,8 @@ export const OrderConfirmationEmail = ({
   paymentMethod = "ONLINE",
   items = [],
   subtotal = 0,
+  discount = 0,
+  shipping = 0,
   total = 0,
   shippingAddress = {
     name: "Customer",
@@ -127,9 +129,17 @@ export const OrderConfirmationEmail = ({
                   <td style={{ color: "#64748b", padding: "4px 0" }}>Subtotal</td>
                   <td style={{ textAlign: "right" as const, color: "#1e293b" }}>₹{subtotal.toFixed(2)}</td>
                 </tr>
+                {discount > 0 && (
+                  <tr>
+                    <td style={{ color: "#64748b", padding: "4px 0" }}>Discount</td>
+                    <td style={{ textAlign: "right" as const, color: "#ef4444" }}>-₹{discount.toFixed(2)}</td>
+                  </tr>
+                )}
                 <tr>
                   <td style={{ color: "#64748b", padding: "4px 0" }}>Shipping</td>
-                  <td style={{ textAlign: "right" as const, color: "#0f766e", fontWeight: "bold" }}>FREE</td>
+                  <td style={{ textAlign: "right" as const, color: shipping === 0 ? "#0f766e" : "#1e293b", fontWeight: shipping === 0 ? "bold" : "normal" }}>
+                    {shipping === 0 ? "FREE" : `₹${shipping.toFixed(2)}`}
+                  </td>
                 </tr>
                 <tr style={{ borderTop: "1px solid #e2e8f0" }}>
                   <td style={{ fontWeight: "bold", color: "#1e293b", paddingTop: "12px" }}>Total</td>

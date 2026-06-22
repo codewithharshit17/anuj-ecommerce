@@ -25,12 +25,15 @@ export interface CheckoutValidationResult {
   cart: CheckoutCart | null;
   address: CheckoutAddress | null;
   subtotal: number;
+  discount: number;
+  shipping: number;
   total: number;
   errors: string[];
 }
 
 export async function validateCheckout(
-  userId: string
+  userId: string,
+  deliveryMethod: string = "standard"
 ): Promise<CheckoutValidationResult> {
   const errors: string[] = [];
 
@@ -45,6 +48,8 @@ export async function validateCheckout(
       cart: null,
       address: null,
       subtotal: 0,
+      discount: 0,
+      shipping: 0,
       total: 0,
       errors: ["User does not exist."],
     };
@@ -73,11 +78,14 @@ export async function validateCheckout(
     errors.push("Default address is required.");
   }
 
-  const subtotal =
-    cart?.items.reduce((sum, item) => {
+  let subtotal = 0;
+  let discount = 0;
+
+  if (cart) {
+    for (const item of cart.items) {
       if (!item.product) {
         errors.push(`Product no longer exists: ${item.productId}.`);
-        return sum;
+        continue;
       }
 
       const defaultVariant = item.variant || item.product.variants[0];
@@ -85,7 +93,7 @@ export async function validateCheckout(
         errors.push(
           `Product variant no longer exists for: ${item.product?.name || item.productId}.`
         );
-        return sum;
+        continue;
       }
 
       if (item.quantity > defaultVariant.stock) {
@@ -94,32 +102,48 @@ export async function validateCheckout(
         );
       }
 
-      const unitPrice = item.product.salePrice !== null && item.product.salePrice !== undefined 
-        ? item.product.salePrice 
-        : (defaultVariant.price ?? item.product.price);
+      const originalPrice = defaultVariant.price ?? item.product.price;
+      const activePrice =
+        item.product.salePrice !== null && item.product.salePrice !== undefined
+          ? item.product.salePrice
+          : originalPrice;
 
       if (
-        unitPrice === null ||
-        unitPrice === undefined ||
-        Number.isNaN(Number(unitPrice)) ||
-        Number(unitPrice) <= 0
+        originalPrice === null ||
+        originalPrice === undefined ||
+        Number.isNaN(Number(originalPrice)) ||
+        Number(originalPrice) <= 0 ||
+        activePrice === null ||
+        activePrice === undefined ||
+        Number.isNaN(Number(activePrice)) ||
+        Number(activePrice) <= 0
       ) {
         errors.push(
           `Invalid price detected for product: ${item.product.name}.`
         );
-        return sum;
+        continue;
       }
 
-      return sum + Number(unitPrice) * item.quantity;
-    }, 0) ?? 0;
+      subtotal += Number(originalPrice) * item.quantity;
+      if (item.product.salePrice !== null && item.product.salePrice !== undefined) {
+        discount += (Number(originalPrice) - Number(activePrice)) * item.quantity;
+      }
+    }
+  }
 
-  const total = subtotal;
+  const activeSubtotal = subtotal - discount;
+  const isFreeShippingThreshold = activeSubtotal >= 999;
+  const shipping =
+    deliveryMethod === "express" ? 99 : isFreeShippingThreshold ? 0 : 49;
+  const total = activeSubtotal + shipping;
 
   return {
-    valid: errors.length === 0,
+    valid: errors.length === 0 && !cart?.items.some(i => i.quantity > (i.variant || i.product?.variants[0])?.stock),
     cart,
     address,
     subtotal,
+    discount,
+    shipping,
     total,
     errors,
   };

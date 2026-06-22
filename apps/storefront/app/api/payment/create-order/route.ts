@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { validateCheckout } from "@/lib/checkout/validate-checkout";
 import { generateOrderNumber } from "@/lib/orders/generate-order-number";
 import { razorpay } from "@/lib/razorpay";
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
     const {
@@ -19,7 +19,10 @@ export async function POST() {
       );
     }
 
-    const checkout = await validateCheckout(user.id);
+    const body = await request.json().catch(() => ({}));
+    const deliveryMethod = body?.deliveryMethod || "standard";
+
+    const checkout = await validateCheckout(user.id, deliveryMethod);
 
     console.log("CHECKOUT RESULT:", checkout);
 

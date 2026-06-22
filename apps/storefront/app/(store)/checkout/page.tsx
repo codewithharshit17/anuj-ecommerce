@@ -284,7 +284,7 @@ export default function CheckoutPage() {
     if (paymentMethod === "COD") {
       setLoading(true);
       try {
-        const res = await createCodOrderAction();
+        const res = await createCodOrderAction(deliveryMethod);
         if (res.success) {
           // Clear cart items in store
           useCartStore.setState({ items: [] });
@@ -323,6 +323,7 @@ export default function CheckoutPage() {
         headers: {
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({ deliveryMethod }),
       });
       const data = (await response.json()) as CreateRazorpayOrderResponse;
 
@@ -368,7 +369,10 @@ export default function CheckoutPage() {
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify(payload),
+              body: JSON.stringify({
+                ...payload,
+                deliveryMethod,
+              }),
             });
 
             const verifyData = await verifyResponse.json();

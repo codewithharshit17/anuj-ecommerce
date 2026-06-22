@@ -141,6 +141,8 @@ export async function checkCodEligibility(
   return { eligible: true };
 }
 
+
+
 interface CreateOrderParams {
   userId: string;
   paymentMethod: PaymentMethod;
@@ -148,6 +150,9 @@ interface CreateOrderParams {
   status: OrderStatus;
   razorpayOrderId?: string | null;
   razorpayPaymentId?: string | null;
+  subtotal: number;
+  discountAmount: number;
+  shippingFee: number;
 }
 
 /**
@@ -254,16 +259,16 @@ export async function createOrderFromCart(params: CreateOrderParams) {
       });
     }
 
-    const totalAmount = orderItems.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0
-    );
+    const totalAmount = params.subtotal - params.discountAmount + params.shippingFee;
 
     // 5. Create order record
     const order = await tx.order.create({
       data: {
         userId: params.userId,
         orderNumber: generateOrderNumber(),
+        subtotal: params.subtotal,
+        discountAmount: params.discountAmount,
+        shippingFee: params.shippingFee,
         totalAmount,
         status: params.status,
         paymentStatus: params.paymentStatus,
@@ -294,7 +299,7 @@ export async function createOrderFromCart(params: CreateOrderParams) {
 /**
  * Server Action to create a COD order securely.
  */
-export async function createCodOrderAction() {
+export async function createCodOrderAction(deliveryMethod: string = "standard") {
   try {
     const supabase = await createClient();
     const {
@@ -307,7 +312,7 @@ export async function createCodOrderAction() {
     }
 
     // Reuse existing checkout validation
-    const checkout = await validateCheckout(user.id);
+    const checkout = await validateCheckout(user.id, deliveryMethod);
     if (!checkout.valid) {
       return { success: false, error: checkout.errors.join(" ") };
     }
@@ -324,6 +329,9 @@ export async function createCodOrderAction() {
       paymentMethod: PaymentMethod.COD,
       paymentStatus: PaymentStatus.PENDING,
       status: OrderStatus.PENDING,
+      subtotal: checkout.subtotal,
+      discountAmount: checkout.discount,
+      shippingFee: checkout.shipping,
     });
 
     // Trigger non-blocking email confirmation sending

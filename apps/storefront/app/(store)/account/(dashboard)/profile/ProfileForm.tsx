@@ -52,7 +52,7 @@ export default function ProfileForm({ initialUser }: ProfileFormProps) {
     .join(" ") || "—";
 
   return (
-    <div className="bg-white dark:bg-[var(--card)] border border-[var(--ag-gray-200)] dark:border-[var(--border)] rounded-2xl overflow-hidden shadow-sm">
+    <div className="bg-card text-card-foreground border border-border rounded-2xl overflow-hidden shadow-sm">
       {/* Banner */}
       <div
         className="h-24 w-full flex items-end justify-end p-4"
@@ -75,7 +75,7 @@ export default function ProfileForm({ initialUser }: ProfileFormProps) {
       {/* Avatar + name */}
       <div className="px-6 -mt-10">
         <div className="flex items-end gap-4">
-          <div className="w-20 h-20 rounded-2xl border-4 border-white dark:border-[var(--card)] bg-white dark:bg-[var(--card)] flex items-center justify-center shadow-md">
+          <div className="w-20 h-20 rounded-2xl border-4 border-card bg-card flex items-center justify-center shadow-md">
             <span
               className="text-2xl font-bold"
               style={{ color: "var(--ag-red)" }}
@@ -85,7 +85,7 @@ export default function ProfileForm({ initialUser }: ProfileFormProps) {
             </span>
           </div>
           <div className="pb-1">
-            <h3 className="font-bold text-lg text-[var(--ag-dark)]">
+            <h3 className="font-bold text-lg text-foreground">
               {displayName}
             </h3>
             <p className="text-xs text-[var(--ag-gray-500)]">
@@ -117,7 +117,7 @@ export default function ProfileForm({ initialUser }: ProfileFormProps) {
                   defaultValue={initialUser.firstName || ""}
                   required
                   disabled={isPending}
-                  className="w-full px-4 py-2.5 rounded-xl border border-[var(--ag-gray-200)] dark:border-[var(--border)] bg-white dark:bg-transparent text-sm font-semibold text-[var(--ag-dark)] placeholder:text-[var(--ag-gray-500)] focus:border-[var(--ag-red)] focus:ring-4 focus:ring-[var(--ag-red)]/10 outline-none transition-all disabled:opacity-50"
+                  className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm font-semibold text-foreground placeholder:text-muted-foreground focus:border-[var(--ag-red)] focus:ring-4 focus:ring-[var(--ag-red)]/10 outline-none transition-all disabled:opacity-50"
                 />
                 {state.errors?.firstName && (
                   <span className="text-[10px] font-semibold text-[var(--ag-red)] mt-0.5">
@@ -137,7 +137,7 @@ export default function ProfileForm({ initialUser }: ProfileFormProps) {
                   defaultValue={initialUser.lastName || ""}
                   required
                   disabled={isPending}
-                  className="w-full px-4 py-2.5 rounded-xl border border-[var(--ag-gray-200)] dark:border-[var(--border)] bg-white dark:bg-transparent text-sm font-semibold text-[var(--ag-dark)] placeholder:text-[var(--ag-gray-500)] focus:border-[var(--ag-red)] focus:ring-4 focus:ring-[var(--ag-red)]/10 outline-none transition-all disabled:opacity-50"
+                  className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm font-semibold text-foreground placeholder:text-muted-foreground focus:border-[var(--ag-red)] focus:ring-4 focus:ring-[var(--ag-red)]/10 outline-none transition-all disabled:opacity-50"
                 />
                 {state.errors?.lastName && (
                   <span className="text-[10px] font-semibold text-[var(--ag-red)] mt-0.5">
@@ -211,7 +211,7 @@ function ProfileField({
         <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--ag-gray-500)]">
           {label}
         </p>
-        <p className="text-sm font-semibold text-[var(--ag-dark)] truncate">
+        <p className="text-sm font-semibold text-foreground truncate">
           {value}
         </p>
       </div>

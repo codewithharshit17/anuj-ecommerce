@@ -67,11 +67,11 @@ export default async function AccountLayout({
     .toUpperCase() || "U";
 
   return (
-    <div className="min-h-screen bg-[var(--ag-gray-100)]">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
         {/* Page header */}
         <div className="mb-8">
-          <h1 className="font-display text-h1 text-[var(--ag-dark)] tracking-tight">
+          <h1 className="font-display text-h1 text-foreground tracking-tight">
             My Account
           </h1>
           <p className="text-sm text-[var(--ag-gray-500)] mt-1">
@@ -82,7 +82,7 @@ export default async function AccountLayout({
         <div className="flex flex-col lg:flex-row gap-6">
           {/* ── Sidebar ── */}
           <aside className="w-full lg:w-72 shrink-0">
-            <div className="bg-white dark:bg-[var(--card)] border border-[var(--ag-gray-200)] dark:border-[var(--border)] rounded-2xl overflow-hidden shadow-sm">
+            <div className="bg-card text-card-foreground border border-border rounded-2xl overflow-hidden shadow-sm">
               {/* User info */}
               <div className="p-5 border-b border-[var(--ag-gray-200)] dark:border-[var(--border)]">
                 <div className="flex items-center gap-3">
@@ -96,7 +96,7 @@ export default async function AccountLayout({
                     {initials}
                   </div>
                   <div className="min-w-0">
-                    <p className="font-bold text-sm text-[var(--ag-dark)] truncate">
+                    <p className="font-bold text-sm text-foreground truncate">
                       {displayName}
                     </p>
                     <p className="text-xs text-[var(--ag-gray-500)] truncate">
@@ -112,7 +112,7 @@ export default async function AccountLayout({
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-[var(--ag-dark)] hover:bg-[var(--ag-gray-100)] dark:hover:bg-[var(--muted)] transition-colors group"
+                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-foreground hover:bg-muted transition-colors group"
                   >
                     <item.icon
                       size={18}

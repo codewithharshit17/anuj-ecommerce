@@ -1,5 +1,6 @@
 import { requireAdmin } from "@/lib/auth/require-admin";
 import AdminSidebar from "@/components/admin/AdminSidebar";
+import ThemeToggle from "@/components/store/ui/ThemeToggle";
 
 export const dynamic = "force-dynamic";
 
@@ -17,22 +18,23 @@ export default async function AdminLayout({
       : admin.email;
 
   return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-900 flex">
+    <div className="min-h-screen bg-background text-foreground flex">
       {/* Sidebar Navigation */}
       <AdminSidebar adminName={adminName} adminEmail={admin.email} />
 
       {/* Main Panel Content */}
       <div className="flex-1 ml-64 flex flex-col min-h-screen">
         {/* Top Header Bar */}
-        <header className="h-14 border-b border-zinc-200 bg-white px-8 flex items-center justify-between sticky top-0 z-20">
+        <header className="h-14 border-b border-border bg-card px-8 flex items-center justify-between sticky top-0 z-20">
           <div className="flex items-center gap-3">
             <div className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
               Admin Portal
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-xs text-zinc-500 font-mono">
+            <ThemeToggle />
+            <span className="text-xs text-muted-foreground font-mono">
               {admin.email}
             </span>
             <div className="size-7 rounded-full bg-red-50 border border-red-100 flex items-center justify-center">
@@ -44,7 +46,7 @@ export default async function AdminLayout({
         </header>
 
         {/* Content area */}
-        <main className="flex-grow p-8 bg-zinc-50">
+        <main className="flex-grow p-8 bg-background">
           {children}
         </main>
       </div>

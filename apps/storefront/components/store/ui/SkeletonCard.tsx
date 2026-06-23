@@ -3,7 +3,7 @@
 
 export default function SkeletonCard() {
   return (
-    <div className="border border-[var(--ag-gray-200)] rounded-[var(--radius-lg)] overflow-hidden shadow-xs flex flex-col h-full bg-white dark:bg-[#1E1E1E] select-none">
+    <div className="border border-border rounded-[var(--radius-lg)] overflow-hidden shadow-xs flex flex-col h-full bg-card select-none">
       {/* Thumbnail area */}
       <div className="aspect-square w-full skeleton border-b border-[var(--ag-gray-200)] shrink-0" />
 

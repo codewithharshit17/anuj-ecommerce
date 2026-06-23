@@ -78,7 +78,7 @@ export default function ProductDetailPage({ params }: PageProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--ag-gray-100)]">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="w-10 h-10 border-4 border-[var(--ag-red)] border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -134,7 +134,7 @@ export default function ProductDetailPage({ params }: PageProps) {
   };
 
   return (
-    <main className="min-h-screen bg-[var(--ag-gray-100)] select-none py-8">
+    <main className="min-h-screen bg-background text-foreground select-none py-8">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         
         {/* Breadcrumb */}
@@ -158,12 +158,12 @@ export default function ProductDetailPage({ params }: PageProps) {
           <div className="lg:col-span-5 flex flex-col gap-5">
             <div>
               {/* Brand Chip */}
-              <span className="inline-block bg-[var(--ag-gray-200)] text-[var(--ag-gray-800)] text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full mb-3">
+              <span className="inline-block bg-muted text-muted-foreground text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full mb-3">
                 {product.category?.name || "Personal Marketing Store"}
               </span>
 
               {/* Title */}
-              <h1 className="text-xl sm:text-2xl font-display font-black leading-tight tracking-tight text-[var(--ag-dark)]">
+              <h1 className="text-xl sm:text-2xl font-display font-black leading-tight tracking-tight text-foreground">
                 {product.name}
               </h1>
             </div>
@@ -180,7 +180,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                       );
                     })}
                   </div>
-                  <span className="text-[var(--ag-dark)]">
+                  <span className="text-foreground">
                     {(reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)}
                   </span>
                   <span className="text-[var(--ag-gray-500)]">|</span>
@@ -209,7 +209,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                   🔥 Limited Time Offer
                 </div>
               )}
-              <div className="flex items-baseline gap-3 p-4 bg-white rounded-[var(--radius-lg)] border border-[var(--ag-gray-200)] w-fit">
+              <div className="flex items-baseline gap-3 p-4 bg-card text-card-foreground rounded-[var(--radius-lg)] border border-border w-fit">
                 <span className="text-2xl font-extrabold text-[var(--ag-red)]">
                   ₹{activePrice}
                 </span>
@@ -268,23 +268,23 @@ export default function ProductDetailPage({ params }: PageProps) {
               <button
                 onClick={handleBuyNow}
                 disabled={(product.variants[0]?.stock ?? 0) <= 0}
-                className="flex-1 h-13 bg-white hover:bg-[var(--ag-gray-100)] border-2 border-[var(--ag-red)] disabled:border-neutral-350 disabled:text-neutral-400 disabled:hover:bg-transparent text-[var(--ag-red)] text-sm font-bold rounded-[var(--radius-md)] flex items-center justify-center gap-2 transition-colors select-none"
+                className="flex-1 h-13 bg-background hover:bg-muted border-2 border-[var(--ag-red)] disabled:border-border disabled:text-muted-foreground disabled:hover:bg-transparent text-[var(--ag-red)] text-sm font-bold rounded-[var(--radius-md)] flex items-center justify-center gap-2 transition-colors select-none"
               >
                 <CreditCard size={16} /> BUY NOW
               </button>
             </div>
 
             {/* Delivery Info */}
-            <div className="flex flex-col gap-2 bg-white border border-[var(--ag-gray-200)] p-4 rounded-[var(--radius-lg)] mt-2">
-              <div className="flex items-center gap-2.5 text-xs font-semibold text-[var(--ag-gray-800)]">
+            <div className="flex flex-col gap-2 bg-card text-card-foreground border border-border p-4 rounded-[var(--radius-lg)] mt-2">
+              <div className="flex items-center gap-2.5 text-xs font-semibold text-foreground">
                 <Truck size={15} className="text-emerald-600 shrink-0" />
                 <span>Free delivery on orders above ₹999</span>
               </div>
-              <div className="flex items-center gap-2.5 text-xs font-semibold text-[var(--ag-gray-800)]">
+              <div className="flex items-center gap-2.5 text-xs font-semibold text-foreground">
                 <RotateCcw size={15} className="text-emerald-600 shrink-0" />
                 <span>Easy 7-day return policy</span>
               </div>
-              <div className="flex items-center gap-2.5 text-xs font-semibold text-[var(--ag-gray-800)]">
+              <div className="flex items-center gap-2.5 text-xs font-semibold text-foreground">
                 <Shield size={15} className="text-emerald-600 shrink-0" />
                 <span>100% genuine & authentic product</span>
               </div>

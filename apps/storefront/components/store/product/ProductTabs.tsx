@@ -82,9 +82,9 @@ export default function ProductTabs({
   };
 
   return (
-    <div className="w-full select-none bg-white dark:bg-[#1E1E1E] border border-[var(--ag-gray-200)] dark:border-neutral-800 rounded-[var(--radius-lg)] overflow-hidden mt-10 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+    <div className="w-full select-none bg-card text-card-foreground border border-border rounded-[var(--radius-lg)] overflow-hidden mt-10 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
       {/* Tabs list Header */}
-      <div className="flex border-b border-[var(--ag-gray-200)] dark:border-neutral-800 bg-[var(--ag-gray-100)] dark:bg-neutral-900/50 overflow-x-auto no-scrollbar relative">
+      <div className="flex border-b border-border bg-muted overflow-x-auto no-scrollbar relative">
         {tabs.map((tab) => {
           const tabKey = tab.split(" ")[0];
           const isActive = activeTab === tabKey;
@@ -289,7 +289,7 @@ export default function ProductTabs({
                         placeholder="Summarize your experience..."
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        className="w-full px-3 py-2 border border-zinc-250 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-xs focus:outline-none focus:ring-2 focus:ring-red-500 text-zinc-900 dark:text-zinc-50 font-semibold"
+                        className="w-full px-3 py-2 border border-border rounded-lg bg-background text-xs focus:outline-none focus:ring-2 focus:ring-red-500 text-foreground placeholder:text-muted-foreground font-semibold"
                       />
                     </div>
 
@@ -304,7 +304,7 @@ export default function ProductTabs({
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
                         rows={4}
-                        className="w-full px-3 py-2 border border-zinc-250 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-xs focus:outline-none focus:ring-2 focus:ring-red-500 text-zinc-900 dark:text-zinc-50 font-semibold resize-y"
+                        className="w-full px-3 py-2 border border-border rounded-lg bg-background text-xs focus:outline-none focus:ring-2 focus:ring-red-500 text-foreground placeholder:text-muted-foreground font-semibold resize-y"
                       />
                     </div>
 

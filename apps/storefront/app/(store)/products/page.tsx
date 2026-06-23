@@ -85,7 +85,7 @@ export default function ProductsPage() {
 
   return (
     <main
-      className="min-h-screen bg-[var(--ag-gray-100)] select-none"
+      className="min-h-screen bg-background text-foreground select-none"
     >
       {/* Page Header */}
       <div className="bg-[#1A1A1A] text-white py-10 border-b border-white/5 relative overflow-hidden">
@@ -108,7 +108,7 @@ export default function ProductsPage() {
 
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8 flex flex-col gap-6">
         {/* Toolbar */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 border border-[var(--ag-gray-200)] rounded-[var(--radius-lg)] shadow-xs">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-card text-card-foreground p-4 border border-border rounded-[var(--radius-lg)] shadow-xs">
           
           {/* Category Pills */}
           <div className="flex items-center gap-2 flex-wrap">
@@ -121,7 +121,7 @@ export default function ProductsPage() {
                   className={`px-4 py-2 rounded-full text-xs font-bold border transition-all ${
                     isActive
                       ? "bg-[var(--ag-red)] text-white border-[var(--ag-red)] shadow-sm"
-                      : "bg-white text-[var(--ag-gray-800)] border-[var(--ag-gray-200)] hover:bg-[var(--ag-gray-100)]"
+                      : "bg-background text-foreground border-border hover:bg-muted"
                   }`}
                 >
                   {cat.label}
@@ -133,14 +133,14 @@ export default function ProductsPage() {
           {/* Right controls */}
           <div className="flex items-center gap-3 self-end md:self-auto flex-wrap">
             {/* Search Input */}
-            <div className="relative flex items-center bg-[var(--ag-gray-100)] border border-[var(--ag-gray-200)] rounded-full px-3 py-1.5 max-w-[200px]">
+            <div className="relative flex items-center bg-background border border-border rounded-full px-3 py-1.5 max-w-[200px]">
               <Search size={13} className="text-[var(--ag-gray-500)] mr-2" />
               <input
                 type="text"
                 placeholder="Search catalog..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-transparent text-xs font-semibold outline-none text-[var(--ag-dark)] placeholder:text-[var(--ag-gray-500)] w-full"
+                className="bg-transparent text-xs font-semibold outline-none text-foreground placeholder:text-muted-foreground w-full"
               />
             </div>
 
@@ -148,9 +148,11 @@ export default function ProductsPage() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-3 py-2 rounded-[var(--radius-sm)] border border-[var(--ag-gray-200)] text-xs font-bold bg-white outline-none cursor-pointer pr-8 focus:border-[var(--ag-red)] appearance-none"
+              className="px-3 py-2 rounded-[var(--radius-sm)] border border-border text-xs font-bold bg-card text-card-foreground outline-none cursor-pointer pr-8 focus:border-[var(--ag-red)] appearance-none"
               style={{
-                background: `white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%231A1A1A' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center`,
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23A1A1AA' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "right 10px center",
                 backgroundSize: "10px",
               }}
             >
@@ -162,11 +164,11 @@ export default function ProductsPage() {
             </select>
 
             {/* View toggles */}
-            <div className="flex rounded-[var(--radius-sm)] overflow-hidden border border-[var(--ag-gray-200)] bg-white shrink-0">
+            <div className="flex rounded-[var(--radius-sm)] overflow-hidden border border-border bg-card shrink-0">
               <button
                 onClick={() => setViewMode("grid")}
                 className={`w-9 h-9 flex items-center justify-center transition-colors ${
-                  viewMode === "grid" ? "bg-[var(--ag-dark)] text-white" : "text-[var(--ag-gray-500)] hover:bg-[var(--ag-gray-100)]"
+                  viewMode === "grid" ? "bg-[var(--ag-red)] text-white" : "text-muted-foreground hover:bg-muted"
                 }`}
                 aria-label="Grid view"
               >
@@ -175,7 +177,7 @@ export default function ProductsPage() {
               <button
                 onClick={() => setViewMode("list")}
                 className={`w-9 h-9 flex items-center justify-center transition-colors ${
-                  viewMode === "list" ? "bg-[var(--ag-dark)] text-white" : "text-[var(--ag-gray-500)] hover:bg-[var(--ag-gray-100)]"
+                  viewMode === "list" ? "bg-[var(--ag-red)] text-white" : "text-muted-foreground hover:bg-muted"
                 }`}
                 aria-label="List view"
               >
@@ -201,11 +203,11 @@ export default function ProductsPage() {
             ))}
           </div>
         ) : products.length === 0 ? (
-          <div className="flex flex-col items-center py-20 text-center bg-white border border-[var(--ag-gray-200)] rounded-[var(--radius-lg)] shadow-xs">
+          <div className="flex flex-col items-center py-20 text-center bg-card text-card-foreground border border-border rounded-[var(--radius-lg)] shadow-xs">
             <div className="w-16 h-16 rounded-full bg-[var(--ag-gray-100)] flex items-center justify-center mb-4 text-[var(--ag-gray-500)] text-2xl">
               📦
             </div>
-            <h3 className="font-display font-black text-lg text-[var(--ag-dark)] mb-1">
+            <h3 className="font-display font-black text-lg text-foreground mb-1">
               No products found
             </h3>
             <p className="text-sm text-[var(--ag-gray-500)] mb-4 max-w-xs">
@@ -230,11 +232,11 @@ export default function ProductsPage() {
                     const originalPrice = product.salePrice !== null && product.salePrice !== undefined ? product.price : product.mrp;
                     const discount = originalPrice > price ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0;
                     return (
-                      <div className="bg-white border border-[var(--ag-gray-200)] p-4 rounded-[var(--radius-lg)] flex gap-4 items-center">
+                      <div className="bg-card text-card-foreground border border-border p-4 rounded-[var(--radius-lg)] flex gap-4 items-center">
                         <img src={product.images.find(i => i.isPrimary)?.url || product.images[0]?.url || PLACEHOLDER_IMAGE} alt="" className="w-20 h-20 object-cover rounded-[var(--radius-sm)] border shrink-0 bg-[var(--ag-gray-100)]" />
                         <div className="flex-1 min-w-0">
                           <span className="text-[10px] font-bold text-[var(--ag-gray-500)] uppercase tracking-wider">{product.category?.name}</span>
-                          <h4 className="font-bold text-sm text-[var(--ag-dark)] truncate">{product.name}</h4>
+                          <h4 className="font-bold text-sm text-foreground truncate">{product.name}</h4>
                           <p className="text-xs text-[var(--ag-gray-500)] line-clamp-1 mt-0.5">{product.description}</p>
                         </div>
                         <div className="text-right shrink-0 flex flex-col items-end gap-1.5">
@@ -248,7 +250,7 @@ export default function ProductsPage() {
                             </div>
                           )}
                           <div className="mt-2">
-                            <Link href={`/products/${product.slug}`} className="px-3.5 py-1.5 bg-[var(--ag-dark)] text-white text-[10px] font-black rounded-[var(--radius-sm)] hover:bg-[var(--ag-red)] transition-colors">
+                            <Link href={`/products/${product.slug}`} className="px-3.5 py-1.5 bg-[var(--ag-red)] text-white text-[10px] font-black rounded-[var(--radius-sm)] hover:bg-[var(--ag-red-hover)] transition-colors">
                               VIEW
                             </Link>
                           </div>

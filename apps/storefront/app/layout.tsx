@@ -22,10 +22,14 @@ export default function RootLayout({
               (function() {
                 try {
                   var theme = localStorage.getItem('theme');
-                  if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                  var systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  var shouldUseDark = theme === 'dark' || theme === 'system' && systemDark || !theme && systemDark;
+                  if (shouldUseDark) {
                     document.documentElement.classList.add('dark');
+                    document.documentElement.style.colorScheme = 'dark';
                   } else {
                     document.documentElement.classList.remove('dark');
+                    document.documentElement.style.colorScheme = 'light';
                   }
                 } catch (e) {}
               })();
@@ -33,7 +37,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col bg-white dark:bg-[var(--background)] text-[var(--ag-dark)] dark:text-[var(--foreground)] transition-colors duration-200">
+      <body className="min-h-full flex flex-col bg-background text-foreground transition-colors duration-200">
         {children}
       </body>
     </html>

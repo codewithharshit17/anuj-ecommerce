@@ -184,7 +184,7 @@ export default function CollectionPage({ params }: PageProps) {
     selectedDiscount !== "";
 
   return (
-    <main className="min-h-screen bg-[var(--ag-gray-100)] select-none">
+    <main className="min-h-screen bg-background text-foreground select-none">
       
       {/* Black Banner: Title and Breadcrumb */}
       <div className="bg-[#1A1A1A] text-white py-12 px-6 sm:px-8 border-b border-white/5 relative overflow-hidden">
@@ -221,8 +221,8 @@ export default function CollectionPage({ params }: PageProps) {
 
         {/* Right column: Results & Sorting */}
         <div className="flex-1 flex flex-col gap-6">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 border border-[var(--ag-gray-200)] rounded-[var(--radius-lg)]">
-            <div className="text-xs font-bold text-[var(--ag-gray-800)]">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-card text-card-foreground p-4 border border-border rounded-[var(--radius-lg)]">
+            <div className="text-xs font-bold text-foreground">
               Showing {products.length} of {count} products
             </div>
             <SortDropdown value={sortBy} onChange={setSortBy} />
@@ -230,7 +230,7 @@ export default function CollectionPage({ params }: PageProps) {
 
           {/* Active Filter Chips */}
           {hasActiveFilters && (
-            <div className="flex items-center gap-2 flex-wrap bg-white p-3 border border-[var(--ag-gray-200)] rounded-[var(--radius-lg)]">
+            <div className="flex items-center gap-2 flex-wrap bg-card text-card-foreground p-3 border border-border rounded-[var(--radius-lg)]">
               <span className="text-[10px] font-black uppercase text-[var(--ag-gray-500)] mr-1 tracking-wider">
                 Filters:
               </span>

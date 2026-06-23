@@ -203,7 +203,7 @@ export default function Header({ categories = [] }: HeaderProps) {
   };
 
   return (
-    <div className="w-full flex flex-col z-[150] bg-white dark:bg-neutral-900 border-b border-[var(--ag-gray-200)] dark:border-neutral-800 relative">
+    <div className="w-full flex flex-col z-[150] bg-background text-foreground border-b border-border relative">
       {/* ZONE A: Announcement Bar */}
       <div
         className={`w-full overflow-hidden transition-all duration-300 ${
@@ -215,7 +215,7 @@ export default function Header({ categories = [] }: HeaderProps) {
 
       {/* STICKY CONTAINER FOR ZONE B & C */}
       <header
-        className={`w-full sticky top-0 z-[140] bg-white dark:bg-neutral-900 transition-shadow duration-300 ${
+        className={`w-full sticky top-0 z-[140] bg-background transition-shadow duration-300 ${
           isScrolled ? "shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.5)]" : ""
         }`}
       >
@@ -229,7 +229,7 @@ export default function Header({ categories = [] }: HeaderProps) {
           <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
             <img src="/logo.jpg" alt="Personal Marketing Store Logo" className="h-12 w-auto object-contain" />
             <div className="hidden sm:block">
-              <span className="text-xl font-display font-black tracking-tight leading-none text-[var(--ag-dark)]">
+              <span className="text-xl font-display font-black tracking-tight leading-none text-foreground">
                 Personal Marketing Store
               </span>
             </div>
@@ -238,7 +238,7 @@ export default function Header({ categories = [] }: HeaderProps) {
           {/* Search bar pill */}
           <div className="flex-1 max-w-xl mx-auto relative hidden md:block">
             <div
-              className={`flex items-center w-full rounded-full border border-[var(--ag-gray-200)] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-4 py-1.5 transition-all duration-200 ${
+              className={`flex items-center w-full rounded-full border border-border bg-card px-4 py-1.5 transition-all duration-200 ${
                 isSearchFocused
                   ? "border-[var(--ag-red)] shadow-[0_0_0_3px_rgba(229,60,60,0.12)]"
                   : ""
@@ -248,10 +248,10 @@ export default function Header({ categories = [] }: HeaderProps) {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="bg-transparent text-xs font-bold text-[var(--ag-gray-800)] dark:text-[var(--ag-gray-200)] outline-none cursor-pointer pr-2 border-r border-[var(--ag-gray-200)] dark:border-neutral-700 mr-3 h-full"
+                className="bg-transparent text-xs font-bold text-foreground outline-none cursor-pointer pr-2 border-r border-border mr-3 h-full"
               >
                 {searchCategories.map((cat) => (
-                  <option key={cat} value={cat} className="dark:bg-neutral-800">
+                  <option key={cat} value={cat} className="bg-card text-card-foreground">
                     {cat}
                   </option>
                 ))}
@@ -267,7 +267,7 @@ export default function Header({ categories = [] }: HeaderProps) {
                 onFocus={() => setIsSearchFocused(true)}
                 onBlur={() => setTimeout(() => setIsSearchFocused(false), 250)}
                 onKeyDown={handleKeyDown}
-                className="flex-1 text-sm font-semibold outline-none bg-transparent text-[var(--ag-dark)] dark:text-[var(--foreground)] placeholder:text-[var(--ag-gray-500)]"
+                className="flex-1 text-sm font-semibold outline-none bg-transparent text-foreground placeholder:text-muted-foreground"
               />
 
               {/* Clear Query */}
@@ -302,7 +302,7 @@ export default function Header({ categories = [] }: HeaderProps) {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -4 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute left-0 right-0 mt-2 bg-white dark:bg-neutral-800 rounded-[var(--radius-xl)] border border-[var(--ag-gray-200)] dark:border-neutral-700 shadow-2xl overflow-hidden z-[160]"
+                  className="absolute left-0 right-0 mt-2 bg-popover text-popover-foreground rounded-[var(--radius-xl)] border border-border shadow-2xl overflow-hidden z-[160]"
                 >
                   {/* Empty state details (Trending & Recents) */}
                   {!searchQuery.trim() ? (
@@ -562,7 +562,7 @@ export default function Header({ categories = [] }: HeaderProps) {
                 >
                   <Link
                     href={`/collections/${category.slug}`}
-                    className="text-sm font-bold text-[var(--ag-gray-800)] hover:text-[var(--ag-red)] transition-colors relative py-3"
+                    className="text-sm font-bold text-foreground hover:text-[var(--ag-red)] transition-colors relative py-3"
                   >
                     {category.name}
                     {hoveredCategory === category.slug && (
@@ -580,7 +580,7 @@ export default function Header({ categories = [] }: HeaderProps) {
               >
                 <Link
                   href="/collections/best-sellers"
-                  className="text-sm font-bold text-[var(--ag-gray-800)] hover:text-[var(--ag-red)] transition-colors relative py-3"
+                  className="text-sm font-bold text-foreground hover:text-[var(--ag-red)] transition-colors relative py-3"
                 >
                   Best Sellers
                   {hoveredCategory === "best-sellers" && (

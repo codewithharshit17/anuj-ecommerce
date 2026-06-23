@@ -38,7 +38,7 @@ export default async function ProfilePage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="font-display text-h2 text-[var(--ag-dark)] tracking-tight">
+        <h2 className="font-display text-h2 text-foreground tracking-tight">
           My Profile
         </h2>
         <p className="text-sm text-[var(--ag-gray-500)] mt-1">

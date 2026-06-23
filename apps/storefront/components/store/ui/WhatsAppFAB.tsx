@@ -19,7 +19,7 @@ export default function WhatsAppFAB() {
         <motion.div
           initial={{ opacity: 0, x: 10 }}
           animate={{ opacity: 1, x: 0 }}
-          className="absolute right-16 top-1/2 -translate-y-1/2 bg-[var(--ag-dark)] text-white text-xs font-bold px-3 py-1.5 rounded-[var(--radius-sm)] shadow-md whitespace-nowrap"
+          className="absolute right-16 top-1/2 -translate-y-1/2 bg-card text-card-foreground border border-border text-xs font-bold px-3 py-1.5 rounded-[var(--radius-sm)] shadow-md whitespace-nowrap"
         >
           Chat with us!
         </motion.div>

@@ -222,39 +222,47 @@
 
 /* Dark Mode Variables Override */
 .dark {
-  --background:          #121212;
-  --foreground:          #E5E5E5;
-  --card:                #1E1E1E;
-  --card-foreground:     #E5E5E5;
-  --popover:             #1E1E1E;
-  --popover-foreground:  #E5E5E5;
+  --background:          #0F0F10;
+  --foreground:          #F4F4F5;
+  --card:                #1F1F23;
+  --card-foreground:     #F4F4F5;
+  --popover:             #1F1F23;
+  --popover-foreground:  #F4F4F5;
   --primary:             #EF4444;
   --primary-foreground:  #FFFFFF;
-  --secondary:           #2A2A2A;
-  --secondary-foreground:#E5E5E5;
-  --muted:               #222222;
-  --muted-foreground:    #888888;
+  --secondary:           #18181B;
+  --secondary-foreground:#F4F4F5;
+  --muted:               #18181B;
+  --muted-foreground:    #A1A1AA;
   --accent:              #4AC5D1;
-  --accent-foreground:   #FFFFFF;
-  --border:              #2D2D2D;
-  --input:               #2D2D2D;
+  --accent-foreground:   #0F0F10;
+  --border:              #2F2F34;
+  --input:               #27272A;
   --ring:                #EF4444;
+  --sidebar:                    #18181B;
+  --sidebar-foreground:         #F4F4F5;
+  --sidebar-primary:            #EF4444;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent:             #1F1F23;
+  --sidebar-accent-foreground:  #F4F4F5;
+  --sidebar-border:             #2F2F34;
+  --sidebar-ring:               #EF4444;
 
   /* Brand overrides for dark mode */
-  --ag-dark:       #E5E5E5;
-  --ag-gray-100:   #1E1E1E;
-  --ag-gray-200:   #2D2D2D;
-  --ag-gray-500:   #888888;
-  --ag-gray-800:   #D4D4D4;
+  --ag-dark:       #F4F4F5;
+  --ag-gray-100:   #18181B;
+  --ag-gray-200:   #2F2F34;
+  --ag-gray-500:   #A1A1AA;
+  --ag-gray-800:   #E4E4E7;
 
   /* Scooboo tokens overrides */
-  --brand-dark:      #E5E5E5;
-  --brand-muted:     #888888;
-  --brand-surface:   #1E1E1E;
-  --brand-border:    #2D2D2D;
-  --brand-navy:      #E5E5E5;
-  --brand-navy-mid:  #D4D4D4;
-  --brand-cream:     #1E1E1E;
+  --brand-dark:      #F4F4F5;
+  --brand-muted:     #A1A1AA;
+  --brand-surface:   #18181B;
+  --brand-border:    #2F2F34;
+  --brand-navy:      #F4F4F5;
+  --brand-navy-mid:  #E4E4E7;
+  --brand-cream:     #18181B;
 }
 
 /* ─── Base Styles ───────────────────────────────────────────────────────────── */
@@ -421,7 +429,7 @@
     background: linear-gradient(135deg, var(--brand-navy) 0%, var(--brand-navy-mid) 100%);
   }
   .bg-gradient-cream {
-    background: linear-gradient(180deg, #FFFFFF 0%, var(--brand-cream) 100%);
+    background: linear-gradient(180deg, var(--background) 0%, var(--brand-cream) 100%);
   }
   .bg-gradient-warm {
     background: linear-gradient(135deg, #FDF8F3 0%, #FFF0E8 100%);
@@ -429,7 +437,8 @@
 
   /* Card styles */
   .card-base {
-    background: white;
+    background: var(--card);
+    color: var(--card-foreground);
     border: 1px solid var(--border);
     border-radius: 12px;
     box-shadow: var(--shadow-card);
@@ -443,7 +452,7 @@
 
   /* Shimmer loading */
   .skeleton {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+    background: linear-gradient(90deg, var(--muted) 25%, var(--border) 50%, var(--muted) 75%);
     background-size: 1000px 100%;
     animation: shimmer 1.5s infinite;
   }
@@ -530,7 +539,7 @@
     transform: translateY(-1px);
   }
   .btn-secondary {
-    background: white;
+    background: var(--background);
     color: var(--brand-coral);
     padding: 0.65rem 1.5rem;
     border-radius: 8px;
@@ -595,7 +604,7 @@
     padding: 0.6rem 1rem;
     font-size: 0.9rem;
     color: var(--foreground);
-    background: white;
+    background: var(--background);
     transition: var(--transition-fast);
     outline: none;
     width: 100%;
@@ -622,5 +631,57 @@
   /* Standardized section spacing */
   .py-section {
     @apply py-14 sm:py-18;
+  }
+
+  [data-admin-theme] :is(.bg-white, .dark\:bg-zinc-950:is(.dark *)) {
+    background-color: var(--card);
+  }
+
+  [data-admin-theme] :is(.bg-zinc-50, .bg-zinc-50\/50, .dark\:bg-zinc-900\/20:is(.dark *), .dark\:bg-zinc-900\/30:is(.dark *), .dark\:bg-zinc-900\/40:is(.dark *), .dark\:bg-zinc-900\/50:is(.dark *)) {
+    background-color: var(--secondary);
+  }
+
+  [data-admin-theme] :is(.bg-zinc-100, .dark\:bg-zinc-900:is(.dark *), .dark\:bg-zinc-800:is(.dark *)) {
+    background-color: var(--muted);
+  }
+
+  [data-admin-theme] :is(.hover\:bg-zinc-50:hover, .hover\:bg-zinc-50\/30:hover, .hover\:bg-zinc-50\/50:hover, .dark\:hover\:bg-zinc-900:hover:is(.dark *), .dark\:hover\:bg-zinc-900\/10:hover:is(.dark *), .dark\:hover\:bg-zinc-900\/20:hover:is(.dark *), .dark\:hover\:bg-zinc-900\/50:hover:is(.dark *)) {
+    background-color: var(--muted);
+  }
+
+  [data-admin-theme] :is(.hover\:text-zinc-950:hover, .hover\:text-zinc-900:hover, .hover\:text-zinc-800:hover, .dark\:hover\:text-zinc-50:hover:is(.dark *), .dark\:hover\:text-zinc-100:hover:is(.dark *), .dark\:hover\:text-zinc-150:hover:is(.dark *)) {
+    color: var(--foreground);
+  }
+
+  [data-admin-theme] :is(.border-zinc-150, .border-zinc-200, .border-zinc-250, .border-zinc-300, .dark\:border-zinc-800:is(.dark *), .dark\:border-zinc-850:is(.dark *)) {
+    border-color: var(--border);
+  }
+
+  [data-admin-theme] :is(.divide-zinc-150, .divide-zinc-200, .dark\:divide-zinc-850:is(.dark *)) > :not(:last-child) {
+    border-color: var(--border);
+  }
+
+  [data-admin-theme] :is(.text-zinc-900, .text-zinc-850, .text-zinc-800, .dark\:text-zinc-50:is(.dark *), .dark\:text-zinc-100:is(.dark *), .dark\:text-zinc-150:is(.dark *), .dark\:text-zinc-200:is(.dark *)) {
+    color: var(--foreground);
+  }
+
+  [data-admin-theme] :is(.text-zinc-700, .text-zinc-650, .text-zinc-600, .text-zinc-550, .text-zinc-500, .text-zinc-450, .text-zinc-400, .dark\:text-zinc-250:is(.dark *), .dark\:text-zinc-300:is(.dark *), .dark\:text-zinc-350:is(.dark *), .dark\:text-zinc-400:is(.dark *)) {
+    color: var(--muted-foreground);
+  }
+
+  [data-admin-theme] :is(input, textarea, select) {
+    background-color: var(--input);
+    border-color: var(--border);
+    color: var(--foreground);
+  }
+
+  [data-admin-theme] :is(input, textarea, select)::placeholder {
+    color: var(--muted-foreground);
+    opacity: 1;
+  }
+
+  [data-admin-theme] :is(input, textarea, select):disabled,
+  [data-admin-theme] button:disabled {
+    opacity: 0.7;
   }
 }

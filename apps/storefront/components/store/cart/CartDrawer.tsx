@@ -106,13 +106,13 @@ export default function CartDrawer() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 30, stiffness: 260 }}
-              className="w-screen max-w-[440px] bg-white dark:bg-[#1E1E1E] border-l border-[var(--ag-gray-200)] dark:border-neutral-800 flex flex-col shadow-2xl relative"
+              className="w-screen max-w-[440px] bg-card text-card-foreground border-l border-border flex flex-col shadow-2xl relative"
             >
               {/* Header */}
               <div className="px-6 py-5 border-b border-[var(--ag-gray-200)] dark:border-neutral-800 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <ShoppingBag size={20} className="text-[var(--ag-dark)] dark:text-white stroke-[2.5]" />
-                  <span className="font-display font-extrabold text-lg text-[var(--ag-dark)] dark:text-white">
+                  <ShoppingBag size={20} className="text-foreground stroke-[2.5]" />
+                  <span className="font-display font-extrabold text-lg text-foreground">
                     Your Cart ({cartCount} {cartCount === 1 ? "item" : "items"})
                   </span>
                 </div>
@@ -219,7 +219,7 @@ export default function CartDrawer() {
                           {recommended.map((prod) => (
                             <div
                               key={prod.id}
-                              className="flex items-center justify-between gap-3 bg-white dark:bg-[#1E1E1E] border border-[var(--ag-gray-200)] dark:border-neutral-800 p-2.5 rounded-[var(--radius-lg)] shadow-xs hover:border-[var(--ag-red)]/30 transition-colors"
+                            className="flex items-center justify-between gap-3 bg-card text-card-foreground border border-border p-2.5 rounded-[var(--radius-lg)] shadow-xs hover:border-[var(--ag-red)]/30 transition-colors"
                             >
                               <div className="flex items-center gap-3 min-w-0">
                                 <img
@@ -228,7 +228,7 @@ export default function CartDrawer() {
                                   className="w-10 h-10 object-cover rounded-[var(--radius-md)] border border-[var(--ag-gray-200)] dark:border-neutral-850 shrink-0 bg-[var(--ag-gray-100)] dark:bg-neutral-800"
                                 />
                                 <div className="min-w-0">
-                                  <h5 className="text-xs font-bold text-[var(--ag-dark)] dark:text-white truncate">
+                                  <h5 className="text-xs font-bold text-foreground truncate">
                                     {prod.name}
                                   </h5>
                                   <p className="text-[10px] font-black text-[var(--ag-red)]">
@@ -254,7 +254,7 @@ export default function CartDrawer() {
 
               {/* Footer Checkout details */}
               {items.length > 0 && (
-                <div className="border-t border-[var(--ag-gray-200)] dark:border-neutral-800 p-6 bg-white dark:bg-[#1E1E1E] shrink-0 shadow-inner">
+                <div className="border-t border-border p-6 bg-card text-card-foreground shrink-0 shadow-inner">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-semibold text-[var(--ag-gray-500)] dark:text-neutral-400">
                       Subtotal

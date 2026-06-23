@@ -68,7 +68,7 @@ export default function CheckoutSuccessPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--ag-gray-100)] dark:bg-neutral-950 py-12 select-none flex items-center justify-center">
+    <div className="min-h-screen bg-background text-foreground py-12 select-none flex items-center justify-center">
       <div className="max-w-2xl w-full mx-auto px-4 text-center">
         {/* Animated Check */}
         <div className="flex flex-col items-center mb-6">
@@ -90,7 +90,7 @@ export default function CheckoutSuccessPage() {
         </div>
 
         {/* Details Card */}
-        <div className="bg-white dark:bg-[#1E1E1E] border border-[var(--ag-gray-200)] dark:border-neutral-850 rounded-[var(--radius-2xl)] p-6 shadow-sm text-left space-y-5">
+        <div className="bg-card text-card-foreground border border-border rounded-[var(--radius-2xl)] p-6 shadow-sm text-left space-y-5">
           {/* Order Meta details */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[var(--ag-gray-100)] dark:border-neutral-800 pb-4">
             <div>
@@ -172,7 +172,7 @@ export default function CheckoutSuccessPage() {
 
           <Link
             href="/"
-            className="px-6 py-3.5 bg-white dark:bg-neutral-850 hover:bg-[var(--ag-gray-100)] dark:hover:bg-neutral-800 text-[var(--ag-dark)] dark:text-white border border-[var(--ag-gray-200)] dark:border-neutral-850 font-black text-xs rounded-[var(--radius-lg)] transition-all flex items-center justify-center gap-1 cursor-pointer"
+            className="px-6 py-3.5 bg-card hover:bg-muted text-card-foreground border border-border font-black text-xs rounded-[var(--radius-lg)] transition-all flex items-center justify-center gap-1 cursor-pointer"
           >
             GO TO HOME
             <ChevronRight size={13} />

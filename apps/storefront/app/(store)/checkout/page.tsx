@@ -419,7 +419,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--ag-gray-100)] dark:bg-neutral-950 py-8 select-none">
+    <div className="min-h-screen bg-background text-foreground py-8 select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Breadcrumbs & Status */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8 pb-6 border-b border-[var(--ag-gray-200)] dark:border-neutral-850">
@@ -451,7 +451,7 @@ export default function CheckoutPage() {
                         ? "bg-[var(--ag-red)] text-white shadow-md scale-105"
                         : isCompleted
                           ? "bg-emerald-500 text-white cursor-pointer"
-                          : "bg-white dark:bg-neutral-800 border border-[var(--ag-gray-200)] dark:border-neutral-700 text-[var(--ag-gray-500)] cursor-not-allowed"
+                          : "bg-card border border-border text-muted-foreground cursor-not-allowed"
                     }`}
                   >
                     {isCompleted ? (
@@ -486,7 +486,7 @@ export default function CheckoutPage() {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Left panel Form steps */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white dark:bg-[#1E1E1E] border border-[var(--ag-gray-200)] dark:border-neutral-850 rounded-[var(--radius-2xl)] p-6 shadow-xs">
+            <div className="bg-card text-card-foreground border border-border rounded-[var(--radius-2xl)] p-6 shadow-xs">
               <AnimatePresence mode="wait">
                 {/* STEP 1: CONTACT */}
                 {step === "contact" && (
@@ -514,7 +514,7 @@ export default function CheckoutPage() {
                           onChange={(e) =>
                             setContact({ fullName: e.target.value })
                           }
-                          className={`px-4 py-3 rounded-[var(--radius-lg)] bg-[var(--ag-gray-100)] dark:bg-neutral-850 border outline-none text-sm font-semibold transition-all ${
+                          className={`px-4 py-3 rounded-[var(--radius-lg)] bg-background text-foreground placeholder:text-muted-foreground border outline-none text-sm font-semibold transition-all ${
                             contactErrors.fullName
                               ? "border-red-500 focus:border-red-500"
                               : "border-[var(--ag-gray-200)] dark:border-neutral-700 focus:border-[var(--ag-red)]"
@@ -538,7 +538,7 @@ export default function CheckoutPage() {
                           onChange={(e) =>
                             setContact({ email: e.target.value })
                           }
-                          className={`px-4 py-3 rounded-[var(--radius-lg)] bg-[var(--ag-gray-100)] dark:bg-neutral-850 border outline-none text-sm font-semibold transition-all ${
+                          className={`px-4 py-3 rounded-[var(--radius-lg)] bg-background text-foreground placeholder:text-muted-foreground border outline-none text-sm font-semibold transition-all ${
                             contactErrors.email
                               ? "border-red-500 focus:border-red-500"
                               : "border-[var(--ag-gray-200)] dark:border-neutral-700 focus:border-[var(--ag-red)]"
@@ -569,7 +569,7 @@ export default function CheckoutPage() {
                                 mobile: e.target.value.replace(/\D/g, ""),
                               })
                             }
-                            className={`w-full pl-14 pr-4 py-3 rounded-[var(--radius-lg)] bg-[var(--ag-gray-100)] dark:bg-neutral-850 border outline-none text-sm font-semibold transition-all ${
+                            className={`w-full pl-14 pr-4 py-3 rounded-[var(--radius-lg)] bg-background text-foreground placeholder:text-muted-foreground border outline-none text-sm font-semibold transition-all ${
                               contactErrors.mobile
                                 ? "border-red-500 focus:border-red-500"
                                 : "border-[var(--ag-gray-200)] dark:border-neutral-700 focus:border-[var(--ag-red)]"
@@ -587,7 +587,7 @@ export default function CheckoutPage() {
                     <div className="pt-6 flex justify-end">
                       <button
                         onClick={handleNextStep}
-                        className="px-6 py-3 bg-[var(--ag-dark)] hover:bg-[var(--ag-red)] text-white font-black text-xs rounded-[var(--radius-lg)] transition-all cursor-pointer flex items-center gap-2 shadow-sm"
+                        className="px-6 py-3 bg-[var(--ag-red)] hover:bg-[var(--ag-red-hover)] text-white font-black text-xs rounded-[var(--radius-lg)] transition-all cursor-pointer flex items-center gap-2 shadow-sm"
                       >
                         CONTINUE TO SHIPPING
                       </button>
@@ -622,7 +622,7 @@ export default function CheckoutPage() {
                           onChange={(e) =>
                             setShipping({ addressLine1: e.target.value })
                           }
-                          className={`px-4 py-3 rounded-[var(--radius-lg)] bg-[var(--ag-gray-100)] dark:bg-neutral-850 border outline-none text-sm font-semibold transition-all ${
+                          className={`px-4 py-3 rounded-[var(--radius-lg)] bg-background text-foreground placeholder:text-muted-foreground border outline-none text-sm font-semibold transition-all ${
                             shippingErrors.addressLine1
                               ? "border-red-500 focus:border-red-500"
                               : "border-[var(--ag-gray-200)] dark:border-neutral-700 focus:border-[var(--ag-red)]"
@@ -647,7 +647,7 @@ export default function CheckoutPage() {
                           onChange={(e) =>
                             setShipping({ addressLine2: e.target.value })
                           }
-                          className="px-4 py-3 rounded-[var(--radius-lg)] bg-[var(--ag-gray-100)] dark:bg-neutral-850 border border-[var(--ag-gray-200)] dark:border-neutral-700 outline-none text-sm font-semibold focus:border-[var(--ag-red)] transition-all"
+                          className="px-4 py-3 rounded-[var(--radius-lg)] bg-background text-foreground placeholder:text-muted-foreground border border-border outline-none text-sm font-semibold focus:border-[var(--ag-red)] transition-all"
                         />
                       </div>
 
@@ -662,7 +662,7 @@ export default function CheckoutPage() {
                           onChange={(e) =>
                             setShipping({ landmark: e.target.value })
                           }
-                          className="px-4 py-3 rounded-[var(--radius-lg)] bg-[var(--ag-gray-100)] dark:bg-neutral-850 border border-[var(--ag-gray-200)] dark:border-neutral-700 outline-none text-sm font-semibold focus:border-[var(--ag-red)] transition-all"
+                          className="px-4 py-3 rounded-[var(--radius-lg)] bg-background text-foreground placeholder:text-muted-foreground border border-border outline-none text-sm font-semibold focus:border-[var(--ag-red)] transition-all"
                         />
                       </div>
 
@@ -677,7 +677,7 @@ export default function CheckoutPage() {
                           onChange={(e) =>
                             setShipping({ city: e.target.value })
                           }
-                          className={`px-4 py-3 rounded-[var(--radius-lg)] bg-[var(--ag-gray-100)] dark:bg-neutral-850 border outline-none text-sm font-semibold transition-all ${
+                          className={`px-4 py-3 rounded-[var(--radius-lg)] bg-background text-foreground placeholder:text-muted-foreground border outline-none text-sm font-semibold transition-all ${
                             shippingErrors.city
                               ? "border-red-500 focus:border-red-500"
                               : "border-[var(--ag-gray-200)] dark:border-neutral-700 focus:border-[var(--ag-red)]"
@@ -701,7 +701,7 @@ export default function CheckoutPage() {
                           onChange={(e) =>
                             setShipping({ state: e.target.value })
                           }
-                          className={`px-4 py-3 rounded-[var(--radius-lg)] bg-[var(--ag-gray-100)] dark:bg-neutral-850 border outline-none text-sm font-semibold transition-all ${
+                          className={`px-4 py-3 rounded-[var(--radius-lg)] bg-background text-foreground placeholder:text-muted-foreground border outline-none text-sm font-semibold transition-all ${
                             shippingErrors.state
                               ? "border-red-500 focus:border-red-500"
                               : "border-[var(--ag-gray-200)] dark:border-neutral-700 focus:border-[var(--ag-red)]"
@@ -728,7 +728,7 @@ export default function CheckoutPage() {
                               pinCode: e.target.value.replace(/\D/g, ""),
                             })
                           }
-                          className={`px-4 py-3 rounded-[var(--radius-lg)] bg-[var(--ag-gray-100)] dark:bg-neutral-850 border outline-none text-sm font-semibold transition-all ${
+                          className={`px-4 py-3 rounded-[var(--radius-lg)] bg-background text-foreground placeholder:text-muted-foreground border outline-none text-sm font-semibold transition-all ${
                             shippingErrors.pinCode
                               ? "border-red-500 focus:border-red-500"
                               : "border-[var(--ag-gray-200)] dark:border-neutral-700 focus:border-[var(--ag-red)]"
@@ -751,7 +751,7 @@ export default function CheckoutPage() {
                       </button>
                       <button
                         onClick={handleNextStep}
-                        className="px-6 py-3 bg-[var(--ag-dark)] hover:bg-[var(--ag-red)] text-white font-black text-xs rounded-[var(--radius-lg)] transition-all cursor-pointer flex items-center gap-2 shadow-sm"
+                        className="px-6 py-3 bg-[var(--ag-red)] hover:bg-[var(--ag-red-hover)] text-white font-black text-xs rounded-[var(--radius-lg)] transition-all cursor-pointer flex items-center gap-2 shadow-sm"
                       >
                         CONTINUE TO DELIVERY
                       </button>
@@ -867,7 +867,7 @@ export default function CheckoutPage() {
                       </button>
                       <button
                         onClick={handleNextStep}
-                        className="px-6 py-3 bg-[var(--ag-dark)] hover:bg-[var(--ag-red)] text-white font-black text-xs rounded-[var(--radius-lg)] transition-all cursor-pointer flex items-center gap-2 shadow-sm"
+                        className="px-6 py-3 bg-[var(--ag-red)] hover:bg-[var(--ag-red-hover)] text-white font-black text-xs rounded-[var(--radius-lg)] transition-all cursor-pointer flex items-center gap-2 shadow-sm"
                       >
                         CONTINUE TO PAYMENT
                       </button>
@@ -1009,7 +1009,7 @@ export default function CheckoutPage() {
                       <button
                         onClick={handlePlaceOrder}
                         disabled={loading || !hasDefaultAddress}
-                        className="px-8 py-3 bg-[var(--ag-red)] hover:bg-[var(--ag-red-hover)] disabled:bg-[var(--ag-red)]/50 text-white font-black text-xs rounded-[var(--radius-lg)] transition-all cursor-pointer flex items-center gap-2 shadow-md hover:shadow-lg select-none active:scale-98"
+                        className="px-8 py-3 bg-[var(--ag-red)] hover:bg-[var(--ag-red-hover)] disabled:bg-muted disabled:text-muted-foreground text-white font-black text-xs rounded-[var(--radius-lg)] transition-all cursor-pointer flex items-center gap-2 shadow-md hover:shadow-lg select-none active:scale-98 disabled:cursor-not-allowed"
                       >
                         {loading ? "PROCESSING..." : paymentMethod === "COD" ? "PLACE ORDER" : "PLACE ORDER & PAY"}
                       </button>
@@ -1020,7 +1020,7 @@ export default function CheckoutPage() {
             </div>
 
             {/* Trust Badges */}
-            <div className="grid grid-cols-3 gap-4 p-4 border border-[var(--ag-gray-200)] dark:border-neutral-850 rounded-[var(--radius-xl)] bg-white dark:bg-[#1E1E1E]">
+            <div className="grid grid-cols-3 gap-4 p-4 border border-border rounded-[var(--radius-xl)] bg-card text-card-foreground">
               <div className="flex flex-col items-center text-center gap-1.5">
                 <ShieldCheck size={18} className="text-emerald-500" />
                 <span className="text-[9px] font-black text-[var(--ag-dark)] dark:text-white uppercase tracking-wider">
@@ -1046,7 +1046,7 @@ export default function CheckoutPage() {
           <div className="lg:col-span-1">
             <div className="sticky top-24 space-y-4">
               {/* Cart Items Summary */}
-              <div className="bg-white dark:bg-[#1E1E1E] border border-[var(--ag-gray-200)] dark:border-neutral-850 rounded-[var(--radius-xl)] p-5 shadow-xs flex flex-col gap-4">
+              <div className="bg-card text-card-foreground border border-border rounded-[var(--radius-xl)] p-5 shadow-xs flex flex-col gap-4">
                 <h3 className="text-sm font-black text-[var(--ag-dark)] dark:text-white border-b border-[var(--ag-gray-100)] dark:border-neutral-800 pb-3">
                   Items Summary
                 </h3>
@@ -1060,7 +1060,7 @@ export default function CheckoutPage() {
                         <img
                           src={item.image}
                           alt=""
-                          className="w-10 h-10 object-cover rounded-[var(--radius-md)] border border-[var(--ag-gray-200)] dark:border-neutral-800 bg-[var(--ag-gray-100)] dark:bg-neutral-850 shrink-0"
+                          className="w-10 h-10 object-cover rounded-[var(--radius-md)] border border-border bg-muted shrink-0"
                         />
                         <div className="min-w-0">
                           <h4 className="text-xs font-bold text-[var(--ag-dark)] dark:text-white truncate">
@@ -1078,7 +1078,7 @@ export default function CheckoutPage() {
                   ))}
                 </div>
                    {/* Offers Applied */}
-              <div className="bg-white dark:bg-[#1E1E1E] border border-[var(--ag-gray-200)] dark:border-neutral-850 rounded-[var(--radius-xl)] p-5 shadow-xs">
+              <div className="bg-card text-card-foreground border border-border rounded-[var(--radius-xl)] p-5 shadow-xs">
                 <h3 className="text-xs font-black text-[var(--ag-dark)] dark:text-white uppercase tracking-wider mb-3 flex items-center gap-1.5">
                   <Tag size={13} className="text-[var(--ag-red)]" /> Offers Applied
                 </h3>
@@ -1103,7 +1103,7 @@ export default function CheckoutPage() {
               </div>           </div>
 
               {/* Totals Summary breakdown */}
-              <div className="bg-white dark:bg-[#1E1E1E] border border-[var(--ag-gray-200)] dark:border-neutral-850 rounded-[var(--radius-xl)] p-5 shadow-xs space-y-4">
+              <div className="bg-card text-card-foreground border border-border rounded-[var(--radius-xl)] p-5 shadow-xs space-y-4">
                 <h3 className="text-sm font-black text-[var(--ag-dark)] dark:text-white border-b border-[var(--ag-gray-100)] dark:border-neutral-800 pb-3">
                   Summary Breakdown
                 </h3>

@@ -67,11 +67,11 @@ export default function ProductCard({ product, showVendor = true, showBadge = tr
       transition={{ type: "spring", damping: 25, stiffness: 200 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="group relative bg-white dark:bg-[#1E1E1E] border border-[var(--ag-gray-200)] dark:border-neutral-800 rounded-[var(--radius-xl)] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_30px_rgba(0,0,0,0.1)] transition-all duration-300 flex flex-col h-full select-none"
+      className="group relative bg-card text-card-foreground border border-border rounded-[var(--radius-xl)] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_30px_rgba(0,0,0,0.1)] transition-all duration-300 flex flex-col h-full select-none"
     >
       <Link href={`/products/${product.slug}`} className="flex flex-col h-full flex-1">
         {/* Image wrapper */}
-        <div className="relative aspect-square w-full bg-[var(--ag-gray-100)] dark:bg-neutral-850 overflow-hidden border-b border-[var(--ag-gray-200)] dark:border-neutral-800 shrink-0">
+        <div className="relative aspect-square w-full bg-muted overflow-hidden border-b border-border shrink-0">
           
           {/* Primary image */}
           <img
@@ -109,8 +109,8 @@ export default function ProductCard({ product, showVendor = true, showBadge = tr
               disabled={isOutOfStock}
               className={`w-full py-2.5 text-white font-black text-xs rounded-[var(--radius-lg)] flex items-center justify-center gap-1.5 shadow-md transition-all duration-200 cursor-pointer ${
                 isOutOfStock 
-                  ? "bg-neutral-400 dark:bg-neutral-700 cursor-not-allowed"
-                  : "bg-[var(--ag-dark)] hover:bg-[var(--ag-red)] hover:shadow-lg active:scale-98"
+                  ? "bg-muted text-muted-foreground cursor-not-allowed"
+                  : "bg-[var(--ag-red)] hover:bg-[var(--ag-red-hover)] hover:shadow-lg active:scale-98"
               }`}
             >
               <ShoppingCart size={12} className="stroke-[2.5]" />
@@ -144,7 +144,7 @@ export default function ProductCard({ product, showVendor = true, showBadge = tr
             </div>
 
             {/* Product Title */}
-            <h3 className="text-xs sm:text-sm font-bold text-[var(--ag-dark)] dark:text-[var(--foreground)] group-hover:text-[var(--ag-red)] transition-colors line-clamp-2 leading-tight min-h-[36px]">
+            <h3 className="text-xs sm:text-sm font-bold text-foreground group-hover:text-[var(--ag-red)] transition-colors line-clamp-2 leading-tight min-h-[36px]">
               {product.name}
             </h3>
 
@@ -166,7 +166,7 @@ export default function ProductCard({ product, showVendor = true, showBadge = tr
           </div>
 
           {/* Price Tag Row */}
-          <div className="flex items-baseline gap-2 mt-3 pt-3 border-t border-[var(--ag-gray-100)] dark:border-neutral-850 shrink-0">
+          <div className="flex items-baseline gap-2 mt-3 pt-3 border-t border-border shrink-0">
             <span className="text-sm sm:text-base font-black text-[var(--ag-red)]">
               ₹{price}
             </span>
